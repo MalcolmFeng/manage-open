@@ -1,0 +1,18 @@
+.content{
+    margin: 0 14px 14px 14px;
+    padding: 0 10px 10px 10px;
+}
+
+.control-label {
+	text-align: right;
+}
+
+.rules {
+	padding-left: 0;
+}
+
+.input_error, .input_error:hover {
+    background-color: #fff;
+    border: 1px #ffb437 solid;
+    box-shadow: 0 0 4px rgba(255,180,55,.6);
+}

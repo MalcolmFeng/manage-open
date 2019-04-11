@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.inspur.bigdata.manage.open.cloud.mcs.dao.MaxComputeServiceInstanceMapper">
+	<resultMap type="com.inspur.bigdata.manage.open.cloud.mcs.data.MaxComputeServiceInstance" id="maxComputeServiceInstance">
+		<id property="instanceId" column="instance_id" />
+		<result property="instanceName" column="instance_name" />
+		<result property="userId" column="user_id" />
+		<result property="serviceId" column="service_id" />
+		<result property="serviceVersion" column="service_version"/>
+		<result property="coreNum" column="core_num" />
+		<result property="memory" column="memory" />
+		<result property="storageVolume" column="storage_volume" />
+		<result property="serviceAddress" column="service_address" />
+		<result property="serviceUsername" column="service_username" />
+		<result property="servicePasswd" column="service_passwd" />
+		<result property="applyTime" column="apply_time" />
+		<result property="applyReason" column="apply_reason" />
+		<result property="replyTime" column="reply_time" />
+		<result property="auditOpinion" column="audit_opinion" />
+		<result property="createTime" column="create_time" />
+		<result property="updateTime" column="update_time" />
+		<result property="applyStatus" column="apply_status" />
+		<result property="runStatus" column="run_status" />
+	</resultMap>
+
+	<select id="getMaxComputeServiceInstances" parameterType="map" resultMap="maxComputeServiceInstance">
+		select instance_id, instance_name, user_id, service_id, service_version, core_num, memory, storage_volume, service_address, service_username, service_passwd, apply_time, apply_reason, reply_time, audit_opinion, create_time, update_time, apply_status, run_status
+		from mcs_instance
+		<where>
+		   run_status != '4'
+			<if test="instanceName != null and instanceName !='' ">
+				and instance_name like #{instanceName}
+			</if>
+			<if test="userId != null and userId !='' ">
+				and user_id = #{userId}
+			</if>
+		</where>
+		order by apply_time asc
+	</select>
+
+	<select id="getMaxComputeServiceInstancesOrderByApplyTimeDesc" parameterType="map" resultMap="maxComputeServiceInstance">
+		select instance_id, instance_name, user_id, service_id, service_version, core_num, memory, storage_volume, service_address, service_username, service_passwd, apply_time, apply_reason, reply_time, audit_opinion, create_time, update_time, apply_status, run_status
+		from mcs_instance
+		<where>
+			run_status != '4'
+			<if test="instanceName != null and instanceName !='' ">
+				and instance_name like #{instanceName}
+			</if>
+			<if test="userId != null and userId !='' ">
+				and user_id = #{userId}
+			</if>
+		</where>
+		order by apply_time desc
+	</select>
+
+	<insert id="saveMaxComputeServiceInstance" parameterType="com.inspur.bigdata.manage.open.cloud.mcs.data.MaxComputeServiceInstance">
+		insert into mcs_instance (instance_id, instance_name, user_id, service_id, service_version, core_num, memory, storage_volume, apply_time, apply_status,run_status)
+		values (#{instanceId}, #{instanceName}, #{userId}, #{serviceId}, #{serviceVersion}, #{coreNum}, #{memory}, #{storageVolume}, #{applyTime}, #{applyStatus},#{runStatus})
+	</insert>
+
+    <select id="getMaxComputeServiceInstanceByInstanceId" parameterType="string" resultMap="maxComputeServiceInstance">
+        select instance_id, instance_name, user_id, service_id, service_version, core_num, memory, storage_volume, service_address, service_username, service_passwd, apply_time, apply_reason, reply_time, audit_opinion, create_time, update_time, apply_status, run_status
+        from mcs_instance
+        where instance_id = #{instanceId}
+    </select>
+
+	<update id="updateMaxComputeServiceInstance" parameterType="com.inspur.bigdata.manage.open.cloud.mcs.data.MaxComputeServiceInstance">
+		update mcs_instance
+		<set>
+			<if test="serviceAddress != null and serviceAddress != ''">
+				service_address = #{serviceAddress},
+			</if>
+			<if test="serviceUsername != null and serviceUsername != ''">
+				service_username = #{serviceUsername},
+			</if>
+			<if test="servicePasswd != null and servicePasswd != ''">
+				service_passwd = #{servicePasswd},
+			</if>
+			<if test="replyTime != null and replyTime != ''">
+				reply_time = #{replyTime},
+			</if>
+			<if test="auditOpinion != null and auditOpinion != ''">
+				audit_opinion = #{auditOpinion},
+			</if>
+			<if test="createTime != null and createTime != ''">
+				create_time = #{createTime},
+			</if>
+			<if test="applyStatus != null and applyStatus != ''">
+				apply_status = #{applyStatus},
+			</if>
+			<if test="runStatus != null and runStatus != ''">
+				run_status = #{runStatus},
+			</if>
+			<if test="updateTime != null and updateTime != ''">
+				update_time = #{updateTime}
+			</if>
+		</set>
+		where instance_id = #{instanceId}
+	</update>
+
+	<select id="getRunningInstances" resultMap="maxComputeServiceInstance">
+		select instance_id, instance_name, user_id, service_id, service_version, core_num, memory, storage_volume, service_address, service_username, service_passwd, apply_time, apply_reason, reply_time, audit_opinion, create_time, update_time, apply_status, run_status
+		from mcs_instance
+		<where>
+			run_status = '3'
+		</where>
+	</select>
+</mapper>

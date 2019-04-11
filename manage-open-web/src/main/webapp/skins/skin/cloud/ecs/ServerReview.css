@@ -1,0 +1,82 @@
+.content {
+	margin: 20px 14px 100px 50px;
+	padding: 10px;
+}
+
+#pass {
+	background: inherit;
+	background-color: #66CC66;
+	min-width: 200px;
+	min-height: 35px;
+}
+
+#reject {
+	background: inherit;
+	background-color: #FF6600;
+	min-width: 80px;
+	min-height: 35px;
+	margin-right: 10px;
+	margin-left: 30px;
+}
+
+.basicInfo {
+	margin-top: 50px;
+}
+
+a {
+	color: #0088cc;
+}
+
+a:hover {
+	text-decoration: underline;
+}
+
+.box-left {
+	float: left;
+	margin-left: 60px;
+	height: 20px;
+	padding: 4px 10px;
+	border-left-width: 2px;
+	border-left-style: solid;
+	border-left-color: #000;
+}
+
+.box-header {
+	margin-top: 20px;
+}
+
+.box-content {
+	position: relative;
+	margin-top: 20px;
+	right: -20px;
+
+}
+
+.button-row {
+	margin-top: 10px;
+	padding-bottom: 10px;
+	margin-bottom: 10px;
+}
+
+label, span {
+	line-height: 30px;
+}
+
+select {
+	height: 25px;
+	width: 190px;
+}
+
+.form-group {
+	margin-bottom: 0;
+}
+
+.control-label {
+	color: #aeaeae;
+	margin-right: -20px;
+}
+
+.audit_reply {
+	width: 40%;
+	overflow-x: hidden;
+}

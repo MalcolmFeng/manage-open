@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.inspur.bigdata.manage.open.service.dao.ServiceDefMapper">
+<resultMap type="com.inspur.bigdata.manage.open.service.data.ServiceDef" id="serviceDef"/>
+	<select id="getServiceDef" parameterType="map" resultMap="serviceDef">
+		select * from api_service_def where id= #{id}
+		<if test="auditStatus!=null">
+			and audit_status = #{auditStatus}
+		</if>
+	</select>
+	<select id="listServiceDefs" parameterType="map" resultMap="serviceDef">
+		select * from api_service_def where 1=1
+		<if test="name!=null and name!=''">
+			and name LIKE '%${name}%'
+		</if>
+		<if test="provider!=null">
+			and provider = #{provider}
+		</if>
+		<if test="auditUser!=null">
+			and audit_user = #{auditUser}
+		</if>
+		<if test='auditStatus=="0" and auditStatus!=null and auditStatus!=""'>
+		and (audit_status ='1' or audit_status ='2' or audit_status ='3'  or audit_status ='4')
+	    </if>
+		<if test='auditStatus!="0" and auditStatus!=null and auditStatus!="" '>
+		  and audit_status = #{auditStatus}
+		</if>
+		<if test="groupArr!=null">
+		 and group_id in
+			<foreach collection="groupArr" item="groupid" index="index" open="(" close=")" separator=",">
+				#{groupid}
+			</foreach>
+		</if>
+
+		<if test="groupId!=null and groupId!=''">
+			and group_id = #{groupId}
+		</if>
+		<if test="createBegintime!=null">
+			<![CDATA[
+			and create_time >= #{createbegintime}
+			 ]]>
+		</if>
+		<if test="createEndtime!=null">
+			<![CDATA[
+		    and create_time<= #{createendtime}
+		    ]]>
+		</if>
+		order by create_time desc
+	</select>
+
+	<select id="getById" parameterType="string" resultMap="serviceDef">
+	select * from api_service_def where id= #{id}
+	</select>
+
+	<update id="audit" parameterType="com.inspur.bigdata.manage.open.service.data.ServiceDef">
+		update api_service_def
+		set
+		audit_status = #{auditStatus},
+		audit_user=#{auditUser},
+		online_time=#{onlineTime},
+		update_time=#{updateTime},
+		group_id=#{groupId}
+		where id= #{id}
+	</update>
+
+	<delete id="deleteById" parameterType="string">
+		DELETE FROM
+		api_service_def
+		WHERE
+		id = #{id}
+	</delete>
+	<select id="getByApiGroupAndPath" parameterType="map" resultMap="serviceDef">
+		select * from api_service_def where API_GROUP= #{apiGroup} and REQ_PATH=#{reqPath}
+	</select>
+
+	<select id="listAPIByProvider" parameterType="map" resultMap="serviceDef">
+		select * from api_service_def where 1=1
+		<if test='provider!=null and provider!=""'>
+			and provider = #{provider}
+		</if>
+		<if test='auditStatus!=null'>
+			and audit_status IN
+			<foreach collection="auditStatus" item="status" index="index" open="(" close=")" separator=",">
+				#{status}
+			</foreach>
+		</if>
+		order by create_time desc
+	</select>
+</mapper>

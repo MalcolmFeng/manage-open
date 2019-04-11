@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.inspur.bigdata.manage.open.service.dao.AppManageMapper">
+
+	<resultMap id="appManageMap" type="com.inspur.bigdata.manage.open.service.data.AppInstance">
+		<id property="appId" column="app_id"/>
+		<result property="appName" column="app_name"/>
+		<result property="appDescription" column="app_description"/>
+		<result property="appKey" column="app_key" />
+		<result property="appSecret" column="app_secret" />
+		<result property="appCreateTime" column="app_create_time" />
+		<result property="appUpdateTime" column="app_update_time" />
+		<result property="userId" column="user_id" />
+		<result property="applyFor" column="applyFor" />
+		<result property="api_service_id" column="api_service_id"/>
+		<result property="auth_status" column="auth_status"/>
+	</resultMap>
+
+	<insert id="insert" parameterType="com.inspur.bigdata.manage.open.service.data.AppInstance">
+		INSERT INTO APP_INFO (
+		    app_id,
+		    app_name,
+		    app_description,
+		    app_key,
+		    app_secret,
+		    app_create_time,
+		    user_id
+
+		) VALUES (
+		    #{appId},
+		    #{appName},
+		    #{appDescription},
+		    #{appKey},
+		    #{appSecret},
+		    #{appCreateTime},
+            #{userId}
+		)
+	</insert>
+
+	<update id="update" parameterType="com.inspur.bigdata.manage.open.service.data.AppInstance">
+		UPDATE 
+		    APP_INFO
+		SET 
+		    app_name = #{appName},
+		    app_description = #{appDescription},
+            app_update_time=  #{appUpdateTime},
+            app_secret = #{appSecret}
+		WHERE
+		    app_id = #{appId}
+	</update>
+
+	<delete id="delete" parameterType="string">
+		DELETE FROM
+		    APP_INFO
+		WHERE
+		    app_id = #{_parameter }
+	</delete>
+
+	<select id="getById" parameterType="string" resultMap="appManageMap">
+		SELECT
+		    app_id,
+		    app_name,
+		    app_key,
+		    app_secret,
+		    app_description,
+		    app_create_time,
+		    app_update_time
+		FROM
+		    APP_INFO
+		WHERE
+		    app_id = #{_parameter }
+	</select>
+
+	<select id="isRegisted" parameterType="string" resultMap="appManageMap">
+		SELECT
+		app_id,
+		app_name,
+		user_id
+		FROM
+		    APP_INFO
+        WHERE
+		    app_name = #{0} AND user_id=#{1}
+
+	</select>
+
+	<select id="isExistedAppKey" parameterType="string" resultType="boolean">
+		<![CDATA[ select count(app_id) from APP_INFO where app_key = #{_parameter}]]>
+		<!--SELECT
+		app_key
+		FROM
+		    APP_INFO
+        WHERE
+		    app_key = #{_parameter }-->
+
+	</select>
+
+	<select id="getAppList" parameterType="map" resultMap="appManageMap">
+		select
+		app_id,
+		app_name,
+		app_description,
+		app_create_time
+		from
+		APP_INFO
+		<where>
+			1=1
+			<if test="appName != null">
+				AND app_name like '%${appName}%'
+			</if>
+			<if test="appId != null">
+				AND app_id = #{appId}
+			</if>
+			<if test="userId!=null and userId!=''">
+				AND user_id=#{userId}
+			</if>
+		</where>
+		ORDER BY
+		app_create_time desc
+	</select>
+
+	<select id="getappListByUserId" parameterType="map" resultMap="appManageMap">
+		select * from APP_INFO
+		<where>
+			<if test="userId!=null and userId!=''">
+			 and	user_id=#{userId}
+			</if>
+			<if test="appName!=null and appName!=''">
+			 and	app_name like '%${appName}%'
+			</if>
+			<if test="appKey!=null and appKey!=''">
+				and	app_key=#{appKey}
+			</if>
+		</where>
+	</select>
+
+	<select id="getAppStatusByUserId" parameterType="map" resultMap="appManageMap">
+		select a.APP_ID,a.APP_NAME,a.APP_CREATE_TIME,b.AUTH_STATUS from app_info as a,api_service_apply as b  where a.APP_ID=b.APP_ID
+		<if test="userId!=null and userId!=''">
+			and a.user_id=#{userId}
+		</if>
+		<if test="api_service_id!=null and api_service_id!=''">
+			and b.api_service_id=#{api_service_id}
+		</if>
+		<if test="appName!=null and appName!=''">
+			and	a.app_name like '%${appName}%'
+		</if>
+	</select>
+
+	<select id="getAppByAppKey" parameterType="string" resultMap="appManageMap">
+		select * from APP_INFO  where APP_KEY= #{_parameter}
+	</select>
+</mapper>

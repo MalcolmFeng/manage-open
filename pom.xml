@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-war-plugin</artifactId>
+                <version>2.6</version>
+                <configuration>
+                    <!-- 解决打包时候排除空文件不打包 -->
+                    <includeEmptyDirectories>true</includeEmptyDirectories>
+                    <!-- 解决却少web.xml报错 -->
+                    <failOnMissingWebXml>false</failOnMissingWebXml>
+                    <outputFileNameMapping>@{artifactId}@-@{baseVersion}@.@{extension}@</outputFileNameMapping>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+    <groupId>com.inspur.bigdata.manage.open</groupId>
+    <artifactId>manage-open</artifactId>
+    <packaging>pom</packaging>
+    <version>1.0-SNAPSHOT</version>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    </properties>
+
+    <!-- 配置私服使用信息 -->
+    <repositories>
+        <repository>
+            <id>inspur-loushang</id>
+            <name>Team Nexus jar Repository</name>
+            <url>http://maven.inspur.com/repository/maven-public/</url>
+        </repository>
+    </repositories>
+    <pluginRepositories>
+        <pluginRepository>
+            <id>inspur-loushang</id>
+            <name>Team Nexus plugin Repository</name>
+            <url>http://maven.inspur.com/repository/maven-public/</url>
+        </pluginRepository>
+    </pluginRepositories>
+
+    <modules>
+
+        <module>manage-open-web</module>
+        <module>manage-open-service</module>
+        <module>manage-open-cloud</module>
+        <module>manage-open-data</module>
+        <module>manage-open-utils</module>
+    </modules>
+
+    <dependencies>
+
+        <!-- loushang -->
+        <dependency>
+            <groupId>org.loushang.framework</groupId>
+            <artifactId>loushang-framework</artifactId>
+            <version>7.0.5</version>
+            <type>pom</type>
+        </dependency>
+        <dependency>
+            <groupId>org.loushang.framework</groupId>
+            <artifactId>loushang-framework</artifactId>
+            <version>7.0.5</version>
+            <type>war</type>
+        </dependency>
+
+        <!-- security -->
+        <dependency>
+            <groupId>com.inspur.security</groupId>
+            <artifactId>security-keycloak-sdk</artifactId>
+            <version>1.2.0</version>
+        </dependency>
+
+        <!-- manage-common -->
+        <dependency>
+            <groupId>com.inspur.bigdata.manage</groupId>
+            <artifactId>manage-common-util</artifactId>
+            <version>1.2.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>com.inspur.bigdata.manage.cluster</groupId>
+            <artifactId>manage-cluster-hadoop-api</artifactId>
+            <version>1.2.0-SNAPSHOT</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.inspur.security</groupId>
+                    <artifactId>security-sdk</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>ch.ethz.ganymed</groupId>
+            <artifactId>ganymed-ssh2</artifactId>
+            <version>build210</version>
+        </dependency>
+
+        <!-- ranger -->
+        <dependency>
+            <groupId>com.inspur.bigdata.manage.ranger</groupId>
+            <artifactId>manage-ranger-client</artifactId>
+            <version>1.3.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.maven</groupId>
+            <artifactId>maven-plugin-api</artifactId>
+            <version>2.0</version>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>3.8.1</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+</project>

@@ -1,0 +1,89 @@
+.content {
+	margin-top: 20px;
+	margin-bottom: 100px;
+}
+
+.pull-left {
+	float: left;
+}
+
+label,
+span {
+	line-height: 30px;
+}
+
+label {
+	line-height: 30px;
+	margin-bottom: 0px;
+	margin-right: 5px;
+}
+
+#vcpu,
+#memory{
+	max-width: 100px;
+}
+
+#os {
+	max-width: 150px; 
+}
+
+#version {
+	max-width: 235px;
+}
+
+#vcpu,
+#os {
+	margin-right: 10px;
+}
+
+input[type='number'] {
+	max-width: 20px;
+}
+
+#instance_name {
+	max-width: 200px;
+}
+
+.del,
+.add {
+	padding: 6px 12px;
+	margin-right: 10px;
+}
+
+#data_disk_num {
+	padding: 4px;
+}
+
+button:disabled {
+	background-color: gray;
+}
+
+.fa-refresh {
+	line-height: 30px;
+	margin-left: 10px;
+	color: gray
+}
+
+.fa-refresh:hover {
+    cursor: pointer;
+}
+
+.rules {
+	color: #999999;
+	margin-left: 5px;
+}
+
+.control-label {
+	min-width:120px;
+}
+
+.apply_reason {
+	width: 40%;
+	overflow-x: hidden;
+}
+
+.input_error, .input_error:hover {
+	background-color: #fff;
+	border: 1px #ffb437 solid;
+	box-shadow: 0 0 4px rgba(255,180,55,.6);
+}

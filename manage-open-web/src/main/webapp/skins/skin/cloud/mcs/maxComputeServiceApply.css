@@ -1,0 +1,57 @@
+.content {
+    margin-top: 20px;
+    margin-bottom: 100px;
+}
+
+.pull-left {
+    float: left;
+}
+
+label, span {
+    line-height: 30px;
+}
+
+label {
+    line-height: 30px;
+    margin-bottom: 0;
+    margin-right: 5px;
+}
+
+#service_version {
+    max-width: 150px;
+}
+
+#core_num, #memory {
+    max-width: 100px;
+}
+
+input[type='number'] {
+    max-width: 20px;
+}
+
+#instance_name {
+    max-width: 200px;
+}
+
+button:disabled {
+    background-color: gray;
+}
+
+.fa-refresh {
+    line-height: 30px;
+    margin-left: 10px;
+    color: gray;
+}
+
+.fa-refresh:hover {
+    cursor: pointer;
+}
+
+.rules {
+    color: #999999;
+    margin-left: 5px;
+}
+
+.control-label {
+    min-width:120px;
+}

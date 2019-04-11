@@ -1,0 +1,79 @@
+.content {
+    margin: 20px 14px 100px 14px;
+    padding: 10px;
+}
+
+.header {
+    margin-top: -15px;
+    margin-bottom: 10px;
+}
+
+.list_header {
+    margin-bottom: 5px;
+    text-align: right
+}
+
+#header {
+    position: absolute;
+    left: 30px;
+    top: 8px;
+    width: 925px;
+    word-wrap: break-word;
+}
+
+.hr {
+    margin-top: -10px;
+    margin-bottom: -34px;
+    background-color: #dddddd;
+}
+
+#search {
+    bottom: -35px;
+}
+
+#passAll {
+    background: inherit;
+    background-color: rgba(255, 255, 255, 1);
+    box-sizing: border-box;
+    border-width: 1px;
+    border-style: solid;
+    border-color: #66CC66;
+    border-radius: 2px;
+    box-shadow: none;
+    font-size: 12px;
+    color: #66CC66;
+}
+
+#rejectAll {
+    background: inherit;
+    background-color: rgba(255, 255, 255, 1);
+    box-sizing: border-box;
+    border-width: 1px;
+    border-style: solid;
+    border-color: #FF6600;
+    border-radius: 2px;
+    box-shadow: none;
+    font-size: 12px;
+    color: #FF6600;
+}
+
+#delAll {
+    background: inherit;
+    background-color: rgba(255, 255, 255, 1);
+    box-sizing: border-box;
+    border-width: 1px;
+    border-style: solid;
+    border-color: gray;
+    border-radius: 2px;
+    box-shadow: none;
+    font-size: 12px;
+    color: black;
+}
+
+.table > tbody > tr > td {
+    vertical-align: middle;
+}
+
+table.dataTable td {
+    overflow: visible;
+}

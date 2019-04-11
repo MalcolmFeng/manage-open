@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE web-app PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN" "http://java.sun.com/dtd/web-app_2_3.dtd">
+<web-app>
+    <!-- 指定Web应用的定义名称 -->
+    <display-name>loushang</display-name>
+
+    <!--&lt;!&ndash; 配置需要装载的Spring配置文件 &ndash;&gt;-->
+    <context-param>
+        <param-name>contextConfigLocation</param-name>
+        <param-value>
+            classpath*:/spring/datasource.xml
+            classpath*:/spring/spring-context.xml
+            classpath*:/spring/mybatis-context.xml
+            classpath*:/spring/service/*
+            classpath*:/spring/dao/*
+        </param-value>
+    </context-param>
+
+    <!--<context-param>-->
+    <!--<param-name>keycloak.config.resolver</param-name>-->
+    <!--<param-value>sdk.security.util.PathBasedKeycloakConfigResolver</param-value>-->
+    <!--</context-param>-->
+    <!--<context-param>-->
+    <!--<param-name>keycloak.config.file</param-name>-->
+    <!--<param-value>classpath*:/keycloak.json</param-value>-->
+    <!--</context-param>-->
+
+    <!--<security-constraint>-->
+    <!--<web-resource-collection>-->
+    <!--<web-resource-name>All Resources</web-resource-name>-->
+    <!--<url-pattern>/service/*</url-pattern>-->
+    <!--<url-pattern>*.jsp</url-pattern>-->
+    <!--</web-resource-collection>-->
+    <!--<auth-constraint>-->
+    <!--<role-name>*</role-name>-->
+    <!--</auth-constraint>-->
+    <!--</security-constraint>-->
+
+    <!--<security-constraint>-->
+    <!--<web-resource-collection>-->
+    <!--<web-resource-name>Exclude Resources</web-resource-name>-->
+    <!--</web-resource-collection>-->
+    <!--</security-constraint>-->
+
+
+    <!--<login-config>-->
+    <!--<auth-method>KEYCLOAK</auth-method>-->
+    <!--<realm-name>indata-dw</realm-name>-->
+    <!--</login-config>-->
+
+    <!--<security-role>-->
+    <!--<role-name>*</role-name>-->
+    <!--</security-role>-->
+
+    <!--&lt;!&ndash; Spring字符编码过滤器配置，处理中文乱码 &ndash;&gt;-->
+    <filter>
+        <filter-name>characterEncodingFilter</filter-name>
+        <filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
+        <init-param>
+            <param-name>encoding</param-name>
+            <param-value>UTF-8</param-value>
+        </init-param>
+        <init-param>
+            <param-name>forceEncoding</param-name>
+            <param-value>true</param-value>
+        </init-param>
+    </filter>
+
+
+
+
+    <!--&lt;!&ndash; Security SDK过滤器 &ndash;&gt;-->
+    <!--<filter>-->
+    <!--<filter-name>SDKFilter</filter-name>-->
+    <!--<filter-class>-->
+    <!--sdk.security.filter.SDKFilter-->
+    <!--</filter-class>-->
+    <!--<init-param>-->
+    <!--<param-name>authzFilter</param-name>-->
+    <!--<param-value>false</param-value>-->
+    <!--</init-param>-->
+    <!--<init-param>-->
+    <!--<param-name>securityRequestWrapperExcludes</param-name>-->
+    <!--<param-value>/service/nifi/database/insertHiveTables</param-value>-->
+    <!--</init-param>-->
+    <!--</filter>-->
+
+    <filter-mapping>
+        <filter-name>characterEncodingFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+    <!--<filter-mapping>-->
+    <!--<filter-name>SDKFilter</filter-name>-->
+    <!--<url-pattern>/service/*</url-pattern>-->
+    <!--</filter-mapping>-->
+
+
+
+    <!--&lt;!&ndash; Spring监听配置，Web容器启动自动装配ApplicationContext的配置信息&ndash;&gt;-->
+    <listener>
+        <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+    </listener>
+
+    <!--&lt;!&ndash; Spring Servlet配置 &ndash;&gt;-->
+    <servlet>
+        <servlet-name>springServlet</servlet-name>
+        <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+        <init-param>
+            <param-name>contextConfigLocation</param-name>
+            <param-value>classpath*:/spring/mvc-context.xml,classpath*:/spring/controller/*</param-value>
+        </init-param>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+
+
+    <servlet-mapping>
+        <servlet-name>springServlet</servlet-name>
+        <url-pattern>/service/*</url-pattern>
+    </servlet-mapping>
+
+
+    <!--&lt;!&ndash;指定对应的格式的浏览器处理方式&ndash;&gt;-->
+    <mime-mapping>
+        <extension>xml</extension>
+        <mime-type>text/xml</mime-type>
+    </mime-mapping>
+
+    <!--&lt;!&ndash; 默认登录页配置 &ndash;&gt;-->
+    <welcome-file-list>
+        <welcome-file>jsp/public/home.jsp</welcome-file>
+    </welcome-file-list>
+
+    <!--&lt;!&ndash; 错误页面的跳转配置 &ndash;&gt;-->
+    <error-page>
+        <error-code>404</error-code>
+        <location>/jsp/public/404.jsp</location>
+    </error-page>
+
+    <error-page>
+        <error-code>500</error-code>
+        <location>/jsp/public/500.jsp</location>
+    </error-page>
+
+    <taglib>
+        <taglib-uri>/tags/loushang-web</taglib-uri>
+        <taglib-location>/WEB-INF/tld/loushang-web.tld</taglib-location>
+    </taglib>
+
+</web-app>

@@ -1,0 +1,57 @@
+@CHARSET "UTF-8";
+
+.form-inline .input-group{
+	width: 70%;
+	margin-left: 16%;
+}
+.form-inline .input-group .input-group-addon {
+	width: 6%;
+}
+.form-inline .input-group .form-control {
+	height: 35px;
+}
+#subGroupList {
+	margin-top: 10px;
+	margin-bottom: 10px;
+}
+.activedlink {
+	  background-color: #0be;
+}
+.activedlink a{
+	color: #fff;
+}
+.ue-list-n li{
+	padding:8px;
+	overflow:hidden;border-bottom:1px solid #ddd
+}
+.ue-list-n>li:focus,.ue-list-n>li:hover,.ue-list-n>li:active{
+	background-color:#f9f9f9;cursor:pointer
+}
+.ue-list-left{
+	float:left;width:80%
+}
+.ue-list-right{
+	float:right;
+	text-align:center;
+}
+.ue-list-left-content{
+	float:left;margin-left:15px
+}
+.ue-list-left-img{
+	float:left;width:64px;height:64px;background-repeat:no-repeat;background-image:url(../img/default-64.png)
+}
+.ue-list-left-content .title{
+	padding-top:0;font-family:"微软雅黑";font-size:17px;color:#0080ff
+}
+.ue-list-left-content .title a{
+	padding-top:0;font-family:"微软雅黑";font-size:17px;color:#0080ff
+}
+.ue-list-left-content .title a:hover{
+	color:#0080ff
+}
+.ue-list-left-content .desc{
+	padding-top:10px;font-size:14px;color:#666
+}
+.ue-list-right span{
+	display:block;font-size:14px;color:#666
+}

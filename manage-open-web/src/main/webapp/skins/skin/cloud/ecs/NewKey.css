@@ -1,0 +1,50 @@
+.container {
+	display:block;
+	width: 100%;
+	height: 30px;
+	padding-top:15px;
+	padding-bottom:10px;
+	margin-left: 10px;
+}
+
+.content{
+    margin: 0 14px 14px 14px;
+    padding: 0 10px 10px 10px;
+}
+
+hr {
+	margin:10px 25px 10px 25px;
+	background-color: #dddddd;
+}
+
+label,
+span {
+	line-height: 30px;
+}
+
+.col-md-2 {
+	margin-left: -8%;
+}
+
+#keyName {
+	max-width: 300px;
+}
+
+button:disabled {
+	background-color: gray;
+	cursor: not-allowed;
+}
+
+.col-xs-8 {
+	padding-left: 0;
+}
+
+.input_error, .input_error:hover {
+    background-color: #fff;
+    border: 1px #ffb437 solid;
+    box-shadow: 0 0 4px rgba(255,180,55,.6);
+}
+
+.rules {
+	color: #999999;
+}

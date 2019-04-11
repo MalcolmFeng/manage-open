@@ -1,0 +1,77 @@
+body {
+    width: 95%;
+    height: 80%;
+}
+
+.content {
+    margin: 20px 14px 100px 14px;
+    padding: 10px;
+}
+
+.basicInfo {
+    margin-top: 50px;
+}
+
+a {
+    color: #0088cc;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+.box-left {
+    float: left;
+    margin-left: 60px;
+    height: 20px;
+    padding: 4px 10px;
+    border-left-width: 2px;
+    border-left-style: solid;
+    border-left-color: #000;
+}
+
+.box-header {
+    margin-top: 20px;
+}
+
+.box-content {
+    position: relative;
+    margin-top: 20px;
+    right: -40px;
+}
+
+label, span {
+    line-height: 30px;
+}
+
+.btn[disabled] {
+    pointer-events: auto;
+}
+
+button:disabled {
+    background-color: #f5f5f5;
+    color: black;
+}
+
+button:disabled:hover {
+    background-color: #D4D4D4;
+}
+
+.control-label {
+    color: #aeaeae;
+}
+
+.form-group {
+    margin-bottom: 0;
+}
+
+.progress {
+    width: 200px;
+    float: left;
+    margin-top: 6px;
+}
+
+.computeUsage, .storageUsage {
+    margin-left: 10px;
+    float: left;
+}

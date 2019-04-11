@@ -1,0 +1,159 @@
+textarea {
+	display: inline;
+}
+/*璁剧疆鏍囬鐨勬枃瀛楁牱寮�*/
+.htext {
+	font-size: 14px;
+	font-weight: bold;
+	margin-top: 30px;
+	margin-left:20px;
+}
+/*璁剧疆鍒嗗壊绾跨殑涓婁笅闂磋窛*/
+hr.fenge {
+	margin-top:10px;
+	margin-bottom: 30px;
+	width: 90%;
+	border-color: #ddd;
+}
+/*琛ㄥ崟涓〃鍗曠粍闂磋窛*/
+.form-group {
+	margin-bottom: 10px !important;
+}
+
+.Validform_checktip {
+	font-size: 14px;
+}
+
+.form-span {
+	height: 30px;
+	line-height: 30px;
+	padding-top: 0;
+}
+/*琛ㄥ崟涓祵濂楄〃鏍兼椂锛岃〃鏍兼牱寮�*/
+.form-table-container {
+	border: 1px solid #e9e9e9;
+	margin-bottom: 10px;
+	background-color: #FAFAFA;
+	padding: 20px;
+	float: left;
+	width: 90%;
+}
+
+.form-table {
+	border: 1px solid #e9e9e9;
+	border-collapse: collapse;
+	font-size: 14px;
+	width: 100%;
+}
+
+.form-table tr {
+	background-color: #FFFFFF;
+	border-bottom: 1px solid #F0EEEE;
+	height: 30px;
+	line-height: 30px;
+}
+
+.form-table tr th {
+	background-color: #F5F5F5;
+	padding-left: 5px;
+}
+
+.form-table tr td {
+	font-size: 14px;
+	text-align: left;
+}
+
+.form-table input {
+	border: none;
+	line-height: 25px;
+	padding-top: 1px;
+	margin-left: 1%;
+	width: 98%;
+	border-color: #D2D2D2;
+	font-size: 14px;
+}
+
+.form-table select {
+	border: none;
+	line-height: 25px;
+	padding-top: 1px;
+	margin-left: 1%;
+	width: 98%;
+	border-color: #D2D2D2;
+	font-size: 14px;
+}
+/*琛ㄥ崟涓祵濂楀垪琛ㄦ椂锛屽垪琛ㄦ牱寮�*/
+.form-ul-checkbox {
+	margin-right: 5px !important;
+	margin-top: 0 !important;
+}
+
+.form-ul-li {
+	width: 130px;
+	padding-top: 10px;
+}
+
+.voffset5 {
+	margin-top: 5px;
+}
+.voffset10 {
+	margin-top: 10px;
+}
+.hint{
+	padding-left: 5px;
+	font-size: 14px;
+    font-weight: normal;
+    color: #999;
+}
+.radio_label{
+	padding-right: 30px;
+}
+.radio{
+	padding-top: 0 !important;
+}
+
+.param-list table {
+	width: 80%;
+	margin-top: 5px;
+}
+
+.param-list table tr {
+	height: 28px;
+	line-height: 28px;
+}
+
+.param-list table th {
+	font-weight: normal;
+	text-align: center;
+	background: #F3F3F3;
+	border: solid 1px #ddd;
+}
+
+.param-list table td {
+	border: solid 1px #ddd;
+	text-align: center;
+}
+
+.param-list input[type="text"],
+.param-list table td select{
+	width: 100%;
+	height: 30px;
+	line-height: 30px;
+	border: solid 1px #FFF;
+}
+
+.param-list input[type="text"]:focus{
+	border: solid 1px lightblue;
+}
+
+.addrow {
+	height: 30px;
+	line-height: 30px;
+	margin-right: 20%;
+}
+
+.leftrow {
+	height: 30px;
+	line-height: 30px;
+	margin-left: 15%;
+}

@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.inspur.bigdata.manage.open.service.dao.ServiceApplyMapper">
+
+    <resultMap type="com.inspur.bigdata.manage.open.service.data.ServiceApply" id="serviceResult">
+        <id property="id" column="id" />
+        <id property="name" column="name" />
+        <id property="audit_status" column="audit_status" />
+        <id property="provider" column="provider" />
+    </resultMap>
+   <select id="getApplyList" resultMap="serviceResult" parameterType="map">
+        select b.`NAME` as name,a.* from api_service_apply a,api_service_def b where a.API_SERVICE_ID=b.ID
+        <if test="name!=null and name!=''">
+            and b.name LIKE '%${name}%'
+        </if>
+        <if test="authStatus!=null and authStatus!='' ">
+            and a.AUTH_STATUS = #{authStatus}
+        </if>
+        <if test="userId!=null and userId!='' ">
+            and a.APPLICANT=#{userId}
+        </if>
+    </select>
+    <select id="getServiceList" resultMap="serviceResult" parameterType="map">
+        select b.`NAME` as name,a.* from api_service_apply a,api_service_def b where a.API_SERVICE_ID=b.ID
+        <if test="name!=null and name!=''">
+            and b.name LIKE '%${name}%'
+        </if>
+
+        <if test='authStatus == "1_2" '>
+            and (a.AUTH_STATUS = '1' or a.AUTH_STATUS = '2')
+        </if>
+
+        <if test='authStatus!=null and authStatus!= "1_2" and authStatus!=""'>
+            and a.AUTH_STATUS = #{authStatus}
+        </if>
+        <if test="userId!=null and userId!='' ">
+            and b.PROVIDER = #{userId}
+        </if>
+        <if test='authStatus == "0" '>
+          order by a.APPLY_TIME asc
+        </if>
+        <if test='authStatus != "0" '>
+          order by a.AUTH_TIME desc
+        </if>
+
+    </select>
+    <select id="getByServiceId" resultMap="serviceResult" parameterType="string">
+        select * from api_service_apply where api_service_id= #{apiServiceId}
+    </select>
+    <select id="isApplyAuthToUser" resultMap="serviceResult" parameterType="map">
+        select * from api_service_apply where api_service_id= #{apiServiceId}
+        <if test="userId!=null and userId!='' ">
+            and APPLICANT=#{userId}
+        </if>
+        <if test="auth_status!=null and auth_status!=''">
+            and auth_status=#{auth_status}
+        </if>
+    </select>
+    <insert id="insert" parameterType="com.inspur.bigdata.manage.open.service.data.ServiceApply">
+        INSERT INTO api_service_apply (
+        id,
+        app_id,
+        app_name,
+        api_service_id,
+        api_service_name,
+        api_provider,
+        applicant,
+        apply_time,
+        auth_status,
+        auth_time,
+        auth_user,
+        apply_flag
+        ) VALUES (
+        #{id},
+        #{app_id},
+        #{app_name},
+        #{api_service_id},
+        #{api_service_name},
+        #{api_provider},
+        #{applicant},
+        #{apply_time},
+        #{auth_status},
+        #{auth_time},
+        #{auth_user},
+        #{apply_flag}
+        )
+    </insert>
+
+    <select id="getListById" resultMap="serviceResult" parameterType="map">
+        select b.name as name,b.audit_status as audit_status,a.auth_user as auth_user,a.auth_time as auth_time ,a.api_service_id as api_service_id,a.id as id from api_service_apply a,api_service_def b where
+        a.API_SERVICE_ID=b.ID and a.APPLY_FLAG='1' and a.AUTH_STATUS='1'
+
+        <if test="userId!=null and userId!='' ">
+            and a.APPLICANT=#{userId}
+        </if>
+        <if test="appId!=null and appId!='' ">
+            and a.APP_ID=#{appId}
+        </if>
+    </select>
+    <select id="getList" resultMap="serviceResult" parameterType="map">
+        select *  from api_service_apply where 1=1
+        <if test="apiServiceId!=null and apiServiceId!=''">
+            and  api_service_id= #{apiServiceId}
+        </if>
+        <if test="appId!=null and appId!='' ">
+            and APP_ID = #{appId}
+        </if>
+        <if test="authStatus!=null and authStatus!='' ">
+            and AUTH_STATUS = #{authStatus}
+        </if>
+        <if test="APPLICANT!=null and APPLICANT!='' ">
+            and APPLICANT = #{APPLICANT}
+        </if>
+    </select>
+    <select id="getAuthorizedApiListById" resultMap="serviceResult" parameterType="string">
+        select b.name as name,b.audit_status as audit_status,a.* from api_service_apply a,api_service_def b where a.API_SERVICE_ID=b.ID and
+        a.APP_ID = #{_parameter} and a.AUTH_STATUS='1'
+    </select>
+
+    <update id="updateById" parameterType="com.inspur.bigdata.manage.open.service.data.ServiceApply">
+        update api_service_apply
+        set
+       auth_status = #{auth_status},
+       apply_time=#{apply_time}
+       where id=#{id}
+    </update>
+
+    <select id="getServiceAuthList" resultMap="serviceResult" parameterType="map">
+        select * from api_service_apply  where 1=1
+        <if test="name!=null and name!=''">
+            and api_service_name LIKE '%${name}%'
+        </if>
+
+        <if test='authStatus == "1_2" '>
+            and (AUTH_STATUS = '1' or AUTH_STATUS = '2')
+        </if>
+
+        <if test='authStatus!=null and authStatus!= "1_2" and authStatus!=""'>
+            and AUTH_STATUS = #{authStatus}
+        </if>
+        <if test="userId!=null and userId!='' ">
+            and API_PROVIDER = #{userId}
+        </if>
+        <if test='authStatus == "0" '>
+            order by APPLY_TIME asc
+        </if>
+        <if test='authStatus != "0" '>
+            order by AUTH_TIME desc
+        </if>
+
+    </select>
+
+
+    <select id="getAPIAuthList" resultMap="serviceResult" parameterType="map">
+        select * from api_service_apply  where 1=1
+        <if test="name!=null and name!=''">
+            and api_service_name LIKE '%${name}%'
+        </if>
+        <if test="userId!=null and userId!='' ">
+            and APPLICANT = #{userId}
+        </if>
+        <if test='authStatus == "1_2" '>
+            and (AUTH_STATUS = '1' or AUTH_STATUS = '2')
+        </if>
+
+        <if test='authStatus!=null and authStatus!= "1_2" and authStatus!=""'>
+            and AUTH_STATUS = #{authStatus}
+        </if>
+        <if test='authStatus == "0" '>
+            order by APPLY_TIME asc
+        </if>
+        <if test='authStatus != "0" '>
+            order by AUTH_TIME desc
+        </if>
+
+    </select>
+
+</mapper>

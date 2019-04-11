@@ -1,0 +1,17 @@
+/.settings/
+/.project
+/.idea/
+*.iml
+/target/
+/*/target/
+/.github/
+/overlays/
+/*/overlays/
+/.settings/
+/.project
+/.classpath
+/bin/
+*.metadata/
+*.settings/
+*.git/
+/RemoteSystemsTempFiles/

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.inspur.bigdata.manage.open.cloud.mcs.dao.BigDataServiceComponentMapper">
+	<resultMap type="com.inspur.bigdata.manage.open.cloud.mcs.data.BigDataServiceComponent" id="bigDataServiceComponent">
+		<id property="serviceId" column="service_id" />
+		<result property="componentName" column="component_name" />
+		<result property="componentVersion" column="component_version" />
+		<result property="componentDesc" column="component_desc" />
+	</resultMap>
+
+	<select id="getBigDataServiceComponentsByServiceId" resultMap="bigDataServiceComponent">
+		select * from bigdata_service_component where service_id = #{serviceId}
+	</select>
+</mapper>

@@ -1,0 +1,7 @@
+{
+  "realm": "indata",
+  "auth-server-url": "http://10.111.24.95:19080/auth",
+  "ssl-required": "none",
+  "resource": "manage-open",
+  "public-client": true
+}

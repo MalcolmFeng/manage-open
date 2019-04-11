@@ -1,0 +1,51 @@
+@CHARSET "UTF-8";
+
+.pagination_info {
+	padding-top: 15px;
+	float: left;
+	width: 30%;
+}
+
+.pagination_number {
+	float: right;
+	text-align: right;
+}
+
+.service_info_title {
+	font-size: 18px;
+	font-family: "微软雅黑";
+	height: 40px;
+	line-height: 40px;
+	width: 100%;
+	margin-bottom: 10px;
+	border-bottom: solid 1px #ccc;
+}
+
+.data-empty {
+	height: 200px;
+}
+
+.param-list table tr{
+	height: 30px;
+	line-height: 30px;
+ }
+
+.param-list table th{
+	 font-weight: normal;
+	 text-align: center;
+	 background: #F3F3F3;
+	 border: solid 1px #ddd;
+	font-weight: normal;
+	height: 30px;
+	line-height: 30px;
+}
+.param-list table td{
+	border: solid 1px #ddd;
+	text-align: center;
+	height: 30px;
+	line-height: 30px;
+}
+.param-list table {
+	width: 80%;
+	margin-top: 5px;
+}

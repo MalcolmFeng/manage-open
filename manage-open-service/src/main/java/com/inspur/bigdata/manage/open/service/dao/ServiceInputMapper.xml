@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.inspur.bigdata.manage.open.service.dao.ServiceInputMapper">
+<resultMap type="com.inspur.bigdata.manage.open.service.data.ServiceInput" id="serviceInput"/>
+
+	<select id="listServiceInputs" parameterType="map" resultMap="serviceInput">
+		select * from api_service_input where 1=1
+		<if test="name!=null and name!=''">
+			and name LIKE '%${name}%'
+		</if>
+		<if test="apiServiceId!=null and apiServiceId!=''">
+			and api_service_id = #{apiServiceId}
+		</if>
+	</select>
+	<select id="deleteByApiId" parameterType="map" resultMap="serviceInput">
+		delete from
+		api_service_input
+		where api_service_id = #{_parameter}
+	</select>
+
+</mapper>

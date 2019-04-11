@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.inspur.bigdata.manage.open.data.dao.DataGroupMapper">
+
+	<resultMap id="dataGroupMap" type="com.inspur.bigdata.manage.open.data.data.DataGroup">
+		<id property="id" column="id"/>
+		<result property="name" column="name"/>
+		<result property="parentId" column="parent_id" />
+		<result property="seq" column="seq" />
+	</resultMap>
+	
+	<insert id="insert" parameterType="com.inspur.bigdata.manage.open.data.data.DataGroup">
+		INSERT INTO DT_DATA_GROUP (
+		    id,
+		    name,
+		    parent_id,
+		    seq
+		) VALUES (
+		    #{id },
+		    #{name },
+		    #{parentId },
+		    #{seq }
+		)
+	</insert>
+
+	<update id="update" parameterType="com.inspur.bigdata.manage.open.data.data.DataGroup">
+		UPDATE 
+		    DT_DATA_GROUP
+		SET 
+		    name = #{name},
+		    parent_id = #{parentId},
+		    seq = #{seq}
+		WHERE
+		    id = #{id }
+	</update>
+	
+	<delete id="delete" parameterType="string">
+		DELETE FROM
+		    DT_DATA_GROUP
+		WHERE
+		    id = #{_parameter } or parent_id = #{_parameter }
+	</delete>
+	
+	<select id="getById" parameterType="string" resultMap="dataGroupMap">
+		SELECT
+		    id,
+		    name,
+		    parent_id,
+		    seq
+		FROM
+		    DT_DATA_GROUP
+		WHERE
+		    id = #{_parameter }
+	</select>
+	
+	<select id="isRegisted" parameterType="string" resultMap="dataGroupMap">
+		SELECT
+		    id,
+		    name,
+		    parent_id,
+		    seq
+		FROM
+		    DT_DATA_GROUP
+		WHERE
+		    parent_id = #{0} and name = #{1}
+	</select>
+	
+	<select id="getGroupList" parameterType="map" resultMap="dataGroupMap">
+		select
+		    id,
+		    name,
+		    parent_id,
+		    seq
+		from
+		    DT_DATA_GROUP
+		<where>
+			<if test="id != null">
+				AND id = #{id }
+			</if>
+			<if test="name != null">
+				AND name like '%${name}%'
+			</if>
+			<if test="parentId != null">
+				AND parent_id = #{parentId}
+			</if>
+		</where>
+		ORDER BY 
+		    seq
+	</select>
+
+</mapper>

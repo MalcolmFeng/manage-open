@@ -1,0 +1,158 @@
+@CHARSET "UTF-8";
+
+.pagination_info {
+    padding-top: 15px;
+    float: left;
+    width: 30%;
+}
+
+.pagination_number {
+    float: right;
+    text-align: right;
+}
+
+.service_info_title {
+    font-size: 18px;
+    font-family: "微软雅黑";
+    height: 40px;
+    line-height: 40px;
+    width: 100%;
+    margin-bottom: 10px;
+    border-bottom: solid 1px #ccc;
+}
+
+.data-empty {
+    height: 200px;
+}
+*{
+	-webkit-box-sizing: content-box;
+}
+.content-body{
+	width:100%;
+	height:100%;
+	float:left;
+	background:#fff;
+	margin-top:10px;
+	min-height:550px;
+    border: 1px solid #EFEEEE;
+}
+.test-left{
+    float: left;
+    width: 40%;
+    padding: 20px 15px 25px 15px;
+    background: #fff;
+    min-height: 450px;
+    height: 450px;
+    position: relative;
+    border-radius: 5px;
+}
+.test-right{
+	float: left;
+    width: 55%;
+    height: auto;
+    padding-top: 25px;
+}
+.service-param {
+    height: auto;
+    border: 1px solid #E7E7E7;
+    border-radius: 3px;
+    background: white;
+}
+.test-clearfix {
+    height: 30px;
+}
+.service-param-item {
+    padding: 5px 0px 5px 0px;
+    float: left;
+}
+.param-input {
+    border: 1px solid #E7E7E7;
+    box-shadow: 1px 1px 1px 0 #F0F0F0 inset;
+    width: 230px;
+    height: 22px;
+    padding: 0 0 0 2px;
+    vertical-align: top;
+    color: #666666;
+    line-height: 22px;
+    margin-left: 5px;
+}
+.param-textarea {
+    overflow: hidden;
+    height: 50px;
+    border: 1px solid #E7E7E7;
+}
+.result-textarea {
+    width: 100%;
+    top: 35px;
+    overflow: auto;
+    background: #000;
+    color: #FFF;
+    line-height: 170%;
+    height:650px;
+}
+.call-service {
+	margin-bottom: 5px;
+    margin-top: 5px;
+    text-align: center;
+}
+
+.call-service input {
+    cursor: pointer;
+    color: #ffffff;
+    display: inline-block;
+    padding: 0 0 0 3px;
+    line-height: 25px;
+    border: 0px;
+    background-color: #0be;
+    height: 35px;
+    border-radius: 5px;
+    width: 80px;
+}
+.returntitle{
+    height: 35px;
+    background: #F4F5F9;
+    border: 1px solid #BBB;
+    border-bottom: none;
+    padding: 10px 0 0 10px;
+    font-size: 16px;
+    margin-top: 20px;
+}
+.left-title{
+    position: relative;
+    background: #F4F5F9;
+    border: 1px solid #E1E6EB;
+    border-bottom: none;
+    padding: 0 12px 0 16px;
+    font-size: 16px;
+    height: 40px;
+    line-height: 38px;
+}
+.left-title1{
+    padding:10px;
+}
+.left-title2{
+    top:20px;
+    border:1px solid #E1E6EB;
+    padding:20px;
+    margin: 0px 10px 0 10px;
+}
+select.columnType{
+    height: 28px;
+}
+select.isNull{
+    height: 28px;
+}
+.description{
+    height: 28px;
+    margin-top: 10px;
+}
+.appsinfo{
+    height: 28px;
+    margin-top: 10px;
+}
+.appselect{
+    height: 25px;
+}
+.appsinfo input{
+    background-color: #f6f7fa;
+}

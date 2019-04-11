@@ -1,0 +1,12 @@
+.content{
+    margin: 0 14px 14px 14px;
+    padding: 0 10px 10px 10px;
+}
+
+textarea {
+	min-height: 150px;
+}
+
+.rules {
+	padding-left: 0;
+}

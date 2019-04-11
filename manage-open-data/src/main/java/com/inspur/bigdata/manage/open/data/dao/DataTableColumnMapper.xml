@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+		"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.inspur.bigdata.manage.open.data.dao.DataTableColumnMapper">
+	<resultMap type="com.inspur.bigdata.manage.open.data.data.DataTableColumn" id="tableColumn"/>
+	<select id="listTableColumns" parameterType="map" resultMap="tableColumn">
+		select * from dt_table_columns where 1=1
+		<if test="dtDataId!=null">
+			and dt_data_id = #{dtDataId}
+		</if>
+	</select>
+	<select id="listTableColumnsByDataId" parameterType="string" resultMap="tableColumn">
+		select * from dt_table_columns where dt_data_id = #{_parameter}
+	</select>
+
+</mapper>

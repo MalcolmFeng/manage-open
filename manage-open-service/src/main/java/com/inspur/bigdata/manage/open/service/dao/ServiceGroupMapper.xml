@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.inspur.bigdata.manage.open.service.dao.ServiceGroupMapper">
+
+	<resultMap id="serviceGroupMap" type="com.inspur.bigdata.manage.open.service.data.ServiceGroup">
+		<id property="id" column="id"/>
+		<result property="name" column="name"/>
+		<result property="parentId" column="parent_id" />
+		<result property="seq" column="seq" />
+	</resultMap>
+
+	<insert id="insert" parameterType="com.inspur.bigdata.manage.open.service.data.ServiceGroup">
+		INSERT INTO API_SERVICE_GROUP (
+		    id,
+		    name,
+		    parent_id,
+		    seq
+		) VALUES (
+		    #{id },
+		    #{name },
+		    #{parentId },
+		    #{seq }
+		)
+	</insert>
+
+	<update id="update" parameterType="com.inspur.bigdata.manage.open.service.data.ServiceGroup">
+		UPDATE 
+		    API_SERVICE_GROUP
+		SET 
+		    name = #{name},
+		    parent_id = #{parentId},
+		    seq = #{seq}
+		WHERE
+		    id = #{id }
+	</update>
+
+	<delete id="delete" parameterType="string">
+		DELETE FROM
+		    API_SERVICE_GROUP
+		WHERE
+		    id = #{_parameter } or parent_id = #{_parameter }
+	</delete>
+
+	<select id="getById" parameterType="string" resultMap="serviceGroupMap">
+		SELECT
+		    id,
+		    name,
+		    parent_id,
+		    seq
+		FROM
+		    API_SERVICE_GROUP
+		WHERE
+		    id = #{_parameter }
+	</select>
+
+	<select id="isRegisted" parameterType="string" resultMap="serviceGroupMap">
+		SELECT
+		    id,
+		    name,
+		    parent_id,
+		    seq
+		FROM
+		    API_SERVICE_GROUP
+		WHERE
+		    parent_id = #{0} and name = #{1}
+	</select>
+
+	<select id="getGroupList" parameterType="map" resultMap="serviceGroupMap">
+		select
+		id,
+		name,
+		parent_id,
+		seq
+		from
+		API_SERVICE_GROUP
+		<where>
+			<if test="id != null">
+				AND id = #{id }
+			</if>
+			<if test="name != null">
+				AND name like '%${name}%'
+			</if>
+			<if test="parentId != null">
+				AND parent_id = #{parentId}
+			</if>
+		</where>
+		ORDER BY
+		seq
+	</select>
+
+</mapper>
