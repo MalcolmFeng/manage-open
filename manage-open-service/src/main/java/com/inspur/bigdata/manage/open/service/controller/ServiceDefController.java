@@ -153,6 +153,24 @@ public class ServiceDefController {
         param.put("apply",true);
         return new ModelAndView("service/service/api_market_info",param);
     }
+    /**
+     * 市场详情页 返回数据
+     * @param id
+     * @return
+     */
+    @RequestMapping("/get/{id}/info")
+    @ResponseBody
+    public Map<String, Object> getInfoForApplyById2(@PathVariable("id") String id) {
+        ServiceDef serviceDef = serviceDefService.getServiceDef(id);
+        DevGroup devGroup=devGroupService.getById(serviceDef.getApiGroup());
+        serviceDef.setOpenAddr(OpenServiceConstants.getOpenAddr(devGroup.getContext(),serviceDef.getReqPath()));
+        Map<String, Object> param = new HashMap<String, Object>();
+        List<ServiceInput> inputParam = serviceInputService.listByServiceId(id);
+        param.put("serviceInfo",serviceDef);
+        param.put("inputParam",inputParam);
+        param.put("apply",true);
+        return param;
+    }
 
     /**
      *查看Api详情
