@@ -129,11 +129,11 @@ var register = {
       });
     }
   },
-  
+
   selectServiceGroup: function(obj) {
     $("input[name=groupId]").val($("#subgroupSelect").val());
   },
-  
+
   setNeedAuth: function(needAuth, authUser) {
     if(needAuth != null && needAuth != '') {
       if(needAuth == '0') {
@@ -147,7 +147,7 @@ var register = {
       }
     }
   },
-  
+
   setGroupId: function(groupId) {
     if(groupId != null && groupId != '') {
       $.ajax({
@@ -289,14 +289,15 @@ var register = {
   getColumnList: function() {
     var inputParam = [];
     $("#inputtable tr:gt(0)").each(function(i, e) {
-      var name = $(this).find("input[name=columnName]").val();
+      var name = $(this).children('td').eq(0).text().trim();
+      console.info(name);
       if(name != null && name != '') {
         var param = {
-          id: $(this).find("input[name=id]").val(),
-          columnName: $(this).find('input[name=columnName]').val(),
-          columnType: $(this).find('select[name=columnType] option:selected').val(),
-          isNull: $(this).find('select[name=isNull] option:selected').val(),
-          description: $(this).find('input[name=description]').val()
+            id: $(this).find("input[name=id]").val(),
+            columnName:name,
+            columnType:$(this).find('input[name=columnType]').val(),
+            isNull:$(this).find('input[name=isNull]').val(),
+            description: $(this).find('input[name=description]').val()
         };
         inputParam.push(param);
       }

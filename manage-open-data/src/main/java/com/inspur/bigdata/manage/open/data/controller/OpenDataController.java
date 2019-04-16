@@ -90,6 +90,20 @@ public class OpenDataController {
 		model.put("groupList",groupList);
 		return new ModelAndView("data/data/applyList",model);
 	}
+
+	/**
+	 * 数据申请页面
+	 * @return
+	 */
+	@RequestMapping(value = "/getApiList", method = RequestMethod.GET)
+	public ModelAndView getApplyPage2() {
+		Map<String, Object> model = new HashMap<String, Object>();
+		Map<String, Object> param = new HashMap<String, Object>();
+		param.put("parentId",-1);
+		List<DataGroup> groupList=groupService.getGroupList(param);
+		model.put("groupList",groupList);
+		return new ModelAndView("data/data/apiList",model);
+	}
 	/**
 	 * 查询可申请数据
 	 *
