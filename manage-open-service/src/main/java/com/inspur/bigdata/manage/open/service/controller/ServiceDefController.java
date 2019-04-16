@@ -62,6 +62,20 @@ public class ServiceDefController {
         model.put("groupList",groupList);
         return new ModelAndView("service/service/marketList",model);
     }
+
+    /**
+     * 首页api列表页
+     * @return
+     */
+    @RequestMapping(value = "/getApiListPage", method = RequestMethod.GET)
+    public ModelAndView getApiListPage() {
+        Map<String, Object> model = new HashMap<String, Object>();
+        Map<String, Object> param = new HashMap<String, Object>();
+        param.put("parentId",-1);
+        List<ServiceGroup> groupList=serviceGroupService.getGroupList(param);
+        model.put("groupList",groupList);
+        return new ModelAndView("service/service/apiList",model);
+    }
     /**
      * 查询市场列表数据
      *
