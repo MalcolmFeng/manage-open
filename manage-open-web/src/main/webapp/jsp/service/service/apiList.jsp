@@ -198,7 +198,7 @@
 <script type="text/html" id="apiListTemp">
     {{each APIList as api}}
     <li class="list-group-item lg-item">
-        <a class="lg-link" onclick="getApiDetail('{{api.id}}')" >
+        <a class="lg-link" onclick="getApiDetail('{{api.id}}',this)" >
             <span class="api-item" title='/{{api.apiGroup}}{{api.reqPath}}'>/{{api.apiGroup}}{{api.reqPath}}</span>
             <span class="api-desc">{{api.description}}</span>
         </a>

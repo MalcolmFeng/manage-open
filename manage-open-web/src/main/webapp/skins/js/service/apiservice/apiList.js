@@ -95,7 +95,9 @@ function loadAppList(openServiceId) {
 }
 
 // 查看api详情
-function getApiDetail(id) {
+function getApiDetail(id, obj) {
+    $(".lg-link").removeClass("clicked");
+    $(obj).addClass("clicked");
     $.ajax({
         url: "/manage-open/service/open/api/get/"+id+"/info",
         success: function(result) {
@@ -116,9 +118,12 @@ function getApiDetail(id) {
                 var temp = template("inputParamTemp", {"inputParamList": inputParam});
                 $("#inputParamBody").empty().append(temp);
 
-                var returnExample=JSON.parse(data.serviceInfo.returnExample);
-                // $("#returnExample").JSONView(returnExample, {collapsed: false, nl2br: true});
-                $("#returnExample").text(returnExample);
+                try{
+                var returnExample=JSON.parse(serviceInfo.returnSample);
+                $("#returnExample").JSONView(returnExample, {collapsed: false, nl2br: true});
+                }catch(e){
+                    document.getElementById("returnExample").innerHTML = serviceInfo.returnSample ;
+                }
 
             }
 
