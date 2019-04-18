@@ -49,6 +49,9 @@ public class ServiceDefController {
     @Autowired
     private IServiceInputService serviceInputService;
 
+    @Autowired
+    private IServiceOutputService serviceOutputService;
+
     /**
      * 市场列表页
      * @return
@@ -162,8 +165,10 @@ public class ServiceDefController {
         serviceDef.setOpenAddr(OpenServiceConstants.getOpenAddr(devGroup.getContext(),serviceDef.getReqPath()));
         Map<String, Object> param = new HashMap<String, Object>();
         List<ServiceInput> inputParam = serviceInputService.listByServiceId(id);
+        List<ServiceOutput> outputList= serviceOutputService.selectByApiId(id);
         param.put("serviceInfo",serviceDef);
         param.put("inputParam",inputParam);
+        param.put("outputParam",outputList);
         param.put("apply",true);
         return new ModelAndView("service/service/api_market_info",param);
     }
@@ -180,8 +185,10 @@ public class ServiceDefController {
         serviceDef.setOpenAddr(OpenServiceConstants.getOpenAddr(devGroup.getContext(),serviceDef.getReqPath()));
         Map<String, Object> param = new HashMap<String, Object>();
         List<ServiceInput> inputParam = serviceInputService.listByServiceId(id);
+        List<ServiceOutput> outputList= serviceOutputService.selectByApiId(id);
         param.put("serviceInfo",serviceDef);
         param.put("inputParam",inputParam);
+        param.put("outputParam",outputList);
         param.put("apply",true);
         return param;
     }

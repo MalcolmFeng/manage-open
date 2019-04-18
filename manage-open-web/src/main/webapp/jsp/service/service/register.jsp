@@ -8,7 +8,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
-    
+
     <!-- 需要引用的CSS -->
 	<link rel="shortcut icon" href="<%=request.getContextPath()%>/jsp/public/images/favicon.ico" />
 	<link rel="stylesheet" type="text/css" href="<l:asset path='css/bootstrap.css'/>" />
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="<l:asset path='jquery.js'/>" ></script>
     <script type="text/javascript" src="<l:asset path='bootstrap.js'/>" ></script>
 	<script type="text/javascript" src="<l:asset path='form.js'/>" ></script>
-	<script type="text/javascript" src="<l:asset path='arttemplate.js'/>" ></script>	
+	<script type="text/javascript" src="<l:asset path='arttemplate.js'/>" ></script>
 	<script type="text/javascript" src="<l:asset path='datatables.js'/>"></script>
     <script type="text/javascript" src="<l:asset path='loushang-framework.js'/>"></script>
     <script type="text/javascript" src="<l:asset path='ui.js'/>"></script>
@@ -41,7 +41,7 @@
 <body>
 	<div>
 		<div class="demo1"></div>
-	  <div class="col-xs-12 col-md-12">	  
+	  <div class="col-xs-12 col-md-12">
 		<form class="form-horizontal" id="saveForm" name="saveForm" onsubmit="return false;">
 			<div id="step_0" class="_step">
 		    <h3 class="text-left htext">基本信息</h3>
@@ -345,7 +345,7 @@
 							   <td><input type="text" name="backname" value="${item.scName }" readonly/></td>
 				              <%--<td><a onclick="register.forColumnDel(this)">删除</a></td>--%>
 				           </tr>
-		               </c:forEach>	
+		               </c:forEach>
 		           </c:if>
 					</tbody>
 				  </table>
@@ -382,6 +382,23 @@
 						<span class="Validform_checktip Validform_span"></span>
 					</div>
 				</div>
+				<h3 class="text-left htext">返回值释义</h3>
+				<hr class="fenge"/>
+				<div class="form-group">
+					<div class="col-xs-12 col-md-12 param-list">
+						<table id="outtable">
+							<tr>
+								<th style="width: 12%;">参数名称</th>
+								<th style="width: 12%;">后端参数类型</th>
+								<th>参数描述</th>
+								<th style="width: 12%;">操作</th>
+							</tr>
+							<tbody id="outbody">
+							</tbody>
+						</table>
+						<div id="addOutParam" class="pull-right addrow"><a onclick="register.addOutParamTr()">增加一行</a></div>
+					</div>
+				</div>
 			</div>
 			<div class="form-group" >
 			  <div class="col-xs-12 col-md-12" style="text-align: center">
@@ -401,7 +418,7 @@
 	    var context = "<l:assetcontext/>";
 	    var defGroupId='${serviceDef.apiGroup}';
         var serviceId='${serviceDef.id}';
-		//编辑时的初始值 	
+		//编辑时的初始值
 		var initContext='${serviceDef.reqPath}';
         var initRemoteId='${serviceDef.remoteId}';
 	 	var initVersion;
@@ -416,7 +433,7 @@
 	            $.dialog({
 	                type: 'confirm',
 	                content: '您确定要提交表单吗？',
-	                ok: function () { 
+	                ok: function () {
 	                  register.forSave();
 	                },
 	                cancel: function () {}
@@ -622,7 +639,7 @@
 	        return false;
 	      }
 	    }
-	    
+
 	    function verifyDescritpion(gets, obj, curform, datatye) {
 	    	if(gets.length>200 || gets.length<5){
 	    		 obj.attr("errormsg", "数据描述字数限制在5-200个!");
@@ -630,7 +647,7 @@
 	    	}
 	    	return true;
 	    }
-	    
+
 	    function verifyExample(gets, obj, curform, datatye) {
 	    	if(gets.length<5){
 	    		 obj.attr("errormsg", "返回内容描述不能小于5个字符!");
@@ -682,6 +699,24 @@
             editFlag=true;
         }
 	</script>
+
+	<script id="outputitem" type="text/html">
+		<tr>
+			<td>
+				<input type="hidden" name="id" />
+				<input type="text" name="name" value="" />
+			</td>
+			<td>
+				<select name="type">
+					<option value="string" selected="selected">字符串</option>
+					<option value="number">数值型</option>
+				</select>
+			</td>
+			<td><input type="text" name="description" value=""/></td>
+			<td><a onclick="register.forColumnDel(this)">删除</a></td>
+		</tr>
+	</script>
+
     <script id="inputitem" type="text/html">
 	    <tr>
 		  <td>
@@ -836,7 +871,7 @@
           {{/each}}
         </select>
     </script>
-    
+
     <script id="subgrouplist2" type="text/html">
     	<select id="subgroupSelect" class="form-control ue-form" onchange="register.selectServiceGroup();">
           {{each data as group}}

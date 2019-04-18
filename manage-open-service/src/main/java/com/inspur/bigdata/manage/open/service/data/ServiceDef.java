@@ -128,6 +128,9 @@ public class ServiceDef implements Serializable{
 
 	@Transient
 	private List<ServiceInput> inputList;
+
+	@Transient
+	private List<ServiceOutput> outputList;
 	/**
 	 * 开放地址
 	 */
@@ -316,5 +319,13 @@ public class ServiceDef implements Serializable{
 
 	public void setOpenAddr(String openAddr) {
 		this.openAddr = openAddr;
+	}
+
+	public void setOutputList(List<ServiceOutput> outputList) {
+		this.outputList = outputList;
+	}
+
+	public List<ServiceOutput> getOutputList() {
+		return outputList;
 	}
 }

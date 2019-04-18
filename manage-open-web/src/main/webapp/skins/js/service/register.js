@@ -144,6 +144,9 @@ var register = {
     addbackendInputParamTr: function () {
         $("#backendinputtbody").append(template('backendinputitemtr'));
     },
+    addOutParamTr: function () {
+        $("#outbody").append(template('outputitem'));
+    },
     addBackendInputParam: function (inputParam) {
         // var arry = [];
         // $("#inputtable tr").each(function (index) {
@@ -223,6 +226,9 @@ var register = {
         serviceInfo.returnSample = $('#returnSample').val();
 
         serviceInfo.inputList = register.initInputParam();
+        serviceInfo.outputList = register.getOutputParamList($("#id").val());
+
+
         return serviceInfo;
     },
     initInputParam: function () {
@@ -317,21 +323,24 @@ var register = {
         });
         return endParam;
     },
-    getOutputParamList: function () {
+    getOutputParamList: function(openServiceId) {
         var outputParam = [];
-        $("#outputtable tr:gt(0)").each(function (i, e) {
+        $("#outtable tr:gt(0)").each(function(i, e) {
             var name = $(this).find("input[name=name]").val();
-            if (name != null && name != '') {
+            if(name != null && name != '') {
                 var param = {
                     id: $(this).find("input[name=id]").val(),
+                    openServiceId:openServiceId,
                     name: $(this).find("input[name=name]").val(),
                     description: $(this).find("input[name=description]").val(),
+                    type: $(this).find('select[name=type] option:selected').val(),
                     seq: i
                 };
                 outputParam.push(param);
             }
         });
-        return JSON.stringify(outputParam);
+        // return JSON.stringify(outputParam);
+        return outputParam;
     },
 
     getHttpAddressList: function () {

@@ -153,52 +153,47 @@
         </ul>
 
 
-        <%--<ul class="ue-collapse">--%>
-            <%--<li>--%>
-        <%--<span class="ue-collapse-header siddown-btn">--%>
-            <%--<span>后端参数</span><i class="control-sidenav-btn-right fa fa-angle-right"></i>--%>
-        <%--</span>--%>
-                <%--<div class="ue-collapse-body">--%>
-                    <%--<div class="table_row">--%>
-                        <%--<ul class="list-group">--%>
-                            <%--<li class="list-group-item">--%>
-                                <%--<div class="col-md-2">字段名称</div>--%>
-                                <%--<div class="col-md-2">是否必填</div>--%>
-                                <%--<div class="col-md-2">字段类型</div>--%>
-                                <%--<div class="col-md-2">字段描述</div>--%>
-                                <%--<div class="clearfix"></div>--%>
-                            <%--</li>--%>
-                            <%--<c:if test="${not empty inputParam}">--%>
-                                <%--<c:forEach items="${inputParam}" var="item">--%>
-                                    <%--<li class="list-group-item">--%>
-                                        <%--<div class="col-md-2">${item.scName }</div>--%>
-                                        <%--<div class="col-md-2">--%>
-                                            <%--<c:if test="${item.scRequired eq '0' }">否</c:if>--%>
-                                            <%--<c:if test="${item.scRequired eq '1' }">是</c:if>--%>
-                                        <%--</div>--%>
-                                        <%--<div class="col-md-2">--%>
-                                                <%--${item.scType}--%>
-                                                <%--&lt;%&ndash;<c:choose>--%>
-                                                    <%--<c:when test="${item.type eq 'number'}">数值型</c:when>--%>
-                                                    <%--<c:otherwise>字符型</c:otherwise>--%>
-                                                <%--</c:choose>&ndash;%&gt;--%>
-                                        <%--</div>--%>
-                                        <%--<div class="col-md-2">${item.scDescription }</div>--%>
-                                        <%--<div class="clearfix"></div>--%>
-                                    <%--</li>--%>
-                                <%--</c:forEach>--%>
-                            <%--</c:if>--%>
-                            <%--<c:if test="${empty inputParam }">--%>
-                                <%--<li class="list-group-item">--%>
-                                    <%--<div>无入参信息</div>--%>
-                                <%--</li>--%>
-                            <%--</c:if>--%>
-                        <%--</ul>--%>
-                    <%--</div>--%>
-                <%--</div>--%>
-            <%--</li>--%>
+        <ul class="ue-collapse">
+            <li>
+        <span class="ue-collapse-header siddown-btn">
+            <span>返回参数</span><i class="control-sidenav-btn-right fa fa-angle-right"></i>
+        </span>
+                <div class="ue-collapse-body">
+                    <div class="table_row">
+                        <ul class="list-group">
+                            <li class="list-group-item">
+                                <div class="col-md-2">字段名称</div>
+                                <div class="col-md-2">字段类型</div>
+                                <div class="col-md-2">字段描述</div>
+                                <div class="clearfix"></div>
+                            </li>
+                            <c:if test="${not empty outputParam}">
+                                <c:forEach items="${outputParam}" var="item">
+                                    <li class="list-group-item">
+                                        <div class="col-md-2">${item.name }</div>
+                                        <div class="col-md-2">
+                                                <%--${item.type}--%>
+                                                <c:choose>
+                                                    <c:when test="${item.type eq 'number'}">数值型</c:when>
+                                                    <c:otherwise>字符型</c:otherwise>
+                                                </c:choose>
+                                        </div>
+                                        <div class="col-md-2">${item.description }</div>
+                                        <div class="clearfix"></div>
+                                    </li>
+                                </c:forEach>
+                            </c:if>
+                            <c:if test="${empty outputParam }">
+                                <li class="list-group-item">
+                                    <div>无出参信息</div>
+                                </li>
+                            </c:if>
+                        </ul>
+                    </div>
+                </div>
+            </li>
 
-        <%--</ul>--%>
+        </ul>
 
         <%--<ul class="ue-collapse">
             <li>
@@ -215,7 +210,7 @@
             </li>
 
         </ul>--%>
-        
+
         <ul class="ue-collapse">
             <li>
         <span class="ue-collapse-header siddown-btn">

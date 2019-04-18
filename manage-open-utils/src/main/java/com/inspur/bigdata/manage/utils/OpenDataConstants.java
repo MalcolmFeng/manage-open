@@ -2,6 +2,7 @@ package com.inspur.bigdata.manage.utils;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
+import org.apache.commons.lang.StringUtils;
 import sdk.security.authc.AuthenticationProvider;
 
 import java.text.SimpleDateFormat;
@@ -27,8 +28,13 @@ public class OpenDataConstants {
      //String realm="realm1234";
         return realm;
     }
+
     public static String getUserId() {
-		String userId = AuthenticationProvider.getKrbPrincipalName();
+        String userId = AuthenticationProvider.getKrbPrincipalName();
+        if (StringUtils.isEmpty(userId)) {
+            //201904 本地临时测试
+            userId = "dev-realm8586";
+        }
         return userId;
         //return "test1-realm1234";
     }
