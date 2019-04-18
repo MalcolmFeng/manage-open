@@ -20,6 +20,7 @@
     <link rel="stylesheet" type="text/css" href="<l:asset path='css/form.css'/>" />
     <link rel="stylesheet" type="text/css" href="<l:asset path='data/datadev.css'/>" />
     <link rel="stylesheet" type="text/css" href="<l:asset path='data/datalist/css/datalist.css'/>" />
+    <link rel="stylesheet" type="text/css" href="/manage-open/skins/skin/css/jquery.jsonview.css" />
     <link rel="stylesheet" type="text/css" href="<l:asset path='data/apiservice/css/apiList.css'/>" />
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -29,12 +30,12 @@
     <![endif]-->
     <script type="text/javascript" src="<l:asset path='jquery.js'/>" ></script>
     <script type="text/javascript" src="<l:asset path='bootstrap.js'/>" ></script>
+    <script type="text/javascript" src="<l:asset path='jquery.jsonview.js'/>"></script>
     <script type="text/javascript" src="<l:asset path='form.js'/>" ></script>
     <script type="text/javascript" src="<l:asset path='arttemplate.js'/>" ></script>
-    <script type="text/javascript" src="<l:asset path='datatables.js'/>"></script>
-    <script type="text/javascript" src="<l:asset path='loushang-framework.js'/>"></script>
     <script type="text/javascript" src="<l:asset path='ui.js'/>"></script>
     <script type="text/javascript" src="<l:asset path='ztree.js'/>"></script>
+
     <script type="text/javascript" src="<l:asset path='service/apiservice/apiList.js'/>"></script>
     <title>API市场</title>
 </head>
@@ -169,6 +170,7 @@
                             <thead class="t-head">
                             <tr>
                                 <th style="width: 15%">名称</th>
+                                <th style="width: 30%">字段类型</th>
                                 <th style="width: 55%">描述</th>
                             </tr>
                             </thead>
@@ -217,6 +219,17 @@
             <td>是</td>
         {{/if}}
         <td>{{inputParam.description}}</td>
+    </tr>
+    {{/each}}
+</script>
+
+<!--输出参数-->
+<script type="text/html" id="outputParamTemp">
+    {{each outputParamList as outputParam}}
+    <tr>
+        <td>{{outputParam.name}}</td>
+        <td>{{outputParam.type}}</td>
+        <td>{{outputParam.description}}</td>
     </tr>
     {{/each}}
 </script>

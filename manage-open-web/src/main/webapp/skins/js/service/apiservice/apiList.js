@@ -104,6 +104,7 @@ function getApiDetail(id, obj) {
             if(result.apply) {
                 var inputParam = result.inputParam;
                 var serviceInfo = result.serviceInfo;
+                var outputParam = result.outputParam;
 
                 // 加载接口信息
                 $("#title-en").text(serviceInfo.openAddr);
@@ -116,7 +117,7 @@ function getApiDetail(id, obj) {
                 }
 
                 var temp = template("inputParamTemp", {"inputParamList": inputParam});
-                $("#inputParamBody").empty().append(temp);
+                $("#inputParamTbody").empty().append(temp);
 
                 try{
                 var returnExample=JSON.parse(serviceInfo.returnSample);
@@ -124,6 +125,9 @@ function getApiDetail(id, obj) {
                 }catch(e){
                     document.getElementById("returnExample").innerHTML = serviceInfo.returnSample ;
                 }
+
+                var tempOut = template("outputParamTemp", {"outputParamList": outputParam});
+                $("#responseParamTbody").empty().append(tempOut);
 
             }
 
