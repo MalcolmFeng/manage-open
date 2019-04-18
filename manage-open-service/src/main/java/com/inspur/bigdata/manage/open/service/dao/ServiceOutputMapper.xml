@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.inspur.bigdata.manage.open.service.dao.ServiceOutputMapper">
+
+	<resultMap id="BaseResultMap" type="com.inspur.bigdata.manage.open.service.data.ServiceOutput">
+		<id property="id" column="id"/>
+		<result property="name" column="name"/>
+		<result property="openServiceId" column="open_service_id" />
+		<result property="seq" column="seq" />
+		<result property="description" column="description" />
+		<result property="type" column="type" />
+	</resultMap>
+
+	<delete id="deleteByApiId" parameterType="string">
+		delete from
+		api_service_output
+		where open_service_id = #{apiId}
+	</delete>
+
+	<select id="selectByApiId" parameterType="string" resultMap="BaseResultMap">
+		select *from api_service_output where open_service_id = #{apiId}
+	</select>
+
+</mapper>
