@@ -23,4 +23,7 @@ public interface ServiceDefMapper extends EntityMapper<ServiceDef> {
     List<ServiceDef> getByApiGroupAndPath(Map map);
 
     List<ServiceDef> listAPIByProvider(Map map);
+
+    List<ServiceDef> queryByRemoteId(String remoteId);
+
 }

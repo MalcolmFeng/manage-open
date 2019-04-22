@@ -27,9 +27,9 @@ public class OpenServiceConstants {
 //        return "master";
     }
     public static String getUserId() {
-		String userId = AuthenticationProvider.getKrbPrincipalName();
+		String userId = AuthenticationProvider.getLoginUserId();
 		return userId;
-        //return "test2-realm1234";
+        //return "test2-realm1234";                                                 g
     }
     public static String api_create="0";//api创建
     public static String api_submit_audit="1";//api提交审核(发布)

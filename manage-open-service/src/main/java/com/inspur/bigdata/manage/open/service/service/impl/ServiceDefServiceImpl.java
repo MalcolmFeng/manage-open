@@ -7,6 +7,7 @@ import com.inspur.bigdata.manage.open.service.data.ServiceDef;
 import com.inspur.bigdata.manage.open.service.data.ServiceInput;
 import com.inspur.bigdata.manage.open.service.data.ServiceOutput;
 import com.inspur.bigdata.manage.open.service.service.IServiceDefService;
+import org.apache.commons.lang.StringUtils;
 import org.loushang.framework.util.UUIDGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -105,5 +106,13 @@ public class ServiceDefServiceImpl implements IServiceDefService{
     public List<ServiceDef> listAPIByProvider(Map map){
         return serviceDefMapper.listAPIByProvider(map);
     }
+    @Override
+    public List<ServiceDef> queryByRemoteId(String remoteId){
+        if (StringUtils.isEmpty(remoteId)){
+            return null;
+        }
+       return serviceDefMapper.queryByRemoteId(remoteId);
+    }
+
 
 }

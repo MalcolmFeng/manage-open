@@ -853,4 +853,19 @@ public class ServiceDefController {
         mpMap.put("data", serviceDef);
         return mpMap;
     }
+
+    /**
+     * 根据数据服务id查询有无开放服务
+     * @param remoteId
+     * @return
+     */
+    @RequestMapping(value = "/queryServiceByRemoteId")
+    @ResponseBody
+    public String queryByRemoteId(@RequestParam("remoteId")String remoteId){
+        if (serviceDefService.queryByRemoteId(remoteId).size()>0){
+            return "true";
+        }else{
+            return "false" ;
+        }
+    }
 }
