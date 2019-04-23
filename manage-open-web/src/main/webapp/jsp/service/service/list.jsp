@@ -35,185 +35,196 @@
 	<script type="text/javascript" src="<l:asset path='ztree.js'/>"></script>
 
 	<script type="text/javascript">
-        var context = "<l:assetcontext/>";
+		var context = "<l:assetcontext/>";
 
-        $(document).ready(function() {
-            if( $("#workspace-header",parent.document))
+		$(document).ready(function() {
+			if( $("#workspace-header",parent.document))
 			{
-                $("#workspace-header",parent.document).html('API列表');
+				$("#workspace-header",parent.document).html('API列表');
 			}
 
-            var options = {
-                info: true,
-                ordering: false
-            };
+			var options = {
+				info: true,
+				ordering: false
+			};
 
-            var url = context + "/service/open/api/getApiList"
-            grid = new L.FlexGrid("myauthList",url);
-            grid.init(options); //初始化datatable
-        });
+			var url = context + "/service/open/api/getApiList"
+			grid = new L.FlexGrid("myauthList",url);
+			grid.init(options); //初始化datatable
+		});
 
-        //弹窗提示样式
-        function sticky(msg, style, position) {
-            var type = style ? style : 'success';
-            var place = position ? position : 'top';
-            $.sticky(
-                msg,
-                {
-                    autoclose : 1000,
-                    position : place,
-                    style : type
-                }
-            );
-        }
-        //发布
-        function apirelease(openServiceId,auditStatus) {
-            if("0"==auditStatus) {
-                $.dialog({
-                    type: "iframe",
-                    title: "api发布",
-                    url: context + '/jsp/service/service/release.jsp?openServiceId=' + openServiceId,
-                    width: 450,
-                    height: 250,
-                    onclose: function () {
-                        reloadApiList();
-                        if (this.returnValue) {
-                            sticky("api发布成功！");
-                        }
-                    }
-                });
-            }
-        }
+		//弹窗提示样式
+		function sticky(msg, style, position) {
+			var type = style ? style : 'success';
+			var place = position ? position : 'top';
+			$.sticky(
+					msg,
+					{
+						autoclose : 1000,
+						position : place,
+						style : type
+					}
+			);
+		}
+		//发布
+		function apirelease(openServiceId,auditStatus) {
+			if("0"==auditStatus) {
+				$.dialog({
+					type: "iframe",
+					title: "api发布",
+					url: context + '/jsp/service/service/release.jsp?openServiceId=' + openServiceId,
+					width: 450,
+					height: 250,
+					onclose: function () {
+						reloadApiList();
+						if (this.returnValue) {
+							sticky("api发布成功！");
+						}
+					}
+				});
+			}
+		}
 
-        //授权
-        function apiauth(openServiceId) {
-            var apply_Flag="1";
-            $.dialog({
-                type: "iframe",
-                title: "应用列表",
-                url: context + '/jsp/service/service/app_auth_list.jsp?openServiceId=' + openServiceId+"&applyFlag="+apply_Flag,
-                width: 700,
-                height: 400
-            });
-        }
-        //删除
-        function apidel(openServiceId,auditStatus) {
-            $.dialog({
-                type: 'confirm',
-                content: '确认删除该记录?',
-                autofocus: true,
-                ok: function() {
-                    $.ajax({
-                        url : context + "/service/open/api/delete/" + openServiceId,
-                        success: function(msg){
-                            if(msg == true) {
-                                reloadApiList();
-                                sticky("删除成功！");
-                            } else {
-                                sticky("删除失败", 'error', 'center');
-                            }
-                        }
-                    });
-                },
-                cancel: function(){}
-            });
-        }
-        //下线
-        function apioffline(openServiceId,auditStatus) {
-            if("2"==auditStatus)
+		//授权
+		function apiauth(openServiceId) {
+			var apply_Flag="1";
+			$.dialog({
+				type: "iframe",
+				title: "应用列表",
+				url: context + '/jsp/service/service/app_auth_list.jsp?openServiceId=' + openServiceId+"&applyFlag="+apply_Flag,
+				width: 700,
+				height: 400
+			});
+		}
+		//删除
+		function apidel(openServiceId,auditStatus) {
+			$.dialog({
+				type: 'confirm',
+				content: '确认删除该记录?',
+				autofocus: true,
+				ok: function() {
+					$.ajax({
+						url : context + "/service/open/api/delete/" + openServiceId,
+						success: function(msg){
+							if(msg == true) {
+								reloadApiList();
+								sticky("删除成功！");
+							} else {
+								sticky("删除失败", 'error', 'center');
+							}
+						}
+					});
+				},
+				cancel: function(){}
+			});
+		}
+		//编辑
+		function apiedit(openServiceId,auditStatus) {
+			window.location.href = context + "/service/open/api/toUpdate/" + openServiceId;
+		}
+		//下线
+		function apioffline(openServiceId,auditStatus) {
+			if("2"==auditStatus)
 			{
-                $.dialog({
-                    type: 'confirm',
-                    content: '确认api下线请求?',
-                    autofocus: true,
-                    ok: function() {
-                        $.ajax({
-                            url : context + "/service/open/api/offline/" + openServiceId,
-                            success: function(msg){
-                                if(msg == true) {
-                                    reloadApiList();
-                                    sticky("下线成功！");
-                                } else {
-                                    sticky("下线失败", 'error', 'center');
-                                }
-                            }
-                        });
-                    },
-                    cancel: function(){}
-                });
+				$.dialog({
+					type: 'confirm',
+					content: '确认api下线请求?',
+					autofocus: true,
+					ok: function() {
+						$.ajax({
+							url : context + "/service/open/api/offline/" + openServiceId,
+							success: function(msg){
+								if(msg == true) {
+									reloadApiList();
+									sticky("下线成功！");
+								} else {
+									sticky("下线失败", 'error', 'center');
+								}
+							}
+						});
+					},
+					cancel: function(){}
+				});
 			}
 
-        }
-        function forRegister() {
-            window.location.href = context + "/service/open/api/create";
+		}
+		function forRegister() {
+			window.location.href = context + "/service/open/api/create";
 
-        }
-        function forQuery() {
-            var serviceName = $("#serviceName").val();
-            grid.setParameter("name", serviceName);
-            reloadApiList();
-        }
-        function forView(id) {
-            window.location.href = context + "/service/open/api/getInfo/"+id;
-        }
-        function reloadApiList() {
-            // 重新请求数据
-            $("#myauthList").DataTable().ajax.reload();
-        }
-        function renderId(data, type, full, meta) {
-            var rowId = meta.settings._iDisplayStart + meta.row + 1;
-            return rowId;
-        }
+		}
+		function forQuery() {
+			var serviceName = $("#serviceName").val();
+			grid.setParameter("name", serviceName);
+			reloadApiList();
+		}
+		function forView(id) {
+			window.location.href = context + "/service/open/api/getInfo/"+id;
+		}
+		function reloadApiList() {
+			// 重新请求数据
+			$("#myauthList").DataTable().ajax.reload();
+		}
+		function renderId(data, type, full, meta) {
+			var rowId = meta.settings._iDisplayStart + meta.row + 1;
+			return rowId;
+		}
 
-        function renderName(data, type, full) {
-            var html = '';
-            html += '<a onclick="forView(\''+ full.id +'\')">'+ data + '</a>&emsp;';
-            return html;
-        }
-        function renderOptions(data, type, full) {
-            var html = '';
-            html += '<div>';
-            html += '    <a onclick="apiauth(\''+data+'\')">授权</a>&emsp;';
-            if("0"==full.auditStatus||"3"==full.auditStatus||"4"==full.auditStatus)
-            {
-                html += '    <a onclick="apidel(\'' + data + '\')">删除</a>&emsp;';
-            }else
+		function renderName(data, type, full) {
+			var html = '';
+			html += '<a onclick="forView(\''+ full.id +'\')">'+ data + '</a>&emsp;';
+			return html;
+		}
+		function renderOptions(data, type, full) {
+			var html = '';
+			html += '<div>';
+			html += '    <a onclick="apiauth(\''+data+'\')">授权</a>&emsp;';
+			if("0"==full.auditStatus||"3"==full.auditStatus||"4"==full.auditStatus)
 			{
-                html += '    <a onclick="return false;" style="cursor: default;color:#CCCCCC">删除</a>&emsp;';
-			}
-       /*     if("2"==full.auditStatus)
-            {
-                html += '    <a class="del" onclick="apioffline(\''+ data +'\',\''+full.auditStatus+'\')">下线</a>';
+				html += '    <a onclick="apidel(\'' + data + '\')">删除</a>&emsp;';
 			}else
 			{
-                html += '    <a class="del" onclick="return false;" style="cursor: default;color:#CCCCCC">下线</a>';
-			}*/
+				html += '    <a onclick="return false;" style="cursor: default;color:#CCCCCC">删除</a>&emsp;';
+			}
+			if("0"==full.auditStatus||"3"==full.auditStatus||"4"==full.auditStatus)
+			{
+				html += '    <a onclick="apiedit(\''+data+'\')">编辑</a>&emsp;';
+			}else
+			{
+				html += '    <a onclick="return false;" style="cursor: default;color:#CCCCCC">编辑</a>&emsp;';
+			}
+			/*     if("2"==full.auditStatus)
+                 {
+                     html += '    <a class="del" onclick="apioffline(\''+ data +'\',\''+full.auditStatus+'\')">下线</a>';
+                 }else
+                 {
+                     html += '    <a class="del" onclick="return false;" style="cursor: default;color:#CCCCCC">下线</a>';
+                 }*/
 
-            html += '</div>';
-            return html;
-        }
-        function renderStatus(data,type,full){
-            if("0"==full.auditStatus)
-            {
-                return "创建";
-            }
-            else if("1"==full.auditStatus)
-            {
-                return "待审核";
-            }
-            else if("2"==full.auditStatus)
-            {
-                return "已上线";
-            }
-            else if("3"==full.auditStatus)
-            {
-                return "已驳回";
-            }
-            else if("4"==full.auditStatus)
-            {
-                return "已下线";
-            }
-        }
+			html += '</div>';
+			return html;
+		}
+		function renderStatus(data,type,full){
+			if("0"==full.auditStatus)
+			{
+				return "创建";
+			}
+			else if("1"==full.auditStatus)
+			{
+				return "待审核";
+			}
+			else if("2"==full.auditStatus)
+			{
+				return "已上线";
+			}
+			else if("3"==full.auditStatus)
+			{
+				return "已驳回";
+			}
+			else if("4"==full.auditStatus)
+			{
+				return "已下线";
+			}
+		}
 	</script>
 </head>
 <body>
@@ -227,11 +238,11 @@
 					<span class="fa fa-search"></span>
 				</div>
 			</div>
-	<%--		<div class="btn-group pull-right">
-				<button id="add" type="button" class="btn ue-btn" onclick="forRegister()">
-					<span class="fa fa-plus"></span>创建API
-				</button>
-			</div>--%>
+			<%--		<div class="btn-group pull-right">
+                        <button id="add" type="button" class="btn ue-btn" onclick="forRegister()">
+                            <span class="fa fa-plus"></span>创建API
+                        </button>
+                    </div>--%>
 		</form>
 	</div>
 	<div class="row">
