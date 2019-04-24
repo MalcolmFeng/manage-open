@@ -1,0 +1,306 @@
+/* public settings
+----------------------------------------------------------------------------- */
+body {
+    font-family: 'Microsoft YaHei';
+}
+html,body {
+    height: 100%;
+}
+img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+}
+/* navbar
+----------------------------------------------------------------------------- */
+.header {
+    color: #333;
+    background-color: #FFF;
+    font-size: 14px;
+    -webkit-transition: all 0.2s ease-in-out;
+    -moz-transition: all 0.2s ease-in-out;
+    -o-transition: all 0.2s ease-in-out;
+    -ms-transition: all 0.2s ease-in-out;
+    transition: all 0.2s ease-in-out;
+    border-bottom: 5px solid #42b3e5;
+}
+/* navbar-item-right
+----------------------------------------------------------------------------- */
+#nav-right {padding-top: 20px;}
+/* navbar-option
+----------------------------------------------------------------------------- */
+#nav-item > li > a {
+    height: 40px;
+    width: 80px;
+    margin: 0px 5px;
+    color: #333;
+    font-size: 14px;
+    padding: 10px 0px;
+    text-align: center;
+}
+#nav-item > li > a:hover, #nav-item > li > a:focus {
+    text-decoration: none;
+    background-color: #42b3e5;
+    color: #fff;
+}
+#nav-item > .active > a {
+    background-color: #42b3e5;
+    color: #fff;
+}
+.clicked{
+    background-color: #f0f0f0;
+}
+.clicked >span.api-item{
+    color: #48a9d8;
+}
+/* control-button
+----------------------------------------------------------------------------- */
+#control-btn {
+    border: 1px solid #42b3e5;
+    border-radius: 15px;
+    width: 80px;
+    height: 30px;
+    padding: 0px;
+    padding-top: 5px;
+    background-color: #fff;
+    color: #42b3e5;
+    font-size: 12px;
+    margin: 8px 10px 8px 0px;
+}
+#control-btn:hover {
+    background-color: #42b3e5;
+    color: #fff;
+    text-align: center;
+}
+/* user-login
+----------------------------------------------------------------------------- */
+#user-opt > li > a {
+    color: #333;
+    font-size: 12px;
+    padding: 15px 10px 15px 10px;
+}
+#user-opt > li > a:hover, #user-opt > li > a:focus{
+    background-color:transparent;
+    color: #42b3e5;
+}
+.navbar-toggle {
+    background-color: #e0e0e0;
+}
+.navbar-toggle .icon-bar {
+    background: #fff;
+}
+@media screen and (max-width:991px) {
+    #nav-right {
+        padding-top: 0px;
+    }
+    .header {
+        height: 140px;
+    }
+}
+/* media settings
+----------------------------------------------------------------------------- */
+@media screen and (max-width:768px) {
+    #nav-con {
+        background-color: #fff;
+    }
+    #nav-right {
+        background: transparent;
+        margin-top: -15px;
+    }
+    .header {
+        height: 120px;
+    }
+    #navbar-collapse-1 {
+        border-top: 1px solid #e0e0e0;
+        border-bottom: 1px solid #e0e0e0;
+    }
+    #nav-item > li > a {
+        width: 100%;
+        text-align: left;
+        padding-left: 10px;
+        margin-bottom: 5px;
+    }
+    #nav-item > li > a:hover {
+        text-decoration: none;
+        color: #42b3e5;
+        background-color: #e0e0e0;
+    }
+    #nav-item > .active > a {
+        background-color: #e0e0e0;
+        color: #42b3e5;
+    }
+}
+@media screen and (max-width:326px) {
+    .header {
+        height: 120px;
+    }
+}
+/* api-list-container
+----------------------------------------------------------------------------- */
+#api-container {
+    margin-top: 20px;
+}
+@media screen and (max-width:768px) {
+    #api-catalog {
+        display: none;
+    }
+    #api-contents {
+        width: 100%;
+    }
+}
+#api-cat-top > span {
+    padding-left: 20px;
+    padding-top: 20px;
+    color: #fff;
+    font-size: 18px;
+}
+#cat-icon {
+    float: right;
+    padding-right: 20px;
+}
+#api-cat-top {
+    height: 60px;
+    background-color: #42b3e5;
+}
+#api-cat-bottomn {
+    height: 100px;
+}
+div.ph {
+    height: 50px;
+    padding: 0px;
+    background-color: transparent;
+}
+a.cat-item {
+    padding-left: 40px;
+    text-decoration: none;
+    font-weight: bold;
+    display: block;
+    height: 50px;
+    padding-top: 15px;
+    padding-right: 15px;
+}
+.lg-item {
+    border: none;
+    height: 50px;
+    padding: 0px;
+}
+a.lg-link {
+    display: inline-block;
+    height: 50px;
+    width: 100%;
+    padding-left: 15px;
+    padding-right: 15px;
+    padding-top: 5px;
+    text-decoration: none;
+}
+a.lg-link > span {
+    display: block;
+    font-size: 12px;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+}
+a.lg-link:hover .api-item{
+    color: #48a9d8;
+}
+.api-item {
+    color: #333333;
+}
+.api-desc {
+    color: #999999;
+}
+li.lg-item:hover {
+    background-color: #f0f0f0;
+}
+.ud {
+    float: right;
+    padding-right: 5px;
+    color: #d0d0d0;
+}
+#api-con-top > span {
+    display: block;
+    padding-left: 20px;
+    color: #fff;
+}
+#api-con-bottom {
+    padding: 20px;
+}
+#title-en {
+    padding-top: 8px;
+    font-size: 14px;
+}
+#title-ch {
+    font-weight: bold;
+    font-size: 16px;
+}
+#api-con-top {
+    height: 60px;
+    background-color: #a4d4ec
+}
+@media screen and (max-width:991px) {
+    #api-container {
+        margin-top: 160px;
+    }
+}
+@media screen and (max-width:768px) {
+    #api-container {
+        margin-top: 140px;
+    }
+}
+/* quick-link
+----------------------------------------------------------------------------- */
+a.link-item {
+    font-size: 14px;
+    color: #48a9d8;
+    margin-bottom: 5px;
+    display: inline-block;
+}
+a.link-item:hover, a.link-item:visited {
+    color: #48a9d8;
+}
+.divide-line {
+    border-right: 1px solid #dedede;
+    margin-left: 15px;
+    margin-right: 15px;
+}
+#link-contents {
+    margin-top: 20px;
+}
+/* api-description
+----------------------------------------------------------------------------- */
+.api-tips {
+    font-size: 14px;
+    color: #999;
+    margin: 20px 0px;
+}
+.api-title {
+    font-size: 14px;
+    font-weight: bold;
+    color: #333;
+    margin: 20px 0px;
+}
+/* table
+----------------------------------------------------------------------------- */
+.t-head {
+    background-color: #48a9d8;
+    color: #fff;
+    font-size: 14px;
+}
+.t-head th {
+    text-align: center;
+}
+.t-body td{
+    font-size: 12px;
+    color: #999999;
+}
+/* panel
+----------------------------------------------------------------------------- */
+.api-panel {
+    border: 1px solid #a1d9f2;
+    background-color: #ecf8fc;
+    color: #48a9d8;
+    font-size: 12px;
+}
+.api-panel span {
+    display: block;
+}

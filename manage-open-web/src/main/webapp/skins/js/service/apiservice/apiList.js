@@ -129,8 +129,15 @@ function getApiDetail(id, obj) {
                 var tempOut = template("outputParamTemp", {"outputParamList": outputParam});
                 $("#responseParamTbody").empty().append(tempOut);
 
+                var testSpan="<span> <a onclick=\"forTest('"+serviceInfo.id+"')\">在线测试</a> </span>";
+                document.getElementById('apiTest').innerHTML=testSpan;
+
             }
 
         }
     });
+}
+
+function forTest(id) {
+    window.open(context + "/service/api/execute/test/" + id, "_blank");
 }
