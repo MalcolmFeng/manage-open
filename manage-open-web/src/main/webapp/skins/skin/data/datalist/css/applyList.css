@@ -1,0 +1,71 @@
+.queue-con {
+    height: 186px;
+    width: 31%;
+    min-width: 385px;
+    float: left;
+    background-color: #fff;
+    margin-left: 20px;
+    margin-bottom: 20px;
+    padding: 20px 15px 15px 15px;
+    border-radius: 5px;
+    box-shadow: 0px 0px 20px rgba(221,221,221, 0.5);
+}
+.con-body {
+    border-bottom: 1px RGBA(187,220,253,0.4) solid;
+    padding-bottom: 40px;
+}
+.con-body>img {
+    width: 80px;
+    height: 80px;
+    float: left;
+    margin-right: 15px;
+}
+.queue-title {
+    overflow: hidden;
+    margin-bottom: 10px;
+}
+
+.queue-name {
+    float: left;
+    font-size: 18px;
+    color: #666;
+    font-weight: bold;
+}
+
+.queue-name:hover {
+    color: #00BBEE;
+    cursor: pointer;
+}
+
+.queue-time {
+    float: right;
+    color: #888888;
+    font-size: 14px;
+}
+
+.table-name, .queue-desc {
+    color: #888888;
+    font-size: 14px;
+}
+
+#applyBtn {
+    width: 80px;
+    height: 30px;
+    color: #fff;
+    background-color: #00BBEE;
+    border: none;
+    float: right;
+    margin-top: 20px;
+}
+
+/*分页*/
+.pagination_info {
+    padding-top: 15px;
+    float: left;
+    width: 30%;
+}
+
+.pagination_number {
+    float: right;
+    text-align: right;
+}
