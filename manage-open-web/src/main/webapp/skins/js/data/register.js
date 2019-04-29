@@ -43,16 +43,25 @@ var register = {
                 // var html = template("grouplist4", data);
                 $(".fs-label").empty().append("请选择表");
                 var opt="";
+                var tableIds=$("#tableInput").val();
+                var tablename=$("#tablename").val();
                 for (var i in data){
                     var item=data[i];
                     for (var j in item) {
                         var jitem = item[j];
-                        opt = opt + "<div class='fs-option' data-value=" + jitem.dataResourceId + " data-index='"
-                            + j + "'><span class='fs-checkbox'><i></i></span><div class='fs-option-label'>" +
-                            jitem.dataResourceName + "</div></div>";
+                        if (tableIds.indexOf(jitem.dataResourceId)!=-1){
+                            opt = opt + "<div class='fs-option selected' data-value=" + jitem.dataResourceId + " data-index='"
+                                + j + "'><span class='fs-checkbox'><i></i></span><div class='fs-option-label'>" +
+                                jitem.dataResourceName + "</div></div>";
+                        }else{
+                            opt = opt + "<div class='fs-option' data-value=" + jitem.dataResourceId + " data-index='"
+                                + j + "'><span class='fs-checkbox'><i></i></span><div class='fs-option-label'>" +
+                                jitem.dataResourceName + "</div></div>";
+                        }
                     }
                 }
                 $(".fs-options").empty().append(opt);
+                $(".fs-label").empty().append(tablename);
                 // $("#tableDiv").empty().append(html);
                 // $('.demo').fSelect();
                 /*$("#groupSelect4").find("option:contains("+tableName+")").attr("selected",true);*/

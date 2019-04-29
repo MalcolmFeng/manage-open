@@ -79,7 +79,8 @@
 				<%--</div>--%>
 			<%--</div>--%>
 			<div class="form-group">
-				<input type="hidden" name="tablename" value="${dataDef.tableName}"/>
+				<input type="hidden" name="remoteId" id="tableInput" value="${dataDef.remoteId}"/>
+				<input type="hidden" name="tablename" id="tablename" value="${dataDef.tableName}"/>
 				<div class="col-xs-2 col-md-2 control-label">
 					<label class="control-label">表名称<span class="required">*</span></label>
 				</div>
