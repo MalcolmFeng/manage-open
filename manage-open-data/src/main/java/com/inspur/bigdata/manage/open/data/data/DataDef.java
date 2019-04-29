@@ -110,6 +110,12 @@ public class DataDef implements Serializable{
 	private String dataSourceId;
 	@Column(name="INSTANCE_NAME")
 	private String instanceName;
+	/**
+	 * 数据产品分析详情页面url
+	 */
+	@Column(name = "DATA_DETAIL_URL")
+	private String dataDetailUrl;
+
 	@Transient
 	List<DataTableColumn> columnList;
 	@Transient
@@ -306,5 +312,13 @@ public class DataDef implements Serializable{
 
 	public void setInstanceName(String instanceName) {
 		this.instanceName = instanceName;
+	}
+
+	public String getDataDetailUrl() {
+		return dataDetailUrl;
+	}
+
+	public void setDataDetailUrl(String dataDetailUrl) {
+		this.dataDetailUrl = dataDetailUrl;
 	}
 }

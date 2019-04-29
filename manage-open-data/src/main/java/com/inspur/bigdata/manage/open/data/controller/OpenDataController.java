@@ -18,6 +18,8 @@ import com.inspur.bigdata.manage.utils.StringUtil;
 import net.sf.json.JSON;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
+import org.apache.commons.lang.StringUtils;
+import org.apache.ibatis.annotations.Param;
 import org.loushang.framework.mybatis.PageUtil;
 import org.loushang.framework.util.HttpRequestUtils;
 import org.loushang.framework.util.UUIDGenerator;
@@ -258,11 +260,11 @@ public class OpenDataController {
 	@ResponseBody
 	public Map<String, Object> register( final HttpServletRequest httpServletRequest,@RequestBody  DataDef dataDef) {
 		Map<String, Object> map=new HashMap<>();
-		if(null==dataDef||dataDef.getColumnList()==null){
-			map.put("result",false);
-			map.put("message","数据不全");
-			return map;
-		}
+//		if(null==dataDef||dataDef.getColumnList()==null){
+//			map.put("result",false);
+//			map.put("message","数据不全");
+//			return map;
+//		}
 		if(StringUtil.isEmpty(dataDef.getName())){
 			map.put("result",false);
 			map.put("message","名称为空");
@@ -397,27 +399,98 @@ public class OpenDataController {
 	public ModelAndView getInfoForApplyById(@PathVariable("id") String id) {
 		DataDef dataDef = openDataService.getDataDef(id);
 		Map<String, Object> param = new HashMap<String, Object>();
-		List<Map> list = new ArrayList<>();
-		//
-		String url = PropertiesUtil.getValue(OpenDataConstants.CONF_PROPERTIES, "od.domain")+"/service/rest/source/getResourceDetail?dataResourceId="+dataDef.getRemoteId();
-		String resultStr = HttpRequestUtils.get(url);
-		JSONObject json = JSONObject.fromObject(resultStr);
-		//////
-		JSONArray jsonArray = json.getJSONArray("exampleData");
-		for(Object object:jsonArray){
-			JSONObject jsonObject = JSONObject.fromObject(object);
-			Map<Object,Object> map = (Map) jsonObject;
-			list.add(map);
-		}
-		dataDef.setList(list);
-		if(null!=dataDef){
-			List<DataTableColumn> columns=dataTableColumnService.listTableColumnsByDataId(id);
-			dataDef.setColumnList(columns);
-		}
+//		List<Map> list = new ArrayList<>();
+//		//
+//		String url = PropertiesUtil.getValue(OpenDataConstants.CONF_PROPERTIES, "od.domain")+"/service/rest/source/getResourceDetail?dataResourceId="+dataDef.getRemoteId();
+//		String resultStr = HttpRequestUtils.get(url);
+//		JSONObject json = JSONObject.fromObject(resultStr);
+//		//////
+//		JSONArray jsonArray = json.getJSONArray("exampleData");
+//		for(Object object:jsonArray){
+//			JSONObject jsonObject = JSONObject.fromObject(object);
+//			Map<Object,Object> map = (Map) jsonObject;
+//			list.add(map);
+//		}
+//		dataDef.setList(list);
+//		if(null!=dataDef){
+//			List<DataTableColumn> columns=dataTableColumnService.listTableColumnsByDataId(id);
+//			dataDef.setColumnList(columns);
+//		}
 		param.put("serviceInfo",dataDef);
 		param.put("apply",true);
 		return new ModelAndView("data/data/info",param);
 	}
+
+	@RequestMapping(value = "getTableInfo")
+	@ResponseBody
+	public Map<String, Object> getTableInfoById(@RequestParam String remoteId) {
+		Map<String, Object> result=new HashMap<>();
+		if (StringUtils.isNotEmpty(remoteId)) {
+			String url = PropertiesUtil.getValue(OpenDataConstants.CONF_PROPERTIES, "od.domain") + "/service/rest/resource/getTables?remoteId=" + remoteId;
+			String resultStr = HttpRequestUtils.get(url);
+			if (StringUtils.isNotEmpty(resultStr)) {
+				result.put("json", resultStr);
+				result.put("msg", "获取表信息成功！");
+			} else {
+				result.put("msg", "未获取到表信息");
+			}
+		}else{
+			result.put("msg","表id不能为空");
+		}
+		return result;
+	}
+
+	/**
+	 * 根据表id获取表字段 调用数据管理接口
+	 * @param resourceId
+	 * @return
+	 */
+	@RequestMapping(value = "getItemsByResourceId")
+	@ResponseBody
+	public Map<String,Object> getItemsByResourceId(@RequestParam String resourceId){
+		Map<String, Object> result=new HashMap<>();
+		if (StringUtils.isNotEmpty(resourceId)) {
+			String url = PropertiesUtil.getValue(OpenDataConstants.CONF_PROPERTIES, "od.domain") + "/service/rest/resource/getItemsByResourceId?resourceId=" + resourceId;
+			String resultStr = HttpRequestUtils.get(url);
+			if (StringUtils.isNotEmpty(resultStr)) {
+				result.put("json", resultStr);
+				result.put("msg", "获取字段信息成功！");
+			} else {
+				result.put("msg", "未获取到字段信息");
+			}
+		}else{
+			result.put("msg","表id不能为空");
+		}
+		return result;
+	}
+	/**
+	 * 根据表id获取表字段 调用数据管理接口
+	 * @param map
+	 * @return
+	 */
+	@RequestMapping(value = "getDataByResourceId")
+	@ResponseBody
+	public Map<String,Object> getDataByResourceId(@RequestParam Map<String,String>map){
+		Map<String, Object> result=new HashMap<>();
+		if (map!=null&&map.size()>0&&StringUtils.isNotEmpty(map.get("DATA_RESOURCE_ID"))) {
+			String limit="10";
+			if (StringUtils.isNotEmpty(map.get("limit"))){
+				limit=map.get("limit");
+			}
+			String url = PropertiesUtil.getValue(OpenDataConstants.CONF_PROPERTIES, "od.domain") + "/service/rest/resource/getDataByResourceId?DATA_RESOURCE_ID=" + map.get("DATA_RESOURCE_ID")+"&needTotal=true&start=0&limit="+limit;
+			String resultStr = HttpRequestUtils.get(url);
+			if (StringUtils.isNotEmpty(resultStr)) {
+				result.put("json", resultStr);
+				result.put("msg", "获取数据成功！");
+			} else {
+				result.put("msg", "未获取到数据信息");
+			}
+		}else{
+			result.put("msg","表id不能为空");
+		}
+		return result;
+	}
+
 
 	/**
 	 * 数据申请操作

@@ -43,12 +43,12 @@ public class OpenDataServiceImpl implements IOpenDataService {
     }
     public DataDef  addDataDefForApi(DataDef def){
          dataDefMapper.insert(def);
-         List<DataTableColumn> list=def.getColumnList();
-         for(DataTableColumn column:list){
-             column.setId(UUIDGenerator.getUUID().toString());
-             column.setDtDataId(def.getId());
-             dataTableColumnMapper.insert(column);
-         }
+//         List<DataTableColumn> list=def.getColumnList();
+//         for(DataTableColumn column:list){
+//             column.setId(UUIDGenerator.getUUID().toString());
+//             column.setDtDataId(def.getId());
+//             dataTableColumnMapper.insert(column);
+//         }
         return def;
     }
 

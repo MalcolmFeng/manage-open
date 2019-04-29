@@ -15,6 +15,7 @@ import com.inspur.bigdata.manage.utils.OpenDataConstants;
 import com.inspur.bigdata.manage.utils.StringUtil;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
+import org.apache.commons.lang.StringUtils;
 import org.loushang.framework.mybatis.PageUtil;
 import org.loushang.framework.util.HttpRequestUtils;
 import org.slf4j.Logger;
@@ -135,61 +136,66 @@ public class DataApplyController {
 	public Map<String, Object> authPassApply(@PathVariable("id") String id) {
 		Map<String, Object> result=new HashMap<>();
 		try {
-			DataApply dataApply=dataApplyService.getById(id);
+			DataApply dataApply = dataApplyService.getById(id);
 			DataDef dataDef = openDataService.getDataDef(dataApply.getDtDataId());
-			if(dataDef==null){
-				result.put("result",false);
-				result.put("message","申请数据不存在,授权不成功");
+			if (dataDef == null) {
+				result.put("result", false);
+				result.put("message", "申请数据不存在,授权不成功");
 				return result;
 			}
-			if(dataDef.getAuditStatus()==null||!dataDef.getAuditStatus().equals(OpenDataConstants.data_audit_pass)){
-				result.put("result",false);
-				result.put("message","数据审核不通过，不允许授权");
+			if (dataDef.getAuditStatus() == null || !dataDef.getAuditStatus().equals(OpenDataConstants.data_audit_pass)) {
+				result.put("result", false);
+				result.put("message", "数据审核不通过，不允许授权");
 				return result;
 			}
 
 			List<String> resAuth = new ArrayList<>();
 			resAuth.add(OpenDataConstants.select);
 			String applicant = dataApply.getApplicant();
-			Map<String,String> cluster = TenantClusterService.getTenantClusterInfo();
+			Map<String, String> cluster = TenantClusterService.getTenantClusterInfo();
 			String clusterId = cluster.get("clusterId");
 			String clusterName = cluster.get("clusterName");
-		//	String clusterId = "cluster4741";
-		//	String clusterName ="cluster4741";
+			//	String clusterId = "cluster4741";
+			//	String clusterName ="cluster4741";
 
-			String dburl = PropertiesUtil.getValue(OpenDataConstants.CONF_PROPERTIES, "od.domain")+ "/service/rest/source/getSourceByUser?userId="+ OpenDataConstants.getUserId();
+			String dburl = PropertiesUtil.getValue(OpenDataConstants.CONF_PROPERTIES, "od.domain") + "/service/rest/source/getSourceByUser?userId=" + OpenDataConstants.getUserId();
 			String resultStr = HttpRequestUtils.get(dburl);
 			List<JSONObject> list = OpenDataConstants.getJsonParse(resultStr);
-			String resPath=null;
-			for(JSONObject jsonObject:list){
-				if(StringUtil.isNotEmpty(dataDef.getDataSourceId())&&dataDef.getDataSourceId().equalsIgnoreCase(jsonObject.getString("dataSourceId"))){
-					resPath=jsonObject.getString("instanceName");
+			String resPath = null;
+			for (JSONObject jsonObject : list) {
+				if (StringUtil.isNotEmpty(dataDef.getDataSourceId()) && dataDef.getDataSourceId().equalsIgnoreCase(jsonObject.getString("dataSourceId"))) {
+					resPath = jsonObject.getString("instanceName");
 				}
 			}
-			String result_string = null;
-			try {
-				String url = PropertiesUtil.getValue(OpenDataConstants.CONF_PROPERTIES, "mcs.domain")+ "/manage/service/security/rest/saveHiveAuth?clusterId="
-						+ clusterId+"&clusterName="+clusterName+"&authUser="+applicant+"&table="+dataDef.getTableName()+"&column=*"+"&resPath="+resPath+"&resAuth="+ URLEncoder.encode(resAuth.toString(),"UTF-8");
-				logger.error("<======================授权url:"+url);
-				result_string = HttpRequestUtils.get(url);
-			} catch (UnsupportedEncodingException e) {
-				e.printStackTrace();
+			/**
+			 * 数据集开放 table-name为多个表逗号分隔 循环授权
+			 */
+			if (StringUtils.isNotEmpty(dataDef.getTableName())) {
+				for (String tableName : dataDef.getTableName().split(",", -1)) {
+					String result_string = null;
+					try {
+						String url = PropertiesUtil.getValue(OpenDataConstants.CONF_PROPERTIES, "mcs.domain") + "/manage/service/security/rest/saveHiveAuth?clusterId="
+								+ clusterId + "&clusterName=" + clusterName + "&authUser=" + applicant + "&table=" + tableName + "&column=*" + "&resPath=" + resPath + "&resAuth=" + URLEncoder.encode(resAuth.toString(), "UTF-8");
+						logger.error("<======================授权url:" + url);
+						result_string = HttpRequestUtils.get(url);
+					} catch (UnsupportedEncodingException e) {
+						e.printStackTrace();
+					}
+					dataApply.setAuthTime(OpenDataConstants.sf.format(new Date()));
+					dataApply.setAuthStatus(OpenDataConstants.auth_status_pass);
+					dataApply.setAuthUser(OpenDataConstants.getUserId());
+					if ("success".equalsIgnoreCase(result_string)) {
+						dataApplyService.updateDataApply(dataApply);
+						result.put("result", true);
+					} else {
+						result.put("result", false);
+					}
+				}
 			}
-			dataApply.setAuthTime(OpenDataConstants.sf.format(new Date()));
-			dataApply.setAuthStatus(OpenDataConstants.auth_status_pass);
-			dataApply.setAuthUser(OpenDataConstants.getUserId());
-			if("success".equalsIgnoreCase(result_string)){
-				dataApplyService.updateDataApply(dataApply);
-				result.put("result",true);
-			}else{
-				result.put("result",false);
-			}
-
-
 		} catch (Exception e) {
 			logger.error("数据授权出错.", e);
-			result.put("result",false);
-			result.put("message",e.getMessage());
+			result.put("result", false);
+			result.put("message", e.getMessage());
 		}
 		return result;
 	}

@@ -67,17 +67,30 @@
 					<span class="Validform_checktip Validform_span" style="float: none"></span>
 				</div>
 			</div>
+			<%--<div class="form-group">--%>
+				<%--<input type="hidden" name="tablename" value="${dataDef.tableName}"/>--%>
+				<%--<div class="col-xs-2 col-md-2 control-label">--%>
+					<%--<label class="control-label">表名称<span class="required">*</span></label>--%>
+				<%--</div>--%>
+				<%--<div class="col-xs-10 col-md-10">--%>
+					<%--<div id="tableDiv" style="width: 25%; display: inline-block"></div>--%>
+					<%--<div id="subtabledataDiv" style="width: 25%; display:none"></div>--%>
+					<%--<span class="Validform_checktip Validform_span" style="float: none"></span>--%>
+				<%--</div>--%>
+			<%--</div>--%>
 			<div class="form-group">
 				<input type="hidden" name="tablename" value="${dataDef.tableName}"/>
 				<div class="col-xs-2 col-md-2 control-label">
 					<label class="control-label">表名称<span class="required">*</span></label>
 				</div>
-				<div class="col-xs-10 col-md-10">
-					<div id="tableDiv" style="width: 25%; display: inline-block"></div>
-					<div id="subtabledataDiv" style="width: 25%; display:none"></div>
-					<span class="Validform_checktip Validform_span" style="float: none"></span>
+				<div class="col-xs-10 col-md-10" >
+					<select id="tableSelect" class="demo" multiple="multiple">
+					</select>
 				</div>
 			</div>
+
+
+
 			<%--    <div class="form-group">
                     <div class="col-xs-2 col-md-2 control-label">
                         <label class="control-label">表名称<span class="required">*</span></label>
@@ -132,20 +145,26 @@
 			<div class="form-group">
 				<label class="col-xs-2 col-md-2 control-label">数据描述<span class="required">*</span></label>
 				<div class="col-xs-10 col-md-10">
-					<c:if test="${not empty dataDef.description}">
-						<textarea id="description" name="description" rows="3" cols="80" style="width:80%;"
-								  class="form-control ue-form Validform_input" placeholder="简述数据信息（5-200字）"
-								  overflow="auto" errormsg="数据描述字数限制在5-200个!" nullmsg="请填写数据描述" readonly>${dataDef.description }</textarea>
-					</c:if>
-					<c:if test="${empty dataDef.description}">
-					<textarea id="description" name="description" rows="3" cols="80" style="width:80%;"
-							  class="form-control ue-form Validform_input" placeholder="简述数据信息（5-200字）"
-							  overflow="auto" dataType="verifyDescritpion" errormsg="数据描述字数限制在5-200个!" nullmsg="请填写数据描述">${dataDef.description }</textarea>
-					</c:if>
+					<textarea id="description" name="description" rows="6" cols="80" style="width:80%;"
+							  class="form-control ue-form Validform_input" placeholder="简述数据信息（5-1000字）"
+							  overflow="auto" dataType="verifyDescritpion" errormsg="数据描述字数限制在5-1000个!" nullmsg="请填写数据描述">${dataDef.description}</textarea>
 					<span class="Validform_checktip Validform_span"></span>
 				</div>
 			</div>
-			<h3 class="text-left htext">表信息</h3>
+			<div class="form-group">
+				<div class="col-xs-2 col-md-2 control-label">
+					<label class="control-label">详情地址<span class="required">*</span></label>
+				</div>
+				<div class="col-xs-10 col-md-10">
+					<input type="text" class="form-control ue-form Validform_input" id="dataDetailUrl"
+						   name="dataDetailUrl" value="${dataDef.dataDetailUrl}" placeholder="请输入详情地址"
+						   errormsg="请输入完整的url" nullmsg="详情地址不能为空"/>
+					<span class="Validform_checktip Validform_span"></span>
+				</div>
+			</div>
+			</div>
+
+			<%--<h3 class="text-left htext">表信息</h3>
 			<hr class="fenge"/>
 			<div class="form-group">
 				<label class="col-xs-2 col-md-2 control-label">表字段</label>
@@ -156,54 +175,8 @@
 							<th style="width: 180px;">字段类型</th>
 							<th style="width: 180px;">是否必填</th>
 							<th>字段描述</th>
-							<%--     <th style="width: 60px;">操作</th>--%>
 						</tr>
-						<%--<c:if test="${not empty dataDef.columnList }">
-                            <c:forEach items="${dataDef.columnList }" var="item">
-                                <tr>
-                                   <td>
-                                       <input type="hidden" name="id" value="${item.id }" />
-                                       <input type="text" name="columnName" value="${item.columnName }" />
-                                   </td>
-                                   <td>
-                                       <select name="columnType">
-                                           <option value="string" <c:if test="${item.columnType eq 'string'}"> selected="selected"</c:if> >字符串</option>
-                                           <option value="number" <c:if test="${item.columnType eq 'number'}"> selected="selected"</c:if> >数值型</option>
-                                       </select>
-                                   </td>
-                                   <td>
-                                       <select name="isNull">
-                                           <option value="1" <c:if test="${item.isNull eq '1' }">selected="selected"  </c:if> >是</option>
-                                           <option value="0" <c:if test="${item.isNull eq '0' }">selected="selected"  </c:if> >否</option>
-                                       </select>
-
-                                   </td>
-                                   <td><input type="text" name="description" value="${item.description }"/></td>
-                                   <td><a onclick="register.forColumnDel(this)">删除</a></td>
-                                </tr>
-                            </c:forEach>
-                        </c:if>
-                        <c:if test="${empty dataDef.columnList }">
-                            <tr>
-                               <td><input type="text" name="columnName" value="" /></td>
-                               <td>
-                                   <select name="columnType">
-                                       <option value="string" selected="selected">字符串</option>
-                                       <option value="number">数值型</option>
-                                   </select>
-                               </td>
-                               <td>
-                                   <select name="isNull">
-                                       <option value="1" selected="selected">是</option>
-                                       <option value="0">否</option>
-                                   </select>
-                               </td>
-                               <td><input type="text" name="description" value=""/></td>
-                               <td><a onclick="register.forColumnDel(this)">删除</a></td>
-                            </tr>
-                        </c:if>--%>
 					</table>
-					<%--<div class="pull-right addrow"><a onclick="register.addInputParam()">增加一行</a></div>--%>
 				</div>
 			</div>
 			<div class="form-group">
@@ -214,7 +187,7 @@
 
 					</table>
 				</div>
-			</div>
+			</div>--%>
 			<div class="form-group" >
 				<label class="col-xs-2 col-md-2 control-label"></label>
 				<div class="col-xs-10 col-md-10">
@@ -283,8 +256,8 @@
 	}
 
 	function verifyDescritpion(gets, obj, curform, datatye) {
-		if(gets.length>200 || gets.length<5){
-			obj.attr("errormsg", "数据描述字数限制在5-200个!");
+		if(gets.length>1000 || gets.length<5){
+			obj.attr("errormsg", "数据描述字数限制在5-1000个!");
 			return false;
 		}
 		return true;
@@ -416,6 +389,10 @@
 	</tr>
 	{{/each}}
 </script>
-
+<script>
+	$(function() {
+		$('.demo').fSelect();
+	});
+</script>
 </body>
 </html>
