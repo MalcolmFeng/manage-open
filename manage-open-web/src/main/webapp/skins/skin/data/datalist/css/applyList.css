@@ -75,3 +75,8 @@
     float: right;
     text-align: right;
 }
+
+.pagination {
+    margin-top:5px;
+    margin-bottom: 0px;
+}

@@ -1,3 +1,4 @@
+var pageSize=10;
 $(function() {
 //	  	   loadServiceApplyCount(openServiceId);
     // 切换tab页
@@ -33,7 +34,7 @@ function initTableName() {
 
                 $("#tableNameList>li:first").addClass("active");
                 var resourceId =  $("#tableNameList>li:first").attr("data-resourceid");
-                initTableCol(resourceId);
+                initTableCol(resourceId,0);
             }
         }
     });
@@ -44,13 +45,14 @@ function tableLiClick() {
     $(this).addClass("active").siblings().removeClass("active");
     var resourceId = $(this).attr("data-resourceid");
     // 加载数据项信息
-    initTableCol(resourceId);
+    initTableCol(resourceId,0);
 }
 
 // 加载数据项信息
-function initTableCol(resourceId) {
+function initTableCol(resourceId,curPage,isPage) {
+    var start = pageSize*curPage;
     $.ajax({
-        url: context + "/service/open/data/getItemsByResourceId?resourceId=" + resourceId,
+        url: context + "/service/open/data/getItemsByResourceId?resourceId=" + resourceId + "&limit=" + pageSize+ "&start=" + start,
         success: function(data) {
             var dataSet = eval("("+data.json+")");
             if(dataSet.recordSet.length > 0) {
@@ -65,10 +67,40 @@ function initTableCol(resourceId) {
                 $("#colDataTable>tbody").empty().append(temp);
 
                 $("#colDataList>tbody").empty();
+
+               /* setPageHeight();*/
+                //重新显示分页
+                var totalPage=0;
+                if(dataSet.count>0){
+                    totalPage=  dataSet.count%pageSize==0?dataSet.count/pageSize:parseInt(dataSet.count/pageSize)+1
+                    setPaginationInfo(curPage+1,totalPage);
+                }else{
+                    setPaginationInfo(0,totalPage);
+                }
+                if(!isPage){
+                    initPagination = function() {
+                        $(".pagination").pagination(totalPage, {
+                            num_edge_entries: 1,
+                            num_display_entries: 4,
+                            items_per_page:1,
+                            callback: pageSelectCallback
+                        });
+                    }();
+                }
+
                 initColData(resourceId, colSet);
             }
         }
     });
+}
+
+function setPaginationInfo(curPage,pageCount) {
+    var html = '<span>共&nbsp;'+pageCount+'&nbsp;页,当前第&nbsp;' + curPage + '&nbsp;页</span>';
+    $(".pagination_info").empty().append(html);
+}
+
+function pageSelectCallback(curPage, pagination) {
+    initServiceList(curPage,"page");
 }
 
 // 加载数据列

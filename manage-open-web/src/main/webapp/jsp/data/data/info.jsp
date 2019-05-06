@@ -134,7 +134,7 @@
 					<tbody></tbody>
 				</table>
 
-				<div class="row">
+				<div>
 					<div class="pagination_info">
 					</div>
 					<div class="pagination_number">

@@ -101,3 +101,18 @@
 .table-hover>tbody>tr:hover {
     border-left: 2px solid #ffab14;
 }
+
+.pagination_info {
+    padding-top: 15px;
+    float: left;
+    width: 30%;
+}
+
+.pagination_number {
+    float: right;
+    text-align: right;
+}
+.pagination {
+    margin-top:5px;
+    margin-bottom: 0px;
+}
