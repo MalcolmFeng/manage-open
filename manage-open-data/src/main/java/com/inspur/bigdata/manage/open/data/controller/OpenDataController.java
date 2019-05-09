@@ -265,6 +265,7 @@ public class OpenDataController {
 //			map.put("message","数据不全");
 //			return map;
 //		}
+		//*****201904 支持数据集发布，数据字段不展示，表数据不展示（对应表删除）********
 		if(StringUtil.isEmpty(dataDef.getName())){
 			map.put("result",false);
 			map.put("message","名称为空");
@@ -421,6 +422,11 @@ public class OpenDataController {
 		return new ModelAndView("data/data/info",param);
 	}
 
+	/**
+	 * 调用数据管理平台接口 根据表id查询表信息
+	 * @param remoteId
+	 * @return
+	 */
 	@RequestMapping(value = "getTableInfo")
 	@ResponseBody
 	public Map<String, Object> getTableInfoById(@RequestParam String remoteId) {
@@ -447,10 +453,10 @@ public class OpenDataController {
 	 */
 	@RequestMapping(value = "getItemsByResourceId")
 	@ResponseBody
-	public Map<String,Object> getItemsByResourceId(@RequestParam String resourceId){
+	public Map<String,Object> getItemsByResourceId(@RequestParam String resourceId,@RequestParam String limit,@RequestParam String start){
 		Map<String, Object> result=new HashMap<>();
 		if (StringUtils.isNotEmpty(resourceId)) {
-			String url = PropertiesUtil.getValue(OpenDataConstants.CONF_PROPERTIES, "od.domain") + "/service/rest/resource/getItemsByResourceId?resourceId=" + resourceId;
+			String url = PropertiesUtil.getValue(OpenDataConstants.CONF_PROPERTIES, "od.domain") + "/service/rest/resource/getItemsByResourceId?resourceId=" + resourceId+"&limit="+limit+"&start="+start;
 			String resultStr = HttpRequestUtils.get(url);
 			if (StringUtils.isNotEmpty(resultStr)) {
 				result.put("json", resultStr);
@@ -464,7 +470,7 @@ public class OpenDataController {
 		return result;
 	}
 	/**
-	 * 根据表id获取表字段 调用数据管理接口
+	 * 根据表id获取表数据 调用数据管理接口
 	 * @param map
 	 * @return
 	 */

@@ -69,7 +69,7 @@ public class DataGroupController {
 		param.put("parentId", pid);
 		String userId = OpenDataConstants.getUserId();
 		//String userId = "superadmin";
-		String url = PropertiesUtil.getValue(OpenDataConstants.CONF_PROPERTIES, "od.domain")+ "/service/rest/source/getSourceByUser?userId="+ userId;
+		String url = PropertiesUtil.getValue(OpenDataConstants.CONF_PROPERTIES, "od.domain")+ "/service/rest/source/getSourceByUser?userId="+ userId+"&sourceType=hive,kudu";
 		String resultStr = HttpRequestUtils.get(url);
 		List<JSONObject> list = OpenDataConstants.getJsonParse(resultStr);
 		Map<String, Object> result = new HashMap<String, Object>();
@@ -144,7 +144,7 @@ public class DataGroupController {
 		group.setName(param.get("name"));
 		group.setParentId(param.get("parentId"));
 		group.setSeq(Integer.valueOf(param.get("seq")));
-		
+
 		boolean isRegisted = groupService.isRegisted(group.getParentId(),group.getName());
 
 		try {
@@ -182,7 +182,7 @@ public class DataGroupController {
 
 
 			}
-			
+
 		} catch (Exception e) {
 			log.error("保存数据分组出错.", e);
 			return result;
@@ -200,5 +200,5 @@ public class DataGroupController {
 			return false;
 		}
 	}
-	
+
 }

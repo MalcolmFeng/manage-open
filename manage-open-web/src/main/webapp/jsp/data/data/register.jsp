@@ -308,7 +308,7 @@
 	<select id="groupSelect3" class="form-control ue-form" onchange="register.loadTableList();" datatype="s" nullmsg="请选择数据源分组">
 		<option value="">请选择数据源</option>
 		{{each data as group}}
-		<option value="{{group.dataSourceId}}">{{group.instanceName}}</option>
+		<option value="{{group.dataSourceId}}" data-value="{{group.instanceName}}">{{group.instanceName}}<span> [{{group.dataSourceType}}]</span></option>
 		{{/each}}
 	</select>
 </script>

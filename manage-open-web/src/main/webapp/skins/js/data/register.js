@@ -33,6 +33,8 @@ var register = {
       });
   },
   loadTableList:function(remoteId){
+        // var sourceName=$("#sourceDiv option:selected").attr("data-value");
+        // console.info(sourceName);
         var sourceId = $("#groupSelect3 option:selected").val();
         $.ajax({
             type: "post",
@@ -61,7 +63,9 @@ var register = {
                     }
                 }
                 $(".fs-options").empty().append(opt);
-                $(".fs-label").empty().append(tablename);
+                if(tablename!=""){
+                    $(".fs-label").empty().append(tablename);
+                }
                 // $("#tableDiv").empty().append(html);
                 // $('.demo').fSelect();
                 /*$("#groupSelect4").find("option:contains("+tableName+")").attr("selected",true);*/
@@ -304,7 +308,8 @@ var register = {
     serviceInfo.authType = $('input[name=authType]:checked').val();//授权方式
 
     // serviceInfo.remoteId = $("#tableDiv option:selected").val();
-    serviceInfo.instanceName = $("#sourceDiv option:selected").text();
+    // serviceInfo.instanceName = $("#sourceDiv option:selected").text();
+    serviceInfo.instanceName = $("#sourceDiv option:selected").attr("data-value");
     serviceInfo.dataSourceId = $("#sourceDiv option:selected").val();
     serviceInfo.auditStatus = $("#auditStatus").val();
     return serviceInfo;
