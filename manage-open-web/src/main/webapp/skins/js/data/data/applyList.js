@@ -12,7 +12,6 @@ $(function() {
         loadAppList(openServiceId);
     });
 
-
 });
 
 function pageSelectCallback(curPage, pagination) {

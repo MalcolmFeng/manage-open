@@ -81,7 +81,7 @@
                             <div class="queue-time">{{item.createTime}}</div>
                         </div>
                         <%--<div class="table-name">表名：tb3</div>--%>
-                        <div class="queue-desc">{{item.description}}</div>
+                        <div class="queue-desc" title='{{item.description}}'>{{item.description}}</div>
                     </div>
                 </div>
                 <button type="button" id="applyBtn" data-id={{item.id}}>申请</button>

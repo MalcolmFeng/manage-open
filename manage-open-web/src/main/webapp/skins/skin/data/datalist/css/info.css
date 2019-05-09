@@ -1,0 +1,118 @@
+.tab-con>ul {
+    overflow: hidden;
+    border-bottom: 1px solid #ddd;
+    height: 43px;
+    line-height: 40px;
+}
+.tab-con>ul>li {
+    float: left;
+    padding: 0 30px;
+}
+
+.tab-con>ul>li>a {
+    color: #666;
+}
+
+.tab-con>ul>li.active {
+    border-bottom: 2px solid #0be;
+}
+
+.tab-con>ul>li.active>a, .tab-con>ul>li:hover>a {
+    color: #0be;
+}
+
+.service-name {
+    font-size: 16px;
+    font-weight: bold;
+    color: #333;
+}
+.service-time, .service-status {
+    font-size: 14px;
+    color: #999;
+}
+
+.button-group {
+    float: right;
+    color: #fff;
+}
+
+#backBtn, #applyBtn {
+    width: 80px;
+    height: 30px;
+    background-color: #00BBEE;
+    border: none;
+}
+
+.service_info_title {
+    font-size: 14px;
+    color: #333;
+    font-weight: bold;
+    border-bottom: 1px solid RGBA(187,220,253,0.5);
+    height: 30px;
+    line-height: 30px;
+    margin-bottom: 15px;
+}
+
+#detailPage {
+    height: -webkit-fill-available;
+}
+
+#sjlb {
+    /*overflow: hidden;
+    position: relative;*/
+}
+
+.table-name-con {
+    position: absolute;
+    left: 0;
+    top: 60px;
+    height: calc(100% - 70px);
+    border-right: 1px solid RGBA(187,220,253,0.5);
+    font-size: 16px;
+    color: #333;
+    padding-top: 20px;
+}
+
+.table-name-con>ul>li {
+    height: 40px;
+    line-height: 40px;
+    padding-left: 20px;
+}
+
+.table-name-con>ul>li:hover, #tableNameList>li.active {
+    background-color: RGBA(187,220,253,0.4);
+    cursor: pointer;
+}
+
+.table-name-con>ul>li>img {
+    margin-right: 15px;
+}
+
+.table-col-con {
+    position: absolute;
+    right: 0;
+}
+
+#colDataTable>thead>tr, #colDataList>thead>tr {
+    background-color: #f2f2f2;
+    border-top: 1px solid #ffab14;
+}
+
+.table-hover>tbody>tr:hover {
+    border-left: 2px solid #ffab14;
+}
+
+.pagination_info {
+    padding-top: 15px;
+    float: left;
+    width: 30%;
+}
+
+.pagination_number {
+    float: right;
+    text-align: right;
+}
+.pagination {
+    margin-top:5px;
+    margin-bottom: 0px;
+}

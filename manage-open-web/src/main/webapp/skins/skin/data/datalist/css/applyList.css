@@ -12,7 +12,7 @@
 }
 .con-body {
     border-bottom: 1px RGBA(187,220,253,0.4) solid;
-    padding-bottom: 40px;
+    padding-bottom: 20px;
 }
 .con-body>img {
     width: 80px;
@@ -43,9 +43,15 @@
     font-size: 14px;
 }
 
-.table-name, .queue-desc {
+.queue-desc {
     color: #888888;
     font-size: 14px;
+    height: 40px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
 }
 
 #applyBtn {
@@ -68,4 +74,9 @@
 .pagination_number {
     float: right;
     text-align: right;
+}
+
+.pagination {
+    margin-top:5px;
+    margin-bottom: 0px;
 }
