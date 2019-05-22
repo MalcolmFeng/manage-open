@@ -11,7 +11,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
     <title>服务详情</title>
-    
+
     <!-- 需要引用的CSS -->
 	<link rel="shortcut icon" href="<%=request.getContextPath()%>/jsp/public/images/favicon.ico" />
 	<link rel="stylesheet" type="text/css" href="<l:asset path='css/bootstrap.css'/>" />
@@ -27,7 +27,7 @@
     <script type="text/javascript" src="<l:asset path='jquery.js'/>" ></script>
     <script type="text/javascript" src="<l:asset path='bootstrap.js'/>" ></script>
 	<script type="text/javascript" src="<l:asset path='form.js'/>" ></script>
-	<script type="text/javascript" src="<l:asset path='arttemplate.js'/>" ></script>	
+	<script type="text/javascript" src="<l:asset path='arttemplate.js'/>" ></script>
     <script type="text/javascript" src="<l:asset path='ui.js'/>"></script>
 	<script type="text/javascript" src="<l:asset path='data/data/info.js'/>"></script>
 	<%--<script type="text/javascript" src="<l:asset path='data/data/resourceDataVisual.js'/>"></script>--%>
@@ -120,6 +120,7 @@
 			</div>
 			<div class="table-col-con col-md-9">
 
+				<div class="service_info_title" id="tablename">数据项信息</div>
 				<div class="service_info_title">数据项信息</div>
 				<table id="colDataTable" class="table table-hover table-bordered">
 					<thead>
@@ -165,7 +166,7 @@
 	<!--表-->
 	<script type="text/html" id="tableTemp">
 		{{each tableList as table}}
-		<li data-resourceId='{{table.resourceId}}'><img src="<%=request.getContextPath() %>/skins/skin/data/datalist/img/table-logo.png"/>{{table.resourceName}}</li>
+		<li data-resourceId='{{table.resourceId}}' data-text="{{table.tableName}}"><img src="<%=request.getContextPath() %>/skins/skin/data/datalist/img/table-logo.png"/>{{table.resourceName}}</li>
 		{{/each}}
 	</script>
 	<!--数据项 -->

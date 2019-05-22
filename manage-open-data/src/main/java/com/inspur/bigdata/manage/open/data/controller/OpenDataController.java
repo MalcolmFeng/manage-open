@@ -288,7 +288,7 @@ public class OpenDataController {
 			map.put("message","数据分组不存在");
 			return map;
 		}
-		String dburl = PropertiesUtil.getValue(OpenDataConstants.CONF_PROPERTIES, "od.domain")+ "/service/rest/source/getSourceByUser?userId="+ OpenDataConstants.getUserId();
+		String dburl = PropertiesUtil.getValue(OpenDataConstants.CONF_PROPERTIES, "od.domain")+ "/service/rest/source/getSourceByUser?userId="+ OpenDataConstants.getUserId()+"&sourceType=hive";
 		String resultStr = HttpRequestUtils.get(dburl);
 		List<JSONObject> list = OpenDataConstants.getJsonParse(resultStr);
 		String jdbcurl=null;

@@ -1,4 +1,5 @@
 var pageSize=10;
+var tableName="";
 $(function() {
 //	  	   loadServiceApplyCount(openServiceId);
     // 切换tab页
@@ -31,7 +32,7 @@ function initTableName() {
             if(dataSet.length > 0) {
                 var temp= template("tableTemp", {"tableList": dataSet});
                 $("#tableNameList").empty().append(temp);
-
+                $("#tablename").empty().append("数据表名称："+dataSet[0].tableName);
                 $("#tableNameList>li:first").addClass("active");
                 var resourceId =  $("#tableNameList>li:first").attr("data-resourceid");
                 initTableCol(resourceId,0);
@@ -43,6 +44,8 @@ function initTableName() {
 // 切换表格
 function tableLiClick() {
     $(this).addClass("active").siblings().removeClass("active");
+    tableName=$(this).attr("data-text");
+    $("#tablename").empty().append("数据表名称："+tableName);
     var resourceId = $(this).attr("data-resourceid");
     // 加载数据项信息
     initTableCol(resourceId,0);
