@@ -148,6 +148,7 @@
 				<div class="pull-left">
 					共<span id="totalCount" style="color: #3F8BE8"></span>条数据
 				</div>
+				<div style="overflow: auto; width: 100%;">
 				<table class="table table-hover table-bordered" id="colDataList">
 					<thead>
 						<tr></tr>
@@ -155,6 +156,7 @@
 					<tbody>
 					</tbody>
 				</table>
+				</div>
 				<%--<table class="table table-hover table-bordered" id="grid">
 					<thead>
 					</thead>

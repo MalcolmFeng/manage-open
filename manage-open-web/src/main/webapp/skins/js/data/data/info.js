@@ -1,5 +1,6 @@
 var pageSize=10;
-var tableName="";
+var tablename="";
+var colResourceId;
 $(function() {
 //	  	   loadServiceApplyCount(openServiceId);
     // 切换tab页
@@ -32,10 +33,12 @@ function initTableName() {
             if(dataSet.length > 0) {
                 var temp= template("tableTemp", {"tableList": dataSet});
                 $("#tableNameList").empty().append(temp);
-                $("#tablename").empty().append("数据表名称："+dataSet[0].tableName);
+				$("#tablename").empty().append("数据表名称："+dataSet[0].tableName);
                 $("#tableNameList>li:first").addClass("active");
                 var resourceId =  $("#tableNameList>li:first").attr("data-resourceid");
-                initTableCol(resourceId,0);
+				colResourceId = resourceId;
+                initTableCol(0);
+				initColData();
             }
         }
     });
@@ -44,38 +47,33 @@ function initTableName() {
 // 切换表格
 function tableLiClick() {
     $(this).addClass("active").siblings().removeClass("active");
-    tableName=$(this).attr("data-text");
+	tableName=$(this).attr("data-text");
     $("#tablename").empty().append("数据表名称："+tableName);
     var resourceId = $(this).attr("data-resourceid");
+	colResourceId = resourceId;
     // 加载数据项信息
-    initTableCol(resourceId,0);
+    initTableCol(0);
+	initColData();
 }
 
 // 加载数据项信息
-function initTableCol(resourceId,curPage,isPage) {
+function initTableCol(curPage,isPage) {
     var start = pageSize*curPage;
     $.ajax({
-        url: context + "/service/open/data/getItemsByResourceId?resourceId=" + resourceId + "&limit=" + pageSize+ "&start=" + start,
+        url: context + "/service/open/data/getItemsByResourceId?resourceId=" + colResourceId + "&limit=" + pageSize+ "&start=" + start,
         success: function(data) {
             var dataSet = eval("("+data.json+")");
             if(dataSet.recordSet.length > 0) {
                 var colSet = dataSet.recordSet;
-                $("#colDataList>thead>tr").empty();
-                for(var i = 0; i < colSet.length; i++) {
-                    var html = '<th>'+colSet[i].data.columnName+'</th>';
-                    $("#colDataList>thead>tr").append(html);
-                }
-
+                       
                 var temp= template("colDataTableTemp", {"colList": dataSet.recordSet});
                 $("#colDataTable>tbody").empty().append(temp);
 
-                $("#colDataList>tbody").empty();
-
-               /* setPageHeight();*/
+                /* setPageHeight();*/
                 //重新显示分页
                 var totalPage=0;
-                if(dataSet.count>0){
-                    totalPage=  dataSet.count%pageSize==0?dataSet.count/pageSize:parseInt(dataSet.count/pageSize)+1
+                if(dataSet.totalCount>0){
+                    totalPage=  dataSet.totalCount%pageSize==0?dataSet.totalCount/pageSize:parseInt(dataSet.totalCount/pageSize)+1;
                     setPaginationInfo(curPage+1,totalPage);
                 }else{
                     setPaginationInfo(0,totalPage);
@@ -90,8 +88,6 @@ function initTableCol(resourceId,curPage,isPage) {
                         });
                     }();
                 }
-
-                initColData(resourceId, colSet);
             }
         }
     });
@@ -103,33 +99,52 @@ function setPaginationInfo(curPage,pageCount) {
 }
 
 function pageSelectCallback(curPage, pagination) {
-    initServiceList(curPage,"page");
+    initTableCol(curPage,"page");
 }
 
 // 加载数据列
-function initColData(resourceId, colSet) {
-    $.ajax({
-        url: context + "/service/open/data/getDataByResourceId?DATA_RESOURCE_ID="+resourceId+"&limit=10",
+function initColData() {
+    $("#colDataList>thead>tr").empty();
+    $("#colDataList>tbody").empty();
+
+	 $.ajax({
+        url: context + "/service/open/data/getItemsByResourceId?resourceId=" + colResourceId + "&limit=9999999&start=0",
         success: function(data) {
             var dataSet = eval("("+data.json+")");
-            $("#totalCount").text(dataSet.count);
             if(dataSet.recordSet.length > 0) {
-                var colDataSet = dataSet.recordSet;
-                for(var i = 0; i < colDataSet.length; i++) {
-                    var dataList = [];
-                    for(var j = 0; j < colSet.length; j++) {
-                        for(var key in colDataSet[i].data){
-                            if(colSet[j].data.columnName == key.toLowerCase()) {
-                                dataList.push(colDataSet[i].data[key]);
-                            }
-                        }
-                    }
-                    var temp= template("colDataListTemp", {"colDataList": dataList});
-                    $("#colDataList>tbody").append(temp);
+				var colSet = dataSet.recordSet;
+
+				for(var i = 0; i < colSet.length; i++) {
+                    var html = '<th>'+colSet[i].data.columnName+'</th>';
+                    $("#colDataList>thead>tr").append(html);
                 }
-            }
-        }
-    });
+
+				$.ajax({
+					url: context + "/service/open/data/getDataByResourceId?DATA_RESOURCE_ID="+colResourceId+"&limit=10",
+					success: function(data) {
+						var dataSet = eval("("+data.json+")");
+						$("#totalCount").text(dataSet.count);
+						if(dataSet.recordSet.length > 0) {
+							var colDataSet = dataSet.recordSet;
+							for(var i = 0; i < colDataSet.length; i++) {
+								var dataList = [];
+								for(var j = 0; j < colSet.length; j++) {
+									for(var key in colDataSet[i].data){
+										if(colSet[j].data.columnName == key.toLowerCase()) {
+											dataList.push(colDataSet[i].data[key]);
+										}
+									}
+								}
+								var temp= template("colDataListTemp", {"colDataList": dataList});
+								$("#colDataList>tbody").append(temp);
+							}
+						}
+					}
+				});
+			}
+		}
+	 });
+    
 }
 
 function loadServiceApplyCount(openServiceId) {
