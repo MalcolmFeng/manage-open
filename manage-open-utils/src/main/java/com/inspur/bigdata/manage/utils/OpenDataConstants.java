@@ -30,10 +30,11 @@ public class OpenDataConstants {
     }
 
     public static String getUserId() {
-        String userId = AuthenticationProvider.getKrbPrincipalName();
+        String userId = AuthenticationProvider.getLoginUserId();
+//        String userId = AuthenticationProvider.getKrbPrincipalName();
 //        if (StringUtils.isEmpty(userId)) {
             //201904 本地临时测试
-            userId = "dev-realm8586";
+//            userId = "dev-realm8586";
 //        }
         return userId;
         //return "test1-realm1234";

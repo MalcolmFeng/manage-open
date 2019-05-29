@@ -69,7 +69,7 @@ public class DataGroupController {
 		param.put("parentId", pid);
 		String userId = OpenDataConstants.getUserId();
 		//String userId = "superadmin";
-		String url = PropertiesUtil.getValue(OpenDataConstants.CONF_PROPERTIES, "od.domain")+ "/service/rest/source/getSourceByUser?userId="+ userId+"&sourceType=hive,kudu";
+		String url = PropertiesUtil.getValue(OpenDataConstants.CONF_PROPERTIES, "od.domain")+ "/service/rest/source/getSourceByUser?userId="+ userId+"&sourceType=hive";
 		String resultStr = HttpRequestUtils.get(url);
 		List<JSONObject> list = OpenDataConstants.getJsonParse(resultStr);
 		Map<String, Object> result = new HashMap<String, Object>();
