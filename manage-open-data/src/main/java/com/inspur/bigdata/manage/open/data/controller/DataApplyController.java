@@ -158,7 +158,7 @@ public class DataApplyController {
 			//	String clusterId = "cluster4741";
 			//	String clusterName ="cluster4741";
 
-			String dburl = PropertiesUtil.getValue(OpenDataConstants.CONF_PROPERTIES, "od.domain") + "/service/rest/source/getSourceByUser?userId=" + OpenDataConstants.getUserId();
+			String dburl = PropertiesUtil.getValue(OpenDataConstants.CONF_PROPERTIES, "od.domain") + "/service/rest/source/getSourceByUser?userId=" + OpenDataConstants.getUserId()+"&sourceType=hive";
 			String resultStr = HttpRequestUtils.get(dburl);
 			List<JSONObject> list = OpenDataConstants.getJsonParse(resultStr);
 			String resPath = null;

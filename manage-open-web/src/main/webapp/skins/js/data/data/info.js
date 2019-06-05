@@ -65,7 +65,7 @@ function initTableCol(curPage,isPage) {
             var dataSet = eval("("+data.json+")");
             if(dataSet.recordSet.length > 0) {
                 var colSet = dataSet.recordSet;
-                       
+
                 var temp= template("colDataTableTemp", {"colList": dataSet.recordSet});
                 $("#colDataTable>tbody").empty().append(temp);
 
@@ -123,7 +123,7 @@ function initColData() {
 					url: context + "/service/open/data/getDataByResourceId?DATA_RESOURCE_ID="+colResourceId+"&limit=10",
 					success: function(data) {
 						var dataSet = eval("("+data.json+")");
-						$("#totalCount").text(dataSet.count);
+						$("#totalCount").text(dataSet.totalCount);
 						if(dataSet.recordSet.length > 0) {
 							var colDataSet = dataSet.recordSet;
 							for(var i = 0; i < colDataSet.length; i++) {
@@ -144,7 +144,7 @@ function initColData() {
 			}
 		}
 	 });
-    
+
 }
 
 function loadServiceApplyCount(openServiceId) {

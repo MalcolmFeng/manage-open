@@ -52,13 +52,13 @@ var register = {
                     for (var j in item) {
                         var jitem = item[j];
                         if (tableIds.indexOf(jitem.dataResourceId)!=-1){
-                            opt = opt + "<div class='fs-option selected' data-value=" + jitem.dataResourceId + " data-index='"
+                            opt = opt + "<div class='fs-option selected' title="+jitem.dataResourceName+" data-value=" + jitem.dataResourceId + " data-index='"
                                 + j + "'><span class='fs-checkbox'><i></i></span><div class='fs-option-label'>" +
-                                jitem.dataResourceName + "</div></div>";
+                                jitem.tableName + "</div></div>";
                         }else{
-                            opt = opt + "<div class='fs-option' data-value=" + jitem.dataResourceId + " data-index='"
+                            opt = opt + "<div class='fs-option' title="+jitem.dataResourceName+" data-value=" + jitem.dataResourceId + " data-index='"
                                 + j + "'><span class='fs-checkbox'><i></i></span><div class='fs-option-label'>" +
-                                jitem.dataResourceName + "</div></div>";
+                                jitem.tableName + "</div></div>";
                         }
                     }
                 }
