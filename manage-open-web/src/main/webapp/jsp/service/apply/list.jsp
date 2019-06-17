@@ -73,7 +73,7 @@
       autofocus: true,
       ok: function() {
         $.ajax({
-          url: context + "/service/data/apply/delete/" + applyId,
+          url: context + "/service/open/apply/delete/" + applyId,
           success: function(msg) {
             if (msg == true) {
               forQuery();
@@ -123,15 +123,21 @@
   }
 
   function renderOptions(data, type, full) {
-    var html = "<div>";
-    if(full.auth_status == '0') {
-      html += '<a onclick="forView(\'' + full.id + '\',\'' + full.api_service_id + '\')">查看</a>&nbsp;&nbsp;';
-      html += '<a onclick="forDel(\'' + full.id + '\')">删除</a>';
-    } else {
-      html += '<a onclick="forView(\'' + full.id + '\',\'' + full.api_service_id + '\')">查看</a>';
-    }
-    html += '</div>';
-    return html;
+	  var html = "<div>";
+	  if (full.apiStatus == '2') {
+	  	//api服务状态是上线状态才可以查看
+		  if (full.auth_status != '1') {
+			  //申请状态不是审核通过都可以删除
+			  html += '<a onclick="forView(\'' + full.id + '\',\'' + full.api_service_id + '\')">查看</a>&nbsp;&nbsp;';
+			  html += '<a onclick="forDel(\'' + full.id + '\')">删除</a>';
+		  } else {
+			  html += '<a onclick="forView(\'' + full.id + '\',\'' + full.api_service_id + '\')">查看</a>';
+		  }
+	  }else{
+		  html += '<a onclick="forDel(\'' + full.id + '\')">删除</a>';
+	  }
+	  html += '</div>';
+	  return html;
   }
 </script>
 </head>

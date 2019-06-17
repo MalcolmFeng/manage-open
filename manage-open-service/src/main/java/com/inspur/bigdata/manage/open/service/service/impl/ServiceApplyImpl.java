@@ -86,5 +86,9 @@ public class ServiceApplyImpl implements IServiceApplyService{
     public List<ServiceApply> getAPIAuthList(Map<String, Object> parameters){
         return  serviceApplyMapper.getAPIAuthList(parameters);
     }
+    @Override
+    public void deleteApplyById(String id){
+        serviceApplyMapper.deleteApplyById(id);
+    }
 
 }

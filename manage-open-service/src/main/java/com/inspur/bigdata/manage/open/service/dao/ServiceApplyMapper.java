@@ -27,4 +27,6 @@ public interface ServiceApplyMapper extends EntityMapper<ServiceApply> {
 
     List<ServiceApply> getAPIAuthList(Map<String, Object> parameters);
 
+    void deleteApplyById(String id);
+
 }

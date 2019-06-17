@@ -32,4 +32,6 @@ public interface IServiceApplyService {
     List<ServiceApply> isApplyAuthToUser(Map<String, Object> map);
 
     List<ServiceApply> getAPIAuthList(Map<String, Object> parameters);
+
+    void deleteApplyById(String id);
 }

@@ -3,6 +3,7 @@
 .form-inline .input-group{
 	width: 70%;
 	margin-left: 16%;
+	padding-top: 15px;
 }
 .form-inline .input-group .input-group-addon {
 	width: 6%;

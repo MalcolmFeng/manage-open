@@ -42,6 +42,9 @@ public class ServiceApply implements Serializable{
     private String version;
     @Transient
     private  String name;
+    //辅助判断 API状态
+    @Transient
+    private String apiStatus;
 
     public String getProvider() {
         return provider;
@@ -174,5 +177,12 @@ public class ServiceApply implements Serializable{
 
     public void setApi_provider(String api_provider) {
         this.api_provider = api_provider;
+    }
+
+    public void setApiStatus(String apiStatus) {
+        this.apiStatus = apiStatus;
+    }
+    public String getApiStatus(){
+        return this.apiStatus;
     }
 }

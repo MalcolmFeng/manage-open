@@ -145,13 +145,18 @@ public class DataApplyController {
 			}
 			if (dataDef.getAuditStatus() == null || !dataDef.getAuditStatus().equals(OpenDataConstants.data_audit_pass)) {
 				result.put("result", false);
-				result.put("message", "数据审核不通过，不允许授权");
+				result.put("message", "数据审核未通过，不允许授权");
 				return result;
 			}
 
 			List<String> resAuth = new ArrayList<>();
 			resAuth.add(OpenDataConstants.select);
 			String applicant = dataApply.getApplicant();
+			//数据表申请通过，调用仓库平台接口需要传用户realm
+			String realm=OpenDataConstants.getRealm();
+			if (StringUtils.isNotEmpty(realm)){
+				applicant=applicant+"-"+realm;
+			}
 			Map<String, String> cluster = TenantClusterService.getTenantClusterInfo();
 			String clusterId = cluster.get("clusterId");
 			String clusterName = cluster.get("clusterName");
@@ -211,11 +216,12 @@ public class DataApplyController {
 				result.put("message","申请数据不存在,授权不成功");
 				return result;
 			}
-			if(dataDef.getAuditStatus()==null||!dataDef.getAuditStatus().equals(OpenDataConstants.data_audit_pass)){
-				result.put("result",false);
-				result.put("message","数据审核不通过，不允许授权");
-				return result;
-			}
+			/***数据未审核状态可以驳回授权申请*/
+//			if(dataDef.getAuditStatus()==null||!dataDef.getAuditStatus().equals(OpenDataConstants.data_audit_pass)){
+//				result.put("result",false);
+//				result.put("message","数据审核未通过，不允许授权");
+//				return result;
+//			}
 			//判断是否是管理员
 		/*	if(!OpenDataConstants.masert_realm.equals(OpenDataConstants.getRealm())){
 				result.put("result",false);

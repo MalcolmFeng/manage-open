@@ -9,6 +9,7 @@ import com.inspur.bigdata.manage.open.service.service.IServiceApplyService;
 import com.inspur.bigdata.manage.open.service.service.IServiceDefService;
 import com.inspur.bigdata.manage.open.service.util.OpenServiceConstants;
 import com.inspur.bigdata.manage.utils.StringUtil;
+import org.apache.commons.lang.StringUtils;
 import org.loushang.framework.mybatis.PageUtil;
 import org.loushang.framework.util.UUIDGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -161,11 +162,12 @@ public class ServiceApplyController {
                 result.put("message","申请api不存在,授权不成功");
                 return result;
             }
-           if(serviceDef.getAuditStatus()==null||!serviceDef.getAuditStatus().equals(OpenServiceConstants.api_audit_pass)){
-                result.put("result",false);
-                result.put("message","api审核不通过，不允许授权");
-                return result;
-            }
+            /***数据未审核状态可以驳回授权申请*/
+//           if(serviceDef.getAuditStatus()==null||!serviceDef.getAuditStatus().equals(OpenServiceConstants.api_audit_pass)){
+//                result.put("result",false);
+//                result.put("message","api审核不通过，不允许授权");
+//                return result;
+//            }
             //判断是否是管理员
         /*   if(!OpenServiceConstants.masert_realm.equals(OpenServiceConstants.getRealm())){
                 result.put("result",false);
@@ -311,4 +313,14 @@ public class ServiceApplyController {
 
         return result;
     }
+    @RequestMapping("/delete/{id}")
+    public boolean deleteApply(@PathVariable("id") String id){
+       boolean result=false;
+       if (StringUtils.isNotEmpty(id)){
+            serviceApplyService.deleteApplyById(id);
+            result=true;
+       }
+       return result;
+    }
 }
+
