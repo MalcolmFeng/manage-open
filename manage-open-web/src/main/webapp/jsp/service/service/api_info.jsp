@@ -480,7 +480,14 @@
 
     function test() {
         var url=context+"/service/api/execute/test/"+id;
-        window.location.href =url;
+        /*window.location.href =url;*/
+        $.dialog({
+            type: "iframe",
+            url: url,
+            title: "API测试工具",
+            width: 1000,
+            height: 650
+        });
     }
 
 

@@ -14,7 +14,6 @@
 		<link rel="stylesheet" type="text/css" href="<l:asset path='css/font-awesome.css'/>" />
 		<link rel="stylesheet" type="text/css" href="<l:asset path='css/ui.css'/>" />
 		<link rel="stylesheet" type="text/css" href="<l:asset path='css/form.css'/>" />
-        <link rel="stylesheet" type="text/css" href="<l:asset path='css/datatables.css'/>"/>
         <link rel="stylesheet" type="text/css" href="<l:asset path='data/servicetest.css'/>"/>
 	    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
 	    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -26,27 +25,24 @@
 	    <script type="text/javascript" src="<l:asset path='bootstrap.js'/>" ></script>
 		<script type="text/javascript" src="<l:asset path='form.js'/>" ></script>
 		<script type="text/javascript" src="<l:asset path='arttemplate.js'/>" ></script>	
-		<script type="text/javascript" src="<l:asset path='datatables.js'/>"></script>
-	    <script type="text/javascript" src="<l:asset path='loushang-framework.js'/>"></script>
 	    <script type="text/javascript" src="<l:asset path='ui.js'/>"></script>
 	</head>
 <title>服务测试</title>
 <body>
-	<div class="content-body" style="width:100%;height:100%;float:left;background:#fff;margin-top:10px;min-height:550px;">
+	<div class="content-body">
 		<div class="test-left" style="height: auto;">
-			<div class="left-title">请求参数</div>
-			<div class="left-title1" ><strong>基本信息</strong></div>
+			<div class="left-title1" style="padding-top: 0px;"><strong>基本信息</strong></div>
 			<div class="left-title2">
 				<div class="test-clearfix">
-					<div class="col-xs-2 col-md-2 control-label">服务名称: </div>
-					<div style="font-weight: bold;" title="${serviceDef.name}">
+					<div class="col-xs-2 col-md-2 control-label" style="font-weight: bold;">服务名称: </div>
+					<div title="${serviceDef.name}">
 						${serviceDef.name}
 					</div>
 
 				</div>
 				<div class="test-clearfix">
-					<div style="margin-right: 10px;" class="col-xs-2 col-md-2 control-label">服务地址:</div>
-					<div style="font-weight: bold;" title="${serviceDef.reqPath}">
+					<div style="margin-right: 10px; font-weight: bold;" class="col-xs-2 col-md-2 control-label">服务地址:</div>
+					<div title="${serviceDef.reqPath}">
 						${serviceDef.reqPath}
 					</div>
 				</div>
@@ -84,9 +80,15 @@
 				<input type="button" name="" value="发送请求" onclick="testService();">
 			</div>
 		</div>
-		<div class="test-right" style="padding-top:0;">
-			<div class="returntitle">返回内容</div>
-			<div class="result-textarea" id="content-area"></div>
+		<div class="test-right">
+			<div id="paramCon">
+				<div class="returntitle">请求</div>
+				<div class="param-textarea"></div>
+			</div>
+			<div id="returnCon">
+				<div class="returntitle">返回内容</div>
+				<div class="result-textarea" id="content-area"></div>
+			</div>
 		</div>
 	</div>
 </body>
@@ -137,22 +139,26 @@
 	function testService(){
 		var isFilled = true;
 		var msg = "";
+        var paramStr = "";
 		//进行校验
         var i = 0;
         $("table>tbody>tr").each(function(){
             var onedata = {};
-            if(i!=0){
+           /* if(i!=0){*/
                 var name = $(this).find('td').eq(0).text();
-                var require = $(this).find('td').eq(2).text().trim();
-                var value = $(this).find('td').eq(4).find('input').val();
+                var require = $(this).find('td').eq(1).text().trim();
+                var value = $(this).find('td').eq(3).find('input').val();
                 if(require =="是"&&value==""){
                     isFilled = false;
                     msg = name +"&nbsp;:&nbsp;"+ "不能为空!";
                     sticky(msg, 'error', 'center');
 				}
-            }
+				paramStr = paramStr + name + ":" + value + "";
+           /* }*/
             i = i+1;
         });
+
+        $(".param-textarea").text(paramStr);
         var appId= $("#appselect option:selected").val();//获取api
 		if(isFilled&&appId==""){
 			isFilled = false;
@@ -165,9 +171,9 @@
 			var listdata={};
 			$("table>tbody>tr").each(function(){
 				var onedata = {};
-				if(i!=0){
-					listdata[$(this).find('td').eq(0).text()]=$(this).find('td').eq(4).find('input').val();
-				}
+				/*if(i!=0){*/
+					listdata[$(this).find('td').eq(0).text()]=$(this).find('td').eq(3).find('input').val();
+				/*}*/
 				i = i+1;
 			});
 			var datass =  JSON.stringify(listdata);
@@ -210,26 +216,30 @@
 </script>
 <script id="paramlist" type="text/html">
 	<table>
-	<tr>
-		<th style="width: 80px;">字段名称</th>
-		<th style="width: 80px;">字段类型</th>
-		<th style="width: 80px;">是否必填</th>
-		<th style="width: 80px;">字段描述</th>
-		<th style="width: 90px;">字段值</th>
-	</tr>
-	{{each data as oneinfo}}
-	<tr>
-		<td>{{oneinfo.name}}</td>
-		<td>{{oneinfo.type}}</td>
-		<td>
-			{{ if oneinfo.required=="1"}} 是 {{ /if }}
-			{{ if oneinfo.required=="0"}} 否 {{ /if }}
+		<thead>
+			<tr>
+				<th style="width: 18%;">字段名称</th>
+				<%--<th style="width: 18%;">字段类型</th>--%>
+				<th style="width: 18%">是否必填</th>
+				<th style="width: 20%">字段描述</th>
+				<th style="width: 26%">字段值</th>
+			</tr>
+		</thead>
+	<tbody>
+		{{each data as oneinfo}}
+		<tr>
+			<td>{{oneinfo.name}}</td>
+			<%--<td>{{oneinfo.type}}</td>--%>
+			<td>
+				{{ if oneinfo.required=="1"}} 是 {{ /if }}
+				{{ if oneinfo.required=="0"}} 否 {{ /if }}
 
-		</td>
-		<td>{{oneinfo.description}}</td>
-		<td><input type="text" class="description"  placeholder="请输入..."></td>
-	</tr>
-	{{/each}}
+			</td>
+			<td>{{oneinfo.description}}</td>
+			<td><input type="text" class="description"  placeholder="请输入..."></td>
+		</tr>
+		{{/each}}
+	</tbody>
 	</table>
 </script>
 
