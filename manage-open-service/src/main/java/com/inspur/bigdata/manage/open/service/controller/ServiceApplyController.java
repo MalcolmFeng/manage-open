@@ -314,6 +314,7 @@ public class ServiceApplyController {
         return result;
     }
     @RequestMapping("/delete/{id}")
+    @ResponseBody
     public boolean deleteApply(@PathVariable("id") String id){
        boolean result=false;
        if (StringUtils.isNotEmpty(id)){

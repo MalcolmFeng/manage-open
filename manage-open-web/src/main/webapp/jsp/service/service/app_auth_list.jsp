@@ -14,19 +14,19 @@
     <link rel="stylesheet" type="text/css" href="<l:asset path='css/form.css'/>"/>
     <link rel="stylesheet" type="text/css" href="<l:asset path='css/ui.css'/>"/>
     <link rel="stylesheet" type="text/css" href="<l:asset path='css/datatables.css'/>"/>
-    
+
     <!--[if lt IE 9]>
     <script src="<l:asset path='html5shiv.js'/>"></script>
     <script src="<l:asset path='respond.js'/>"></script>
     <![endif]-->
-    
+
     <script  type="text/javascript" src="<l:asset path='jquery.js'/>"></script>
     <script  type="text/javascript" src="<l:asset path='bootstrap.js'/>"></script>
     <script  type="text/javascript" src="<l:asset path='form.js'/>"></script>
     <script  type="text/javascript" src="<l:asset path='datatables.js'/>"></script>
     <script  type="text/javascript" src="<l:asset path='loushang-framework.js'/>"></script>
     <script  type="text/javascript" src="<l:asset path='ui.js'/>"></script>
-    
+
     <script type="text/javascript">
     var context = "<l:assetcontext/>";
     var isInit=false;
@@ -34,14 +34,15 @@
     $(document).ready(function() {
         options = {
            ordering: false
-       };      
+       };
         var url = context+"/service/open/api/getAppByAuth";
         grid = new L.FlexGrid("appList",url);
         grid.setParameter("openServiceId", '${param.openServiceId }');
         grid.setParameter("applyFlag",'${param.applyFlag}');
-//        grid.init(options); //初始化datatable
+        grid.setParameter("selectType",'0');
+        grid.init(options); //初始化datatable
     });
-    
+
     function reloadAppList() {
         if(isInit){
             // 重新请求数据
@@ -52,7 +53,7 @@
         }
 
     }
-    
+
     function renderId(data, type, full, meta) {
       var rowId = meta.settings._iDisplayStart + meta.row + 1;
       return rowId;
@@ -68,7 +69,7 @@
       html += '</div>';
       return html;
     }
-    
+
     function applyService(appId,userId, appName) {
       var param = {
         openServiceId: $("#openServiceId").val(),
@@ -77,7 +78,7 @@
         userId: userId,
         appName: appName
       };
-      
+
       $.ajax({
         type: "post",
         url: context + "/service/open/apply/auth",
@@ -99,7 +100,7 @@
         $.sticky(
             msg,
             {
-                autoclose : 1000, 
+                autoclose : 1000,
                 position : place,
                 style : type
             }

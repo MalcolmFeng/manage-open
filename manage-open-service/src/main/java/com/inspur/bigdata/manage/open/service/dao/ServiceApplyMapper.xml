@@ -10,7 +10,7 @@
         <id property="provider" column="provider" />
     </resultMap>
    <select id="getApplyList" resultMap="serviceResult" parameterType="map">
-        select b.`NAME` as name,b.AUTH_STATUS as apiStatus,a.* from api_service_apply a,api_service_def b where a.API_SERVICE_ID=b.ID
+        select b.`NAME` as name,b.AUDIT_STATUS as apiStatus,a.* from api_service_apply a,api_service_def b where a.API_SERVICE_ID=b.ID
         <if test="name!=null and name!=''">
             and b.name LIKE '%${name}%'
         </if>
@@ -176,8 +176,8 @@
 
     </select>
 
-    <update id="deleteApplyById" parameterType="String">
-        update api_service_apply set  where id=#{id}
-    </update>
+    <delete id="deleteApplyById" parameterType="String">
+        delete from  api_service_apply where id=#{id}
+    </delete>
 
 </mapper>
