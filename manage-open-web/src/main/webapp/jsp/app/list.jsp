@@ -33,7 +33,7 @@
 
             <div class="btn-group pull-right">
                 <button id="add" type="button" class="btn ue-btn">
-                    <span class="fa fa-plus"></span>创建APP
+                    <span class="fa fa-plus"></span>创建应用
                 </button>
 
             </div>

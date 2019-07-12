@@ -35,7 +35,7 @@ public class MaxComputeServiceInstanceImpl implements IMaxComputeServiceInstance
 
 	public List<MaxComputeServiceInstance> getMaxComputeServiceInstancesOrderByApplyTimeDesc() {
         Map<String, String> params = new HashMap<String, String>();
-        params.put("userId", OpenDataConstants.getUserId());
+        params.put("userId", OpenDataConstants.getUserId()+"-"+OpenDataConstants.getRealm());
 
 		return maxComputeServiceInstanceMapper.getMaxComputeServiceInstancesOrderByApplyTimeDesc(params);
 	}
@@ -70,7 +70,7 @@ public class MaxComputeServiceInstanceImpl implements IMaxComputeServiceInstance
 		MaxComputeServiceInstance mcs = new MaxComputeServiceInstance();
 		mcs.setInstanceId(instanceId);
 		mcs.setInstanceName(instanceName);
-		mcs.setUserId(OpenDataConstants.getUserId());
+		mcs.setUserId(OpenDataConstants.getUserId()+"-"+OpenDataConstants.getRealm());
 		mcs.setServiceId(serviceId);
 		mcs.setServiceVersion(serviceVersion);
 		mcs.setCoreNum(coreNum);
