@@ -285,32 +285,35 @@ public class ServiceExecuteController {
                 writer.flush();
                 return;
             }
+            /**
+             * 前台传入X-Ca-Key=appKey,X-Ca-Signature=appSecret 验证身份
+             */
 
             //生成签名验证是否一致
-            Map<String,String[]> pmap=request.getParameterMap();
-            Iterator<String> iterator= pmap.keySet().iterator();
-            Map<String,String> reqmap=new HashMap<>();
-            while (iterator.hasNext()) {
-                String key = iterator.next();
-                reqmap.put(key,pmap.get(key)[0]);
-            }
-            String pre_sign= SignUtil.sign(appSecret,
-                    request.getMethod().toUpperCase(),
-                    context_path,
-                    headers,
-                    reqmap,
-                    null,
-                    new ArrayList<String>());
-            if(!pre_sign.equals(signature)){//判断签名正确性
+//            Map<String,String[]> pmap=request.getParameterMap();
+//            Iterator<String> iterator= pmap.keySet().iterator();
+//            Map<String,String> reqmap=new HashMap<>();
+//            while (iterator.hasNext()) {
+//                String key = iterator.next();
+//                reqmap.put(key,pmap.get(key)[0]);
+//            }
+//            String pre_sign= SignUtil.sign(appSecret,
+//                    request.getMethod().toUpperCase(),
+//                    context_path,
+//                    headers,
+//                    reqmap,
+//                    null,
+//                    new ArrayList<String>());
+            if(!appSecret.equals(signature)){//判断签名正确性
                 success=false;
-                headers.remove(SystemHeader.X_CA_SIGNATURE_HEADERS);
-                String signurl=SignUtil.buildStringToSign(request.getMethod().toUpperCase(),
-                        context_path,
-                        headers,
-                        reqmap,
-                        null,
-                        new ArrayList<String>());
-                writer.print("验证签名出错，签名字符串应为：\n"+signurl);
+//                headers.remove(SystemHeader.X_CA_SIGNATURE_HEADERS);
+//                String signurl=SignUtil.buildStringToSign(request.getMethod().toUpperCase(),
+//                        context_path,
+//                        headers,
+//                        reqmap,
+//                        null,
+//                        new ArrayList<String>());
+                writer.print("验证签名不正确！");
                 writer.flush();
                 return;
             }
