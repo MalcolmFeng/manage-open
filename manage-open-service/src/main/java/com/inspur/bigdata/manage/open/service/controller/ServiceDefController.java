@@ -39,6 +39,10 @@ public class ServiceDefController {
     private IServiceDefService serviceDefService;
 
     @Autowired
+    private IServiceApplyService serviceApplyService;
+
+
+    @Autowired
     private IServiceGroupService serviceGroupService;
 
     @Autowired
@@ -160,9 +164,23 @@ public class ServiceDefController {
     @RequestMapping("/get/{id}/apply")
     @ResponseBody
     public ModelAndView getInfoForApplyById(@PathVariable("id") String id) {
+        String userId= OpenDataConstants.getUserId();
+        if(StringUtil.isEmpty(userId)){
+            userId="";
+        }
         ServiceDef serviceDef = serviceDefService.getServiceDef(id);
         DevGroup devGroup=devGroupService.getById(serviceDef.getApiGroup());
-        serviceDef.setOpenAddr(OpenServiceConstants.getOpenAddr(devGroup.getContext(),serviceDef.getReqPath()));
+        Map<String, Object> temp = new HashMap<String, Object>();
+        temp.put("apiServiceId",id);
+        temp.put("userId",userId);
+        temp.put("auth_status",OpenDataConstants.auth_status_pass);
+        List<ServiceApply> serviceApplies=serviceApplyService.isApplyAuthToUser(temp);
+        if(serviceApplies==null||serviceApplies.isEmpty()){
+            serviceDef.setOpenAddr(serviceDef.getReqPath());
+        }else {
+            serviceDef.setOpenAddr(OpenServiceConstants.getOpenAddr(devGroup.getContext(),serviceDef.getReqPath()));
+        }
+        serviceDef.setScAddr("");
         Map<String, Object> param = new HashMap<String, Object>();
         List<ServiceInput> inputParam = serviceInputService.listByServiceId(id);
         List<ServiceOutput> outputList= serviceOutputService.selectByApiId(id);
@@ -182,7 +200,9 @@ public class ServiceDefController {
     public Map<String, Object> getInfoForApplyById2(@PathVariable("id") String id) {
         ServiceDef serviceDef = serviceDefService.getServiceDef(id);
         DevGroup devGroup=devGroupService.getById(serviceDef.getApiGroup());
-        serviceDef.setOpenAddr(OpenServiceConstants.getOpenAddr(devGroup.getContext(),serviceDef.getReqPath()));
+//        serviceDef.setOpenAddr(OpenServiceConstants.getOpenAddr(devGroup.getContext(),serviceDef.getReqPath()));
+        serviceDef.setOpenAddr(serviceDef.getReqPath());
+        serviceDef.setScAddr("");
         Map<String, Object> param = new HashMap<String, Object>();
         List<ServiceInput> inputParam = serviceInputService.listByServiceId(id);
         List<ServiceOutput> outputList= serviceOutputService.selectByApiId(id);
