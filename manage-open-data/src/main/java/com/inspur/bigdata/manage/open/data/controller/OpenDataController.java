@@ -375,9 +375,11 @@ public class OpenDataController {
             userId = "";
         }
         Map<String, Object> userParam = new HashMap<String, Object>();
-        userParam.put("id", id);
-        userParam.put("userId", userId);
-        userParam.put("authStatus", OpenDataConstants.auth_status_pass);
+        userParam.put("dataDefId", id);
+        userParam.put("applicant", userId);
+        List<String> statusList = new ArrayList<>();
+        statusList.add(OpenDataConstants.auth_status_pass);
+        userParam.put("authStatusStr", statusList);
         List<DataApply> dataAuthorized = dataApplyService.getUserApplyList(userParam);
 		DataDef dataDef = openDataService.getDataDef(id);
 		List<Map> list = new ArrayList<>();
