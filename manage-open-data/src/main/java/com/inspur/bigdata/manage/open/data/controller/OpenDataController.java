@@ -129,7 +129,7 @@ public class OpenDataController {
 		{
 			for(int i=0;i<list.size();i++)
 			{
-				groupArr.add(list.get(i).getId().toString());
+                groupArr.add(list.get(i).getId());
 			}
 			parameters.put("groupArr",groupArr);
 			parameters.put("groupId","");
@@ -172,8 +172,8 @@ public class OpenDataController {
 	@RequestMapping(value = "/remoteList", method = RequestMethod.POST)
 	@ResponseBody
 	public Map<String, Object> remoteList(@RequestBody Map<String, String> parameters) {
-		String clusterId=parameters.get("clusterId").toString();
-		String clusterName=parameters.get("clusterName").toString();
+        String clusterId = parameters.get("clusterId");
+        String clusterName = parameters.get("clusterName");
 		//调用接口查询列表数据
 		String url="";
 		String str= HttpUtil.execGet("",url);
@@ -191,8 +191,8 @@ public class OpenDataController {
 				newList.add(d);
 			}
 		}
-        int  start=Integer.parseInt(parameters.get("start").toString());
-		int  limit=Integer.parseInt(parameters.get("limit").toString());
+        int start = Integer.parseInt(parameters.get("start"));
+        int limit = Integer.parseInt(parameters.get("limit"));
 		int  total=newList.size();
         List<DataDef> dataList = new ArrayList<>();
 		int toIndex = start + limit;
@@ -314,7 +314,7 @@ public class OpenDataController {
 			openDataService.update(dataDef);
 			 map.put("result","editsuccess");
 		}else{
-			dataDef.setId(UUIDGenerator.getUUID().toString());
+            dataDef.setId(UUIDGenerator.getUUID());
 			dataDef.setCreateTime(OpenDataConstants.sf.format(new Date()));
 			openDataService.addDataDefForApi(dataDef);
 			map.put("result",true);
@@ -370,6 +370,15 @@ public class OpenDataController {
 	@RequestMapping("/get/{id}")
 	@ResponseBody
 	public ModelAndView getInfoById(@PathVariable("id") String id) {
+        String userId = OpenDataConstants.getUserId();
+        if (StringUtil.isEmpty(userId)) {
+            userId = "";
+        }
+        Map<String, Object> userParam = new HashMap<String, Object>();
+        userParam.put("id", id);
+        userParam.put("userId", userId);
+        userParam.put("authStatus", OpenDataConstants.auth_status_pass);
+        List<DataApply> dataAuthorized = dataApplyService.getUserApplyList(userParam);
 		DataDef dataDef = openDataService.getDataDef(id);
 		List<Map> list = new ArrayList<>();
 		String dataexample = dataDef.getDataExample();
@@ -386,7 +395,11 @@ public class OpenDataController {
 			dataDef.setColumnList(columns);
 		}
 		param.put("serviceInfo",dataDef);
-		param.put("apply",false);
+        if (dataAuthorized == null || dataAuthorized.isEmpty()) {
+            param.put("apply", true);
+        } else {
+            param.put("apply", false);
+        }
 		return new ModelAndView("data/data/info",param);
 	}
 
@@ -535,7 +548,7 @@ public class OpenDataController {
 				return result;
 			}
 			DataApply dataApply =new DataApply();
-			dataApply.setId(UUIDGenerator.getUUID().toString());
+            dataApply.setId(UUIDGenerator.getUUID());
 			dataApply.setDtDataId(dataDef.getId());
 			dataApply.setApplyTime(OpenDataConstants.sf.format(new Date()));
 			dataApply.setApplicant(userId);
