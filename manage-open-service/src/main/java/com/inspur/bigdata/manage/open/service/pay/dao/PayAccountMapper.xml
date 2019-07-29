@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.inspur.bigdata.manage.open.service.pay.dao.PayAccountMapper">
+	<resultMap type="com.inspur.bigdata.manage.open.service.pay.data.PayAccountCapital" id="payAccountMap">
+		<id property="userId" column="user_id" />
+		<result property="accountBalance" column="account_balance" />
+		<result property="updateTime" column="update_time" />
+	</resultMap>
+
+	<select id="getPayAccount" parameterType="string" resultMap="payAccountMap">
+        SELECT
+        user_id,
+        account_balance,
+        update_time
+        FROM PAY_ACCOUNT_CAPITAL
+        WHERE USER_ID = #{userId}
+    </select>
+
+	<insert id="insertPayAccount" parameterType="com.inspur.bigdata.manage.open.service.pay.data.PayAccountCapital">
+		INSERT INTO PAY_ACCOUNT_CAPITAL(USER_ID,ACCOUNT_BALANCE,UPDATE_TIME)
+		VALUES(#{userId},#{accountBalance},#{updateTime})
+	</insert>
+
+	<update id="addPayAccount" parameterType="com.inspur.bigdata.manage.open.service.pay.data.PayAccountCapital">
+		UPDATE PAY_ACCOUNT_CAPITAL
+		SET account_balance = account_balance + #{accountBalance},
+		update_time = #{updateTime}
+		WHERE USER_ID = #{userId}
+	</update>
+
+	<update id="subPayAccount" parameterType="com.inspur.bigdata.manage.open.service.pay.data.PayAccountCapital">
+		UPDATE PAY_ACCOUNT_CAPITAL
+		SET account_balance = account_balance - #{accountBalance},
+		update_time = #{updateTime}
+		WHERE USER_ID = #{userId}
+	</update>
+</mapper>
