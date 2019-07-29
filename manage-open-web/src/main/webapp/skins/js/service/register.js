@@ -208,6 +208,7 @@ var register = {
         serviceInfo.id = $("#id").val();
         serviceInfo.remoteId = $("#remoteId").val();
         serviceInfo.name = $("#name").val();
+        serviceInfo.price = $("#price").val();
         serviceInfo.apiGroup = $("#groupId").val();
         serviceInfo.description = $("#description").val();
         serviceInfo.authType = $('input[name=authType]:checked').val();//授权方式

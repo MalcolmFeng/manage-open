@@ -8,6 +8,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.List;
 
 @Table(name="api_service_def")
@@ -125,6 +126,17 @@ public class ServiceDef implements Serializable{
 	 */
 	@Column(name = "API_GROUP")
 	private String apiGroup;
+
+	/**
+	 * 价格
+	 */
+	@Column(name="price")
+	private BigDecimal price;
+	/**
+	 * 收费类型 默认1
+	 */
+	@Column(name = "price_type")
+	private String priceType;
 
 	@Transient
 	private List<ServiceInput> inputList;
@@ -327,5 +339,21 @@ public class ServiceDef implements Serializable{
 
 	public List<ServiceOutput> getOutputList() {
 		return outputList;
+	}
+
+	public String getPriceType() {
+		return priceType;
+	}
+
+	public void setPriceType(String priceType) {
+		this.priceType = priceType;
+	}
+
+	public BigDecimal getPrice() {
+		return price;
+	}
+
+	public void setPrice(BigDecimal price) {
+		this.price = price;
 	}
 }
