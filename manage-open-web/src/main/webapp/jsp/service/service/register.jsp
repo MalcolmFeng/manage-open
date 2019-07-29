@@ -518,14 +518,14 @@
               });
             });
             $("#clear").click(function(){
-                if($("#remoteId").val()){
+                // if($("#remoteId").val()){
                     $("#serviceAddr").val("");
                     $("#returnSample").val("");
                     $("#remoteId").val("");
                     $("#backendinputtbody").html("");
                     $("#addBackend").show();
                     $("#serviceHttpMethod").removeAttr("disabled");
-				}
+				// }
             });
 	    });
 
