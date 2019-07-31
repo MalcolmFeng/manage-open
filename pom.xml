@@ -118,6 +118,28 @@
             <version>3.8.1</version>
             <scope>test</scope>
         </dependency>
+
+        <!-- sc -->
+
+        <dependency>
+            <groupId>org.loushang.sc</groupId>
+            <artifactId>sc-common</artifactId>
+            <version>1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.loushang.sc</groupId>
+            <artifactId>sc-rtf</artifactId>
+            <version>1.0</version>
+        </dependency>
+
+        <!-- alipay sdk -->
+        <!-- https://mvnrepository.com/artifact/com.alipay.sdk/alipay-sdk-java -->
+        <dependency>
+            <groupId>com.alipay.sdk</groupId>
+            <artifactId>alipay-sdk-java</artifactId>
+            <version>3.1.0</version>
+        </dependency>
+
     </dependencies>
 
 </project>

@@ -13,5 +13,6 @@
 
 	<!-- 注释资源扫描包路径 -->
 	<context:component-scan base-package="com.inspur.bigdata.manage.open.service.controller" />
+    <context:component-scan base-package="com.inspur.bigdata.manage.open.service.pay.controller"/>
 
 </beans>

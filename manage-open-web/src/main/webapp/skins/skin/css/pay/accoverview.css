@@ -1,0 +1,121 @@
+/* public settings
+----------------------------------------------------------------------------- */
+body {
+    font-family: 'Microsoft YaHei';
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
+
+html, body {
+    height: 100%;
+}
+
+#overview {
+    margin: 0px 15px;
+}
+
+img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+}
+
+#page-title {
+    border-bottom: 1px solid #DDDDDD;
+    width: 100%;
+    height: 40px;
+    line-height: 40px;
+    color: #666666;
+    font-size: 14px;
+    padding-left: 15px;
+}
+
+/* pannel
+----------------------------------------------------------------------------- */
+#recharge-panel {
+    background-color: #0099FF;
+    height: 155px;
+    margin-top: 15px;
+    border: none;
+}
+
+#balance-text {
+    margin-top: 15px;
+}
+
+#amount {
+    font-size: 16px;
+    color: #FFFFFF;
+    margin-bottom: 5px;
+}
+
+#amount-text {
+    color: #FFFFFF;
+    font-size: 50px;
+    font-weight: bold;
+}
+
+#amount-text i {
+    font-size: 40px;
+    margin-right: 10px;
+}
+
+#recharge-btn {
+    margin-top: 60px;
+}
+
+#payBtn {
+    font-size: 16px;
+    height: 40px;
+    border: 1px solid #FFFFFF;
+    background-color: transparent;
+    color: #FFFFFF;
+    padding-top: 7px;
+    position: absolute;
+    right: 30px;
+    width: 100px;
+}
+
+#payBtn:hover {
+    background-color: #FFFFFF;
+    color: #0099FF;
+}
+
+#recharge-desc {
+    /*height: 60px;*/
+    border: 1px solid #0099FF;
+    background-color: rgba(0, 153, 255, 0.05);
+    color: #0099FF;
+    font-size: 16px;
+    padding-top: 15px;
+    padding-bottom: 20px;
+}
+
+#recharge-desc i {
+    font-size: 20px;
+    margin-right: 10px;
+}
+
+@media screen and (max-width: 768px) {
+    #amount-text {
+        font-size: 40px;
+    }
+
+    #amount-text i {
+        font-size: 30px;
+    }
+
+    #recharge-btn {
+        margin-top: 50px;
+    }
+
+    #recharge-desc i {
+        margin-right: 3px;
+        font-size: 18px;
+    }
+
+    #recharge-desc {
+        font-size: 16px;
+    }
+}

@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.inspur.bigdata.manage.open.service.pay.dao.PayServiceMapper">
+
+    <!--支付日志 -->
+    <insert id="addPayLog" parameterType="com.inspur.bigdata.manage.open.service.pay.data.PayLog">
+		INSERT INTO PAY_LOG(log_id,order_id,amount,pay_seq,pay_time,pay_type,
+			pay_status,update_time,pay_user_id,pay_user_type,pay_bank_id,pay_bank_name,
+			pay_cardholder_name,pay_bank_card_no,payee_user_id,payee_user_type,
+			payee_bank_id,payee_bank_name,payee_cardholder_name,payee_bank_card_no,note) 
+		VALUES(#{log_id},#{order_id},#{amount},#{pay_seq},#{pay_time},#{pay_type},#{pay_status},
+			#{update_time},#{pay_user_id},#{pay_user_type},#{pay_bank_id},#{pay_bank_name},#{pay_cardholder_name},
+			#{pay_bank_card_no},#{payee_user_id},#{payee_user_type},#{payee_bank_id},#{payee_bank_name},
+			#{payee_cardholder_name},#{payee_bank_card_no},#{note})
+	</insert>
+
+    <update id="updatePayLog" parameterType="com.inspur.bigdata.manage.open.service.pay.data.PayLog">
+		UPDATE PAY_LOG SET order_id=#{order_id},amount=#{amount},pay_seq=#{pay_seq},pay_time=#{pay_time},
+			pay_type=#{pay_type},pay_status=#{pay_status},update_time=#{update_time},pay_user_id=#{pay_user_id},
+			pay_user_type=#{pay_user_type},pay_bank_id=#{pay_bank_id},pay_bank_name=#{pay_bank_name},
+			pay_cardholder_name=#{pay_cardholder_name},pay_bank_card_no=#{pay_bank_card_no},payee_user_id=#{payee_user_id},
+			payee_user_type=#{payee_user_type},payee_bank_id=#{payee_bank_id},payee_bank_name=#{payee_bank_name},
+			payee_cardholder_name=#{payee_cardholder_name},payee_bank_card_no=#{payee_bank_card_no},note=#{note} 
+		WHERE log_id=#{log_id}
+	</update>
+
+    <select id="queryPayLog" parameterType="map" resultType="com.inspur.bigdata.manage.open.service.pay.data.PayLog">
+        SELECT * FROM PAY_LOG where 1=1
+        <if test="orderId != null and '' != orderId">
+            AND order_id = #{orderId}
+        </if>
+        <if test="userId != null and '' != userId">
+            AND pay_user_id = #{userId}
+        </if>
+    </select>
+
+    <!-- 	账户资金 -->
+    <!-- <insert id="addPayAccount" parameterType="com.inspur.pay.data.PayAccount">
+        INSERT INTO PAY_ACCOUNT_CAPITAL(USER_ID,ACCOUNT_BALANCE,UPDATE_TIME)
+        VALUES(#{user_id},#{account_balance},#{update_time})
+    </insert> -->
+
+    <!-- <update id="updatePayAccount" parameterType="com.inspur.pay.data.PayAccount">
+        UPDATE TABLE PAY_ACCOUNT_CAPITAL SET ACCOUNT_BALANCE=#{account_balance},UPDATE_TIME=#{update_time}
+        WHERE USER_ID = #{user_id}
+    </update> -->
+
+    <!-- <select id="queryPayAccount" parameterType="map" resultType="com.inspur.pay.data.PayAccount">
+        SELECT * FROM PAY_ACCOUNT_CAPITAL where 1=1
+        <if test="user_id != null and '' != user_id">
+            AND USER_ID = #{user_id}
+        </if>
+    </select>  -->
+
+</mapper>
+
+
+
+
+
+
+
+
