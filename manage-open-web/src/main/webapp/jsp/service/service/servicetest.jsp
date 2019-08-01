@@ -7,7 +7,7 @@
 	    <meta charset="utf-8">
 	    <meta http-equiv="X-UA-Compatible" content="IE=edge">
 	    <meta name="viewport" content="width=device-width, initial-scale=1">
-	    
+
 	    <!-- 需要引用的CSS -->
 		<link rel="shortcut icon" href="<%=request.getContextPath()%>/jsp/public/images/favicon.ico" />
 		<link rel="stylesheet" type="text/css" href="<l:asset path='css/bootstrap.css'/>" />
@@ -24,7 +24,7 @@
 	    <script type="text/javascript" src="<l:asset path='jquery.js'/>" ></script>
 	    <script type="text/javascript" src="<l:asset path='bootstrap.js'/>" ></script>
 		<script type="text/javascript" src="<l:asset path='form.js'/>" ></script>
-		<script type="text/javascript" src="<l:asset path='arttemplate.js'/>" ></script>	
+		<script type="text/javascript" src="<l:asset path='arttemplate.js'/>" ></script>
 	    <script type="text/javascript" src="<l:asset path='ui.js'/>"></script>
 	</head>
 <title>服务测试</title>
@@ -172,7 +172,7 @@
 			$("table>tbody>tr").each(function(){
 				var onedata = {};
 				/*if(i!=0){*/
-					listdata[$(this).find('td').eq(0).text()]=$(this).find('td').eq(3).find('input').val();
+					listdata[$(this).find('td').eq(0).text()]=encodeURIComponent($(this).find('td').eq(3).find('input').val());
 				/*}*/
 				i = i+1;
 			});

@@ -238,6 +238,8 @@
                                                 <option value="double" <c:if test="${inparam.scType =='double'}"> selected="selected" </c:if>>Double</option>
                                                 <option value="float" <c:if test="${inparam.scType =='float'}"> selected="selected" </c:if>>Float</option>
                                                 <option value="boolean" <c:if test="${inparam.scType =='boolean'}"> selected="selected" </c:if>>Boolean</option>
+                                                <option value="application/json" <c:if test="${inparam.scType =='application/json'}"> selected="selected" </c:if>>application/json</option>
+                                                <option value="text/xml" <c:if test="${inparam.scType =='text/xml'}"> selected="selected" </c:if>>text/xml</option>
                                             </select>
                                         </td>
                                         <td>
@@ -762,6 +764,8 @@
                 <option value="double">Double</option>
                 <option value="float">Float</option>
                 <option value="boolean">Boolean</option>
+                <option value="application/json">application/json</option>
+                <option value="text/xml">text/xml</option>
             </select>
         </td>
         <td>
@@ -864,6 +868,8 @@
                 <option value="double">Double</option>
                 <option value="float">Float</option>
                 <option value="boolean">Boolean</option>
+                <option value="application/json">application/json</option>
+                <option value="text/xml">text/xml</option>
             </select>
         </td>
         <td>

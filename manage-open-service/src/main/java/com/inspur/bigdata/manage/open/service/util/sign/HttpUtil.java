@@ -42,16 +42,15 @@ import org.apache.http.params.CoreConnectionPNames;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
+import javax.servlet.http.HttpServletRequest;
+import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URLEncoder;
 import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.WritableByteChannel;
+import java.nio.charset.StandardCharsets;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
@@ -294,7 +293,7 @@ public class HttpUtil {
 
     /**
      * 构建FormEntity
-     * 
+     *
      * @param formParam
      * @return
      * @throws UnsupportedEncodingException
@@ -314,7 +313,7 @@ public class HttpUtil {
 
         return null;
     }
-    
+
     private static String initUrl(String host, String path, Map<String, String> querys) throws UnsupportedEncodingException {
     	StringBuilder sbUrl = new StringBuilder();
     	sbUrl.append(host);
@@ -335,17 +334,17 @@ public class HttpUtil {
         			if (!StringUtils.isBlank(query.getValue())) {
         				sbQuery.append(Constants.SPE4);
         				sbQuery.append(URLEncoder.encode(query.getValue(), Constants.ENCODING));
-        			}        			
+        			}
                 }
         	}
         	if (0 < sbQuery.length()) {
         		sbUrl.append(Constants.SPE5).append(sbQuery);
         	}
         }
-    	
+
     	return sbUrl.toString();
     }
-    	
+
 
     /**
      * 初始化基础Header
@@ -361,7 +360,7 @@ public class HttpUtil {
      * @throws MalformedURLException
      */
     private static Map<String, String> initialBasicHeader(String method, String path,
-                                                          Map<String, String> headers, 
+                                                          Map<String, String> headers,
                                                           Map<String, String> querys,
                                                           Map<String, String> bodys,
                                                           List<String> signHeaderPrefixList,
@@ -381,7 +380,7 @@ public class HttpUtil {
 
     /**
      * 读取超时时间
-     * 
+     *
      * @param timeout
      * @return
      */
@@ -392,27 +391,27 @@ public class HttpUtil {
 
         return timeout;
     }
-    
+
     private static Response convert(HttpResponse response) throws IOException {
-    	Response res = new Response(); 
-    	
+    	Response res = new Response();
+
     	if (null != response) {
     		res.setStatusCode(response.getStatusLine().getStatusCode());
     		for (Header header : response.getAllHeaders()) {
     			res.setHeader(header.getName(), MessageDigestUtil.iso88591ToUtf8(header.getValue()));
             }
-    		
+
     		res.setContentType(res.getHeader("Content-Type"));
     		res.setRequestId(res.getHeader("X-Ca-Request-Id"));
     		res.setErrorMessage(res.getHeader("X-Ca-Error-Message"));
     		res.setBody(readStreamAsStr(response.getEntity().getContent()));
-    		
+
     	} else {
     		//服务器无回应
     		res.setStatusCode(500);
     		res.setErrorMessage("No Response");
     	}
-    	
+
     	return res;
     }
 
@@ -429,7 +428,7 @@ public class HttpUtil {
 	    WritableByteChannel dest = Channels.newChannel(bos);
 	    ReadableByteChannel src = Channels.newChannel(is);
 	    ByteBuffer bb = ByteBuffer.allocate(4096);
-	
+
 	    while (src.read(bb) != -1) {
 	        bb.flip();
 	        dest.write(bb);
@@ -437,7 +436,7 @@ public class HttpUtil {
 	    }
 	    src.close();
 	    dest.close();
-	
+
 	    return new String(bos.toByteArray(), Constants.ENCODING);
 	}
 
@@ -446,10 +445,10 @@ public class HttpUtil {
 		if (host.startsWith("https://")) {
 			sslClient(httpClient);
 		}
-		
+
 		return httpClient;
 	}
-	
+
 	private static void sslClient(HttpClient httpClient) {
         try {
             SSLContext ctx = SSLContext.getInstance("TLS");
@@ -458,10 +457,10 @@ public class HttpUtil {
                     return null;
                 }
                 public void checkClientTrusted(X509Certificate[] xcs, String str) {
-                	
+
                 }
                 public void checkServerTrusted(X509Certificate[] xcs, String str) {
-                	
+
                 }
             };
             ctx.init(null, new TrustManager[] { tm }, null);
@@ -475,5 +474,17 @@ public class HttpUtil {
         } catch (NoSuchAlgorithmException ex) {
         	throw new RuntimeException(ex);
         }
+    }
+
+    public static String getRequestIn(HttpServletRequest request) throws IOException {
+
+        BufferedReader streamReader = new BufferedReader(new InputStreamReader(request.getInputStream(), StandardCharsets.UTF_8));
+        StringBuilder responseStrBuilder = new StringBuilder();
+        String inputStr;
+        while ((inputStr = streamReader.readLine()) != null) {
+            responseStrBuilder.append(inputStr);
+        }
+        System.out.println(responseStrBuilder.toString());
+        return responseStrBuilder.toString();
     }
 }

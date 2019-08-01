@@ -2,8 +2,6 @@ package com.inspur.bigdata.manage.open.service.controller;
 
 import com.alibaba.druid.support.logging.Log;
 import com.alibaba.druid.support.logging.LogFactory;
-import com.alibaba.fastjson.JSON;
-import com.inspur.bigdata.manage.common.utils.PropertiesUtil;
 import com.inspur.bigdata.manage.open.service.data.*;
 import com.inspur.bigdata.manage.open.service.pay.data.PayAccountCapital;
 import com.inspur.bigdata.manage.open.service.pay.service.IPayService;
@@ -11,7 +9,6 @@ import com.inspur.bigdata.manage.open.service.service.*;
 import com.inspur.bigdata.manage.open.service.util.OpenServiceConstants;
 import com.inspur.bigdata.manage.open.service.util.sign.*;
 import com.inspur.bigdata.manage.open.service.util.signconstants.Constants;
-import com.inspur.bigdata.manage.open.service.util.signconstants.Method;
 import com.inspur.bigdata.manage.utils.OpenDataConstants;
 import com.inspur.bigdata.manage.utils.StringUtil;
 import net.sf.json.JSONObject;
@@ -30,23 +27,15 @@ import org.apache.http.conn.socket.ConnectionSocketFactory;
 import org.apache.http.conn.socket.PlainConnectionSocketFactory;
 import org.apache.http.conn.ssl.NoopHostnameVerifier;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
-import org.loushang.framework.mybatis.PageUtil;
-import org.loushang.framework.util.DateUtil;
-import org.loushang.framework.util.HttpRequestUtils;
-import org.loushang.framework.util.UUIDGenerator;
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.BeanWrapper;
-import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.HandlerMapping;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.net.ssl.SSLContext;
@@ -54,10 +43,9 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.math.BigDecimal;
-import java.net.URL;
+import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
@@ -164,7 +152,7 @@ public class ServiceExecuteController {
         for (ServiceInput serviceInput : listServiceInput) {
             for (Object key : json.keySet()) {
                 if (serviceInput.getName().equals(String.valueOf(key))) {
-                    String value = String.valueOf(json.get(key));
+                    String value=URLDecoder.decode(String.valueOf(json.get(key)));
                     if (StringUtil.isNotEmpty(value)) serviceInput.setValue(value);
                     break;
                 }
@@ -183,7 +171,7 @@ public class ServiceExecuteController {
                 return map;
             }
             //后台请求
-            String result_str = doRequest(serviceDef, listServiceInput);
+            String result_str = doRequest("", serviceDef, listServiceInput);
             ///发送请求
             map.put("result", true);
             map.put("header", "Content-Type:" + OpenServiceConstants.getContentType(serviceDef.getContentType()));
@@ -221,10 +209,11 @@ public class ServiceExecuteController {
         long startTime = 0;
         String requestUserId = null;
         BigDecimal servicePrice = null;
+        String instream = null;
         String context_path = "/" + apiContext + "/" + reqPath;
         try {
             response.setCharacterEncoding("utf-8");
-            response.addHeader("Content-Type", "text/html;charset=UTF-8");
+            response.addHeader("Content-Type", OpenServiceConstants.content_type_html);
             writer = response.getWriter();
             //通过context查询apiGroup
             Map<String, Object> groupmap = new HashMap<>();
@@ -339,7 +328,6 @@ public class ServiceExecuteController {
                         writer.print("账户余额不足，请及时充值！");
                         writer.flush();
                         return;
-//                        throw new RuntimeException("账户余额不足，请及时充值！");
                     } else {
                         BigDecimal bigDecimal = balance.subtract(serviceDef.getPrice());
                         if (bigDecimal.compareTo(new BigDecimal(0.00)) <= 0) {
@@ -347,13 +335,17 @@ public class ServiceExecuteController {
                             writer.print("账户余额不足调用，请及时充值！");
                             writer.flush();
                             return;
-//                            throw new RuntimeException("账户余额不足调用，请及时充值！");
                         }
                     }
                 }
             }
             List<ServiceInput> listServiceInput = serviceInputService.listByServiceId(apiServiceId);
             try {
+                //读取request数据流
+                String contentType = request.getHeader("Content-Type");
+                if (StringUtils.isNotEmpty(contentType) && !contentType.equals(OpenServiceConstants.SC_TYPE_APPLICATION_XWWWFORMURLENCODED)) {
+                    instream = HttpUtil.getRequestIn(request);
+                }
                 initInputList(request, listServiceInput);
             } catch (Exception e) {
                 success = false;
@@ -363,12 +355,12 @@ public class ServiceExecuteController {
                 return;
             }
             startTime = System.currentTimeMillis();
-            String result_str = doRequest(serviceDef, listServiceInput);
+            String result_str = doRequest(instream, serviceDef, listServiceInput);
             response.addHeader("Content-Type", OpenServiceConstants.getContentType(serviceDef.getContentType()));
             writer.print(result_str);
             writer.flush();
         } catch (Throwable e) {
-            response.addHeader("Content-Type", "text/html;charset=UTF-8");
+            response.addHeader("Content-Type", OpenServiceConstants.content_type_html);
             success = false;
             log.error("目标服务调用出错", e);
             Map<String, Object> errorResult = new HashMap<String, Object>();
@@ -403,12 +395,17 @@ public class ServiceExecuteController {
     public void initInputList(HttpServletRequest request, List<ServiceInput> listServiceInput) throws Exception {
         Map<String, String[]> requestmap = request.getParameterMap();
         for (ServiceInput serviceInput : listServiceInput) {
-            for (Object key : requestmap.keySet()) {//循环请求所有参数
-                if (serviceInput.getName().equals(String.valueOf(key))) {
-                    String value = String.valueOf(requestmap.get(key)[0]);
-                    checkData(serviceInput.getType(), value, (String) key);
-                    serviceInput.setValue(value);
-                    break;
+            if (serviceInput.getScParamType().equals(OpenServiceConstants.SC_PARAMTYPE_HEAD)) {
+                serviceInput.setValue(request.getHeader(serviceInput.getScName()));
+            }
+            if (requestmap != null) {
+                for (Object key : requestmap.keySet()) {//循环请求所有参数
+                    if (serviceInput.getName().equals(String.valueOf(key))) {
+                        String value = String.valueOf(requestmap.get(key)[0]);
+                        checkData(serviceInput.getType(), value, (String) key);
+                        serviceInput.setValue(value);
+                        break;
+                    }
                 }
             }
         }
@@ -453,7 +450,8 @@ public class ServiceExecuteController {
         }
     }
 
-    private String doRequest(ServiceDef serviceDef, List<ServiceInput> listServiceInput) throws Exception {
+    private String doRequest(String instream, ServiceDef serviceDef, List<ServiceInput> listServiceInput) throws Exception {
+        String scType = null;
         String addr = serviceDef.getScAddr();
         addr = addr.endsWith("/") ? addr.substring(0, addr.length() - 1) : addr;
         StringBuilder httpurl = new StringBuilder();
@@ -461,28 +459,31 @@ public class ServiceExecuteController {
         //组装后端参数param
         Map<String, String> header = new HashMap<>();
         Map<String, String> bodys = new HashMap<String, String>();
-        header.put(Constants.HTTP_HEADER_ACCEPT, "application/json");
+        header.put(Constants.HTTP_HEADER_ACCEPT, "*/*");
         Collections.sort(listServiceInput);//根据scSeq排序
 
-        for (ServiceInput serviceInput : listServiceInput) {
-            checkData(serviceInput.getScType(), serviceInput.getValue(), serviceInput.getScName());//判断参数类型是否正确
-            String paramType = serviceInput.getScParamType();
-            if (paramType.equalsIgnoreCase("path")) {
-                httpurl.append("/").append(serviceInput.getValue());
-            }
-        }
         boolean firstQueryParam = true;
         for (ServiceInput serviceInput : listServiceInput) {
-            String paramType = serviceInput.getScParamType();
             //判断必填属性
-            if (OpenDataConstants.is_null_no == serviceInput.getRequired() && StringUtils.isBlank(serviceInput.getValue())) {
+            if (OpenDataConstants.is_null_no == serviceInput.getRequired() && StringUtils.isBlank(serviceInput.getValue())&&!serviceInput.getScType().equals("text/xml")&&!serviceInput.getScType().equals("application/json")) {
                 throw new Exception("请传入必填参数" + serviceInput.getName());
             }
-            if (paramType.equalsIgnoreCase("body")) {
-                if (StringUtils.isNotBlank(serviceInput.getValue())) {
-                    bodys.put(serviceInput.getScName(), serviceInput.getValue());
+            checkData(serviceInput.getScType(), serviceInput.getValue(), serviceInput.getScName());//判断参数类型是否正确
+            String paramType = serviceInput.getScParamType();
+            if (paramType.equalsIgnoreCase(OpenServiceConstants.SC_PARAMTYPE_PATH)) {
+                httpurl.append("/").append(serviceInput.getValue());
+            } else if (paramType.equalsIgnoreCase(OpenServiceConstants.SC_PARAMTYPE_BODY)) {
+                if (!serviceInput.getScType().equals(OpenServiceConstants.SC_TYPE_APPLICATION_JSON)&&!serviceInput.getScType().equals(OpenServiceConstants.SC_TYPE_TEXT_XML)) {
+                    if (StringUtils.isNotBlank(serviceInput.getValue())) {
+                        bodys.put(serviceInput.getScName(), serviceInput.getValue());
+                    }
+                }else{
+                    if (StringUtils.isEmpty(instream)&&StringUtils.isNotBlank(serviceInput.getValue())){
+                        instream=serviceInput.getValue();
+                    }
+                    scType = serviceInput.getScType();
                 }
-            } else if (paramType.equalsIgnoreCase("query")) {
+            } else if (paramType.equalsIgnoreCase(OpenServiceConstants.SC_PARAMTYPE_QUERY)) {
                 if (firstQueryParam) {
                     if (StringUtils.isNotBlank(serviceInput.getValue())) {
                         httpurl.append("?").append(serviceInput.getScName()).append("=").append(URLEncoder.encode(serviceInput.getValue()));
@@ -493,7 +494,7 @@ public class ServiceExecuteController {
                         httpurl.append("&").append(serviceInput.getScName()).append("=").append(URLEncoder.encode(serviceInput.getValue()));
                     }
                 }
-            } else {
+            } else if (paramType.equalsIgnoreCase(OpenServiceConstants.SC_PARAMTYPE_HEAD)) {
                 header.put(serviceInput.getScName(), serviceInput.getValue());
             }
         }
@@ -502,7 +503,7 @@ public class ServiceExecuteController {
             case "GET":
                 return execGet(httpurl.toString(), timeout, header);
             case "POST":
-                return execPost(httpurl.toString(), timeout, header, bodys);
+                return execPost(instream, scType, httpurl.toString(), timeout, header, bodys);
             default:
                 return "{error:404}";
         }
@@ -547,7 +548,7 @@ public class ServiceExecuteController {
      * @return
      */
 
-    public static String execPost(String url, int timeout, Map<String, String> headers, Map<String, String> parameters) {
+    public static String execPost(String instream, String scType, String url, int timeout, Map<String, String> headers, Map<String, String> parameters) {
         String str = "{error:404}";
         HttpPost httpPost = new HttpPost(url);
         HttpGet httpGet = new HttpGet(url);
@@ -563,15 +564,30 @@ public class ServiceExecuteController {
             for (String key : parameters.keySet()) {
                 nvps.add(new BasicNameValuePair(key, parameters.get(key)));
             }
+
             try {
-                httpPost.setEntity(new UrlEncodedFormEntity(nvps));
+                httpPost.setEntity(new UrlEncodedFormEntity(nvps, "utf-8"));
             } catch (Exception e) {
+            }
+        } else if (StringUtils.isNotEmpty(instream) && (scType.equals(OpenServiceConstants.SC_TYPE_APPLICATION_JSON) || scType.equals(OpenServiceConstants.SC_TYPE_TEXT_XML))) {
+            switch (scType) {
+                case OpenServiceConstants.SC_TYPE_APPLICATION_JSON:
+                    httpPost.addHeader("Content-Type", OpenServiceConstants.content_type_json);
+                    break;
+                case OpenServiceConstants.SC_TYPE_TEXT_XML:
+                    httpPost.addHeader("Content-Type", OpenServiceConstants.content_type_text_xml);
+                    break;
+            }
+            try {
+                httpPost.setEntity(new StringEntity(instream, "utf-8"));
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         }
         try (final CloseableHttpClient httpclient = createCloseableHttpClient(url);
              final CloseableHttpResponse response = httpclient.execute(httpPost)) {
             HttpEntity entity = response.getEntity();
-            str = EntityUtils.toString(entity);
+            str = EntityUtils.toString(entity, "UTF-8");
             EntityUtils.consume(entity);
         } catch (Exception e) {
             e.printStackTrace();
