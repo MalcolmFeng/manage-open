@@ -16,6 +16,9 @@ function initAccount() {
         success: function (data) {
             var dataRtn = data.accountBalance;
             $("#accountNum").text(dataRtn);
+            if (dataRtn > 0) {
+                $("#recharge-desc").show();
+            }
         }
     });
 }

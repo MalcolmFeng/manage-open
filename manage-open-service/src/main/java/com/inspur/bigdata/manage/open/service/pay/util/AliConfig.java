@@ -50,7 +50,7 @@ public class AliConfig {
         Properties p = new Properties();
         //System.out.println(Thread.currentThread().getContextClassLoader());
         try {
-            p.load(new InputStreamReader(Thread.currentThread().getContextClassLoader().getResourceAsStream("conf.properties"), StandardCharsets.UTF_8));
+            p.load(new InputStreamReader(Thread.currentThread().getContextClassLoader().getResourceAsStream("alipay-conf.properties"), StandardCharsets.UTF_8));
             if (!p.isEmpty()) {
 
                 gatewayUrl = getValue(p, "alipay.gatewayUrl");

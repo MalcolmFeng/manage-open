@@ -49,6 +49,8 @@
         <url-pattern>/service/api/execute/getAppList/*</url-pattern>
         <url-pattern>/service/api/execute/getserviceinput/*</url-pattern>
         <url-pattern>/service/api/execute/getAppInfo/*</url-pattern>
+        <url-pattern>/service/pay/payNotifyUrl</url-pattern>
+        <url-pattern>/service/pay/payReturnUrl</url-pattern>
     </web-resource-collection>
   </security-constraint>
 

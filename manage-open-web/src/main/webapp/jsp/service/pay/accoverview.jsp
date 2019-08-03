@@ -23,9 +23,9 @@
 </head>
 <body style="height:100%;">
 <div id="overview">
-    <div class="row">
-        <div id="page-title">账户总览</div>
-    </div>
+    <%--    <div class="row">--%>
+    <%--        <div id="page-title">账户总览</div>--%>
+    <%--    </div>--%>
     <div id="recharge-panel" class="panel panel-default">
         <div class="panel-body">
             <div id="balance-text" class="col-md-10 col-xs-10">
@@ -39,7 +39,7 @@
             </div>
         </div>
     </div>
-    <div id="recharge-desc" class="panel panel-default col-md-12 col-xs-12">
+    <div id="recharge-desc" class="panel panel-default col-md-12 col-xs-12" style="display: none">
         <i class="fa fa-check-circle" style=""></i>可用额度大于零，不会影响业务的正常使用！
     </div>
 </div>

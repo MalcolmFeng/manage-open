@@ -217,7 +217,7 @@ public class PayServiceImpl implements IPayService {
         if (PayUtil.PAY_STATUS_PRE_PAY.equals(payStatus)
                 && total_amount != null && !"".equals(total_amount)) {
             payLog.setAmount(total_amount);
-            Map<String, String> addOrUpdatePayAccountByUserId = addOrUpdatePayAccountByUserId(OpenDataConstants.getUserId(), total_amount);
+            Map<String, String> addOrUpdatePayAccountByUserId = addOrUpdatePayAccountByUserId(payLog.getPayUserId(), total_amount);
             // 万一往数据库更新余额失败，要怎么处理？
         }
         payLog.setPaySeq(trade_no);
@@ -265,7 +265,7 @@ public class PayServiceImpl implements IPayService {
                 mapRet.putAll(aliResult);
             }
         } catch (Exception e) {
-            log.debug("payNotifyUrl 出错: " + e);
+            log.error("payNotifyUrl 出错: " + e);
         }
         return mapRet;
     }

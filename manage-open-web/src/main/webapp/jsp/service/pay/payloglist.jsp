@@ -31,9 +31,9 @@
 </head>
 <body style="height:100%;overflow: hidden;">
 <div class="container col-xs-12 col-md-12">
-    <div class="row">
-        <div id="page-title" class="col-xs-12 col-md-12">充值记录</div>
-    </div>
+    <%--    <div class="row">--%>
+    <%--        <div id="page-title" class="col-xs-12 col-md-12">充值记录</div>--%>
+    <%--    </div>--%>
     <div class="col-xs-12 col-md-12" style="margin-top: 20px;">
         <table id="payList" class="table table-bordered table-hover">
             <thead>
@@ -55,6 +55,6 @@
 <script type="text/javascript" src="<l:asset path='datatables.js'/>"></script>
 <script type="text/javascript" src="<l:asset path='loushang-framework.js'/>"></script>
 <script type="text/javascript" src="<l:asset path='ui.js'/>"></script>
-<script type="text/javascript" src="<l:asset path='pay/payloglist.js'/>"></script>
+<script type="text/javascript" src="<l:asset path='service/pay/payloglist.js'/>"></script>
 </body>
 </html>

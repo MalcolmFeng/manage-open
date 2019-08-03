@@ -243,15 +243,18 @@ public class AliPayDomain {
             String trade_no = new String(request.getParameter("trade_no").getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
             //交易状态
             String trade_status = new String(request.getParameter("trade_status").getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
+            //付款金额
+            String total_amount = new String(request.getParameter("total_amount").getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
 
             if (trade_status.equals("TRADE_FINISHED")) { // 交易完成
                 //判断该笔订单是否在商户网站中已经做过处理
                 //如果没有做过处理，根据订单号（out_trade_no）在商户网站的订单系统中查到该笔订单的详细，并执行商户的业务程序
                 //如果有做过处理，不执行商户的业务程序
                 result.put("code", "201");
-                result.put(out_trade_no, "out_trade_no");
-                result.put(trade_no, "trade_no");
-                result.put(trade_status, "trade_status");
+                result.put("out_trade_no", out_trade_no);
+                result.put("trade_no", trade_no);
+                result.put("trade_status", trade_status);
+                result.put("total_amount", total_amount);//金额
 
                 //注意：
                 //退款日期超过可退款期限后（如三个月可退款），支付宝系统发送该交易状态通知
@@ -264,16 +267,14 @@ public class AliPayDomain {
                 //付款完成后，支付宝系统发送该交易状态通知
 
                 result.put("code", "200");
-                result.put(out_trade_no, "out_trade_no");
-                result.put(trade_no, "trade_no");
-                result.put(trade_status, "trade_status");
+                result.put("out_trade_no", out_trade_no);
+                result.put("trade_no", trade_no);
+                result.put("trade_status", trade_status);
+                result.put("total_amount", total_amount);//金额
 
             }
 
-//			out.println("success");
-
         } else {//验证失败
-//			out.println("fail");
 
             result.put("code", "901");
             result.put("msg", "验签失败");
@@ -281,7 +282,6 @@ public class AliPayDomain {
             //String sWord = AlipaySignature.getSignCheckContentV1(params);
             //AlipayConfig.logResult(sWord);
         }
-
         // 这里根据需要返回数据，目前没有往result里放数据
         return result;
     }
