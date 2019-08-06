@@ -484,7 +484,6 @@ public class HttpUtil {
         while ((inputStr = streamReader.readLine()) != null) {
             responseStrBuilder.append(inputStr);
         }
-        System.out.println(responseStrBuilder.toString());
         return responseStrBuilder.toString();
     }
 }
