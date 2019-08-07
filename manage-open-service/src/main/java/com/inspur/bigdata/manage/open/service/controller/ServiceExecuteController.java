@@ -6,6 +6,7 @@ import com.inspur.bigdata.manage.open.service.data.*;
 import com.inspur.bigdata.manage.open.service.pay.data.PayAccountCapital;
 import com.inspur.bigdata.manage.open.service.pay.service.IPayService;
 import com.inspur.bigdata.manage.open.service.service.*;
+import com.inspur.bigdata.manage.open.service.util.ApiServiceMonitorUtil;
 import com.inspur.bigdata.manage.open.service.util.OpenServiceConstants;
 import com.inspur.bigdata.manage.open.service.util.sign.*;
 import com.inspur.bigdata.manage.open.service.util.signconstants.Constants;
@@ -53,6 +54,8 @@ import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.*;
 
+import static com.inspur.bigdata.manage.open.service.util.OpenServiceConstants.*;
+
 
 @Controller
 @RequestMapping("/api/execute")
@@ -71,6 +74,8 @@ public class ServiceExecuteController {
     private IDevGroupService devGroupService;
     @Autowired
     private IPayService payService;
+    @Autowired
+    private IServiceMonitorService monitorService;
 
 
     @RequestMapping("/test/{apiServiceId}")
@@ -152,7 +157,7 @@ public class ServiceExecuteController {
         for (ServiceInput serviceInput : listServiceInput) {
             for (Object key : json.keySet()) {
                 if (serviceInput.getName().equals(String.valueOf(key))) {
-                    String value=URLDecoder.decode(String.valueOf(json.get(key)));
+                    String value = URLDecoder.decode(String.valueOf(json.get(key)));
                     if (StringUtil.isNotEmpty(value)) serviceInput.setValue(value);
                     break;
                 }
@@ -171,7 +176,7 @@ public class ServiceExecuteController {
                 return map;
             }
             //后台请求
-            String result_str = doRequest("", serviceDef, listServiceInput);
+            String result_str = doRequest("", serviceDef, listServiceInput, new ApiServiceMonitor());
             ///发送请求
             map.put("result", true);
             map.put("header", "Content-Type:" + OpenServiceConstants.getContentType(serviceDef.getContentType()));
@@ -210,43 +215,17 @@ public class ServiceExecuteController {
         String requestUserId = null;
         BigDecimal servicePrice = null;
         String instream = null;
+        String requestTime = OpenServiceConstants.sf.format(new Date());
+        String responseTime = null;
+        ApiServiceMonitor apiServiceMonitor = new ApiServiceMonitor();
+        apiServiceMonitor.setRequestTime(requestTime);
+        apiServiceMonitor.setOpenServiceInput(JSONObject.fromObject(request.getParameterMap()).toString());
+        apiServiceMonitor.setOpenServiceMethod(request.getMethod());
         String context_path = "/" + apiContext + "/" + reqPath;
         try {
             response.setCharacterEncoding("utf-8");
             response.addHeader("Content-Type", OpenServiceConstants.content_type_html);
             writer = response.getWriter();
-            //通过context查询apiGroup
-            Map<String, Object> groupmap = new HashMap<>();
-            groupmap.put("context", apiContext);
-            List<DevGroup> grouplist = devGroupService.getGroupList(groupmap);
-            if (grouplist == null || grouplist.size() != 1) {
-                success = false;
-                writer.print("API分组错误");
-                writer.flush();
-                return;
-            }
-            String apiGroupId = grouplist.get(0).getId();
-
-            //根据apiGroupId和reqPath查询唯一的API service
-            Map<String, Object> map = new HashMap<>();
-            map.put("apiGroup", apiGroupId);
-            map.put("reqPath", "/" + reqPath);
-            List<ServiceDef> defs = serviceDefService.getByApiGroupAndPath(map);
-            if (defs == null || defs.size() != 1) {
-                success = false;
-                writer.print("API服务错误");
-                writer.flush();
-                return;
-            }
-            ServiceDef serviceDef = defs.get(0);
-            if (!OpenServiceConstants.api_audit_pass.equals(serviceDef.getAuditStatus())) {
-                success = false;
-                writer.print("API服务当前状态不可用");
-                writer.flush();
-                return;
-            }
-            String apiServiceId = serviceDef.getId();
-
             //组装头部并获取 appkey、appSecret 和请求签名signature
             Enumeration<String> headNames = request.getHeaderNames();
             Map<String, String> headers = new HashMap<>();
@@ -263,25 +242,52 @@ public class ServiceExecuteController {
                     signature = request.getHeader(headName);
                 }
             }
+            JSONObject json = JSONObject.fromObject(headers);
+            apiServiceMonitor.setOpenServiceInputHeader(json.toString());
+            //通过context,reqPath关联查询apiService
+            ServiceDef serviceDef = checkApiService(apiContext, reqPath, apiServiceMonitor);
+            if (serviceDef == null) {
+                writer.print("API分组错误或API服务错误");
+                writer.flush();
+                return;
+            }
+            String apiServiceId = serviceDef.getId();
+            apiServiceMonitor.setApiServiceId(apiServiceId);
+            apiServiceMonitor.setApiServiceName(serviceDef.getName());
+            if (!OpenServiceConstants.api_audit_pass.equals(serviceDef.getAuditStatus())) {
+                success = false;
+                writer.print("API服务当前状态不可用");
+                writer.flush();
+                apiServiceMonitor.setNotes("API服务当前状态不可用");
+                apiServiceMonitor.setResult(ASM_ERROR_SERVICE_NO_PASS);
+                return;
+            }
             List<AppInstance> appList = appManage.getAppByAppKey(appkey);
             if (appList == null || appList.size() != 1) {
                 success = false;
                 writer.print("查询授权应用异常");
                 writer.flush();
+                apiServiceMonitor.setNotes("查询授权应用异常");
+                apiServiceMonitor.setResult(ASM_ERROR_APP_UNAUTHORIZE);
                 return;
             }
             appSecret = appList.get(0).getAppSecret();
-
+            String appId = appList.get(0).getAppId();
+            requestUserId = appList.get(0).getUserId();
+            apiServiceMonitor.setCallerAppId(appId);
+            apiServiceMonitor.setCallerUserId(requestUserId);
             //TODO 通过serviceId和appId查询授权记录，无授权直接返回
             Map applymap = new HashMap();
             applymap.put("apiServiceId", apiServiceId);
-            applymap.put("appId", appList.get(0).getAppId());
+            applymap.put("appId", appId);
             applymap.put("authStatus", OpenServiceConstants.auth_status_pass);
             List<ServiceApply> alist = serviceApplyService.getList(applymap);
             if (alist == null || alist.size() == 0) {
                 success = false;
                 writer.print("API未授权应用");
                 writer.flush();
+                apiServiceMonitor.setNotes("API未授权应用");
+                apiServiceMonitor.setResult(ASM_ERROR_SERVICE_UNAUTHORIZE_APP);
                 return;
             }
             /**
@@ -314,9 +320,10 @@ public class ServiceExecuteController {
 //                        new ArrayList<String>());
                 writer.print("验证签名不正确！");
                 writer.flush();
+                apiServiceMonitor.setNotes("验证签名不正确");
+                apiServiceMonitor.setResult(ASM_ERROR_SIGNATURE);
                 return;
             }
-            requestUserId = appList.get(0).getUserId();
             servicePrice = serviceDef.getPrice();
             if (servicePrice.compareTo(new BigDecimal(0.00)) > 0) {
                 //如果调用的API服务售价大于0 需要判断调用者账号下的余额
@@ -327,6 +334,8 @@ public class ServiceExecuteController {
                         success = false;
                         writer.print("账户余额不足，请及时充值！");
                         writer.flush();
+                        apiServiceMonitor.setNotes("账户余额不足，请及时充值");
+                        apiServiceMonitor.setResult(ASM_ERROR_BALANCE);
                         return;
                     } else {
                         BigDecimal bigDecimal = balance.subtract(serviceDef.getPrice());
@@ -334,6 +343,8 @@ public class ServiceExecuteController {
                             success = false;
                             writer.print("账户余额不足调用，请及时充值！");
                             writer.flush();
+                            apiServiceMonitor.setNotes("账户余额不足调用，请及时充值");
+                            apiServiceMonitor.setResult(ASM_ERROR_BALANCE);
                             return;
                         }
                     }
@@ -345,6 +356,7 @@ public class ServiceExecuteController {
                 String contentType = request.getHeader("Content-Type");
                 if (StringUtils.isNotEmpty(contentType) && !contentType.equals(OpenServiceConstants.SC_TYPE_APPLICATION_XWWWFORMURLENCODED)) {
                     instream = HttpUtil.getRequestIn(request);
+                    apiServiceMonitor.setOpenServiceInput(instream);
                 }
                 initInputList(request, listServiceInput);
             } catch (Exception e) {
@@ -352,13 +364,17 @@ public class ServiceExecuteController {
                 e.printStackTrace();
                 writer.print("输入参数异常:" + e.getMessage());
                 writer.flush();
+                apiServiceMonitor.setNotes("输入参数异常:" + e.getMessage());
+                apiServiceMonitor.setResult(ASM_ERROR_PARAMETER);
                 return;
             }
             startTime = System.currentTimeMillis();
-            String result_str = doRequest(instream, serviceDef, listServiceInput);
+            String result_str = doRequest(instream, serviceDef, listServiceInput, apiServiceMonitor);
             response.addHeader("Content-Type", OpenServiceConstants.getContentType(serviceDef.getContentType()));
             writer.print(result_str);
             writer.flush();
+            apiServiceMonitor.setOpenServiceOutput(result_str);
+            apiServiceMonitor.setResult("200");
         } catch (Throwable e) {
             response.addHeader("Content-Type", OpenServiceConstants.content_type_html);
             success = false;
@@ -369,13 +385,18 @@ public class ServiceExecuteController {
             Map<String, Object> result = new HashMap<String, Object>();
             result.put("result", errorResult);
             // 未知错误编码
-            result.put("status", "99999");
+            result.put("status", ASM_ERROR_UNKNOWN);
             writer.print(result);
             writer.flush();
+            apiServiceMonitor.setOpenServiceOutput(String.valueOf(result));
+            apiServiceMonitor.setNotes(String.valueOf(errorResult));
+            apiServiceMonitor.setResult(ASM_ERROR_UNKNOWN);
         } finally {
             IOUtils.closeQuietly(writer);
+            responseTime = OpenServiceConstants.sf.format(new Date());
+            long serviceTime = System.currentTimeMillis() - startTime;
             if (log.isDebugEnabled()) {
-                log.debug("调用api执行的时间" + (System.currentTimeMillis() - startTime) + "毫秒");
+                log.debug("调用api执行的时间" + (serviceTime) + "毫秒");
             }
             if (success) {
                 // TODO 服务调用成功，查询之前调用此服务失败的记录，将之前的失败的etime
@@ -385,9 +406,35 @@ public class ServiceExecuteController {
                     //成功调用时扣费
                     payService.subPayAccountByUserId(requestUserId, servicePrice + "");
                 }
+                apiServiceMonitor.setServiceTotalTime((int) serviceTime);
             }
+            apiServiceMonitor.setResponseTime(responseTime);
+            apiServiceMonitor.setCreateTime(OpenServiceConstants.sf.format(new Date()));
+//            monitorService.insert(apiServiceMonitor);
+            ApiServiceMonitorUtil.insert(monitorService, apiServiceMonitor);
         }
     }
+
+    /**
+     * 检查api服务是否存在可用
+     */
+    public ServiceDef checkApiService(String apiContext, String reqPath, ApiServiceMonitor apiServiceMonitor) {
+        //根据apiContext和reqPath查询唯一的API service
+        ServiceDef serviceDef = null;
+        Map<String, Object> tmp = new HashMap<>();
+        tmp.put("context", apiContext);
+        tmp.put("reqPath", "/" + reqPath);
+        String context_path = "/" + apiContext + "/" + reqPath;
+        List<ServiceDef> defs2 = serviceDefService.getByGroupContextAndPath(tmp);
+        if (defs2 == null || defs2.size() != 1) {
+            apiServiceMonitor.setNotes("API分组错误或API服务错误,context_path=[" + context_path + "]");
+            apiServiceMonitor.setResult(ASM_ERROR_SERVICE);
+        } else {
+            serviceDef = defs2.get(0);
+        }
+        return serviceDef;
+    }
+
 
     /**
      * 验证输入参数并赋值
@@ -450,7 +497,7 @@ public class ServiceExecuteController {
         }
     }
 
-    private String doRequest(String instream, ServiceDef serviceDef, List<ServiceInput> listServiceInput) throws Exception {
+    private String doRequest(String instream, ServiceDef serviceDef, List<ServiceInput> listServiceInput, ApiServiceMonitor apiServiceMonitor) throws Exception {
         String scType = null;
         String addr = serviceDef.getScAddr();
         addr = addr.endsWith("/") ? addr.substring(0, addr.length() - 1) : addr;
@@ -459,13 +506,15 @@ public class ServiceExecuteController {
         //组装后端参数param
         Map<String, String> header = new HashMap<>();
         Map<String, String> bodys = new HashMap<String, String>();
+        JSONObject serviceInputParam = new JSONObject();
         header.put(Constants.HTTP_HEADER_ACCEPT, "*/*");
         Collections.sort(listServiceInput);//根据scSeq排序
 
         boolean firstQueryParam = true;
         for (ServiceInput serviceInput : listServiceInput) {
+            serviceInputParam.put(serviceInput.getScName(), serviceInput.getValue());
             //判断必填属性
-            if (OpenDataConstants.is_null_no == serviceInput.getRequired() && StringUtils.isBlank(serviceInput.getValue())&&!serviceInput.getScType().equals("text/xml")&&!serviceInput.getScType().equals("application/json")) {
+            if (OpenDataConstants.is_null_no == serviceInput.getRequired() && StringUtils.isBlank(serviceInput.getValue()) && !serviceInput.getScType().equals("text/xml") && !serviceInput.getScType().equals("application/json")) {
                 throw new Exception("请传入必填参数" + serviceInput.getName());
             }
             checkData(serviceInput.getScType(), serviceInput.getValue(), serviceInput.getScName());//判断参数类型是否正确
@@ -473,13 +522,13 @@ public class ServiceExecuteController {
             if (paramType.equalsIgnoreCase(OpenServiceConstants.SC_PARAMTYPE_PATH)) {
                 httpurl.append("/").append(serviceInput.getValue());
             } else if (paramType.equalsIgnoreCase(OpenServiceConstants.SC_PARAMTYPE_BODY)) {
-                if (!serviceInput.getScType().equals(OpenServiceConstants.SC_TYPE_APPLICATION_JSON)&&!serviceInput.getScType().equals(OpenServiceConstants.SC_TYPE_TEXT_XML)) {
+                if (!serviceInput.getScType().equals(OpenServiceConstants.SC_TYPE_APPLICATION_JSON) && !serviceInput.getScType().equals(OpenServiceConstants.SC_TYPE_TEXT_XML)) {
                     if (StringUtils.isNotBlank(serviceInput.getValue())) {
                         bodys.put(serviceInput.getScName(), serviceInput.getValue());
                     }
-                }else{
-                    if (StringUtils.isEmpty(instream)&&StringUtils.isNotBlank(serviceInput.getValue())){
-                        instream=serviceInput.getValue();
+                } else {
+                    if (StringUtils.isEmpty(instream) && StringUtils.isNotBlank(serviceInput.getValue())) {
+                        instream = serviceInput.getValue();
                     }
                     scType = serviceInput.getScType();
                 }
@@ -499,14 +548,23 @@ public class ServiceExecuteController {
             }
         }
         int timeout = 30000;
-        switch (serviceDef.getScHttpMethod().toUpperCase()) {
+        String method = serviceDef.getScHttpMethod().toUpperCase();
+        String result = null;
+        apiServiceMonitor.setServiceInput(serviceInputParam.toString());
+        apiServiceMonitor.setServiceInputHeader(JSONObject.fromObject(header).toString());
+        apiServiceMonitor.setServiceMethod(method);
+        switch (method) {
             case "GET":
-                return execGet(httpurl.toString(), timeout, header);
+                result = execGet(httpurl.toString(), timeout, header);
+                break;
             case "POST":
-                return execPost(instream, scType, httpurl.toString(), timeout, header, bodys);
+                result = execPost(instream, scType, httpurl.toString(), timeout, header, bodys);
+                break;
             default:
-                return "{error:404}";
+                result = "{error:404}";
         }
+        apiServiceMonitor.setServiceOutput(result);
+        return result;
     }
 
     /**
@@ -533,7 +591,7 @@ public class ServiceExecuteController {
             str = EntityUtils.toString(entity, "utf-8");
             EntityUtils.consume(entity);
         } catch (Exception e) {
-            str="API网关POST method failed to access URL，URL：" + url+","+e.getMessage();
+            str = "API网关POST method failed to access URL，URL：" + url + "," + e.getMessage();
             log.error("API网关GET method failed to access URL，URL：" + url, e);
         }
         return str;
@@ -591,7 +649,7 @@ public class ServiceExecuteController {
             str = EntityUtils.toString(entity, "UTF-8");
             EntityUtils.consume(entity);
         } catch (Exception e) {
-            str="API网关POST method failed to access URL，URL：" + url+","+e.getMessage();
+            str = "API网关POST method failed to access URL，URL：" + url + "," + e.getMessage();
             e.printStackTrace();
             log.error("API网关POST method failed to access URL，URL：" + url, e);
         }

@@ -21,6 +21,8 @@ public interface IServiceDefService {
     void updateServiceDef(ServiceDef serviceDef);
     void deleteById(String id);
     List<ServiceDef> getByApiGroupAndPath(Map map);
+
+    List<ServiceDef> getByGroupContextAndPath(Map map);
     List<ServiceDef> listAPIByProvider(Map map);
     List<ServiceDef> queryByRemoteId(String remoteId);
 }

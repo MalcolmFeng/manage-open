@@ -74,6 +74,10 @@
 		select * from api_service_def where API_GROUP= #{apiGroup} and REQ_PATH=#{reqPath}
 	</select>
 
+	<select id="getByGroupContextAndPath" parameterType="map" resultMap="serviceDef">
+		SELECT * FROM api_service_def asd INNER JOIN api_developer_group adg ON asd.API_GROUP=adg.id WHERE adg.context= #{context} and asd.REQ_PATH=#{reqPath}
+	</select>
+
 	<select id="listAPIByProvider" parameterType="map" resultMap="serviceDef">
 		select * from api_service_def where 1=1
 		<if test='provider!=null and provider!=""'>

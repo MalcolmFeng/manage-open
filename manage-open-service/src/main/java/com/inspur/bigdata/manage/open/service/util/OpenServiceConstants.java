@@ -35,12 +35,41 @@ public class OpenServiceConstants {
     public final static String SC_TYPE_TEXT_XML = "text/xml";
     public final static String SC_TYPE_APPLICATION_XWWWFORMURLENCODED = "application/x-www-form-urlencoded";
 
+    /*
+    ApiServiceMonitor表，api监控审计用到的错误代码等常量
+     */
+    public final static String ASM_SUCCESS = "200";
+
+    //API分组错误
+    public final static String ASM_ERROR_GROUP = "10001";
+
+    //API服务错误
+    public final static String ASM_ERROR_SERVICE = "10002";
+
+    //API服务当前状态不可用
+    public final static String ASM_ERROR_SERVICE_NO_PASS = "10003";
+
+    //查询授权应用异常
+    public final static String ASM_ERROR_APP_UNAUTHORIZE = "10004";
+
+    //API未授权应用
+    public final static String ASM_ERROR_SERVICE_UNAUTHORIZE_APP = "10005";
+
+    //验证签名不正确
+    public final static String ASM_ERROR_SIGNATURE = "10006";
+
+    //账户余额不足
+    public final static String ASM_ERROR_BALANCE = "10007";
+
+    //输入参数异常
+    public final static String ASM_ERROR_PARAMETER = "10008";
+
+    //未知错误
+    public final static String ASM_ERROR_UNKNOWN = "99999";
+
 
     public static boolean isSuperAdmin(String realm) {
-        if (masert_realm.equals(realm)) {
-            return true;
-        }
-        return false;
+        return masert_realm.equals(realm);
     }
 
     public static String getRealm() {

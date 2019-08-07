@@ -1,0 +1,277 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.inspur.bigdata.manage.open.service.dao.ServiceMonitorMapper">
+
+    <resultMap id="BaseResultMap" type="com.inspur.bigdata.manage.open.service.data.ApiServiceMonitor">
+        <result column="id" property="id"/>
+        <result column="api_service_id" property="apiServiceId"/>
+        <result column="api_service_name" property="apiServiceName"/>
+        <result column="open_service_input" property="openServiceInput"/>
+        <result column="open_service_input_header" property="openServiceInputHeader"/>
+        <result column="open_service_output" property="openServiceOutput"/>
+        <result column="open_service_method" property="openServiceMethod"/>
+        <result column="service_input" property="serviceInput"/>
+        <result column="service_input_header" property="serviceInputHeader"/>
+        <result column="service_output" property="serviceOutput"/>
+        <result column="service_method" property="serviceMethod"/>
+        <result column="result" property="result"/>
+        <result column="caller_ip" property="callerIp"/>
+        <result column="caller_app_id" property="callerAppId"/>
+        <result column="caller_user_id" property="callerUserId"/>
+        <result column="request_time" property="requestTime"/>
+        <result column="response_time" property="responseTime"/>
+        <result column="service_total_time" property="serviceTotalTime"/>
+        <result column="notes" property="notes"/>
+        <result column="create_time" property="createTime"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+                `id`,
+                `api_service_id`,
+                `api_service_name`,
+                `open_service_input`,
+                `open_service_input_header`,
+                `open_service_output`,
+                `open_service_method`,
+                `service_input`,
+                `service_input_header`,
+                `service_output`,
+                `service_method`,
+                `result`,
+                `caller_ip`,
+                `caller_app_id`,
+                `caller_user_id`,
+                `request_time`,
+                `response_time`,
+                `service_total_time`,
+                `notes`,
+                `create_time`
+    </sql>
+
+    <insert id="insert" useGeneratedKeys="true" keyColumn="id"
+            parameterType="com.inspur.bigdata.manage.open.service.data.ApiServiceMonitor">
+        INSERT INTO api_service_monitor
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="null != id and '' != id">
+                `id`,
+            </if>
+            <if test="null != apiServiceId and '' != apiServiceId">
+                `api_service_id`,
+            </if>
+            <if test="null != apiServiceName and '' != apiServiceName">
+                `api_service_name`,
+            </if>
+            <if test="null != openServiceInput and '' != openServiceInput">
+                `open_service_input`,
+            </if>
+            <if test="null != openServiceInputHeader and '' != openServiceInputHeader">
+                `open_service_input_header`,
+            </if>
+            <if test="null != openServiceOutput and '' != openServiceOutput">
+                `open_service_output`,
+            </if>
+            <if test="null != openServiceMethod and '' != openServiceMethod">
+                `open_service_method`,
+            </if>
+            <if test="null != serviceInput and '' != serviceInput">
+                `service_input`,
+            </if>
+            <if test="null != serviceInputHeader and '' != serviceInputHeader">
+                `service_input_header`,
+            </if>
+            <if test="null != serviceOutput and '' != serviceOutput">
+                `service_output`,
+            </if>
+            <if test="null != serviceMethod and '' != serviceMethod">
+                `service_method`,
+            </if>
+            <if test="null != result and '' != result">
+                `result`,
+            </if>
+            <if test="null != callerIp and '' != callerIp">
+                `caller_ip`,
+            </if>
+            <if test="null != callerAppId and '' != callerAppId">
+                `caller_app_id`,
+            </if>
+            <if test="null != callerUserId and '' != callerUserId">
+                `caller_user_id`,
+            </if>
+            <if test="null != requestTime and '' != requestTime">
+                `request_time`,
+            </if>
+            <if test="null != responseTime and '' != responseTime">
+                `response_time`,
+            </if>
+            <if test="null != serviceTotalTime and '' != serviceTotalTime">
+                `service_total_time`,
+            </if>
+            <if test="null != notes and '' != notes">
+                `notes`,
+            </if>
+            <if test="null != createTime and '' != createTime">
+                `create_time`
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="null != id and '' != id">
+                #{id},
+            </if>
+            <if test="null != apiServiceId and '' != apiServiceId">
+                #{apiServiceId},
+            </if>
+            <if test="null != apiServiceName and '' != apiServiceName">
+                #{apiServiceName},
+            </if>
+            <if test="null != openServiceInput and '' != openServiceInput">
+                #{openServiceInput},
+            </if>
+            <if test="null != openServiceInputHeader and '' != openServiceInputHeader">
+                #{openServiceInputHeader},
+            </if>
+            <if test="null != openServiceOutput and '' != openServiceOutput">
+                #{openServiceOutput},
+            </if>
+            <if test="null != openServiceMethod and '' != openServiceMethod">
+                #{openServiceMethod},
+            </if>
+            <if test="null != serviceInput and '' != serviceInput">
+                #{serviceInput},
+            </if>
+            <if test="null != serviceInputHeader and '' != serviceInputHeader">
+                #{serviceInputHeader},
+            </if>
+            <if test="null != serviceOutput and '' != serviceOutput">
+                #{serviceOutput},
+            </if>
+            <if test="null != serviceMethod and '' != serviceMethod">
+                #{serviceMethod},
+            </if>
+            <if test="null != result and '' != result">
+                #{result},
+            </if>
+            <if test="null != callerIp and '' != callerIp">
+                #{callerIp},
+            </if>
+            <if test="null != callerAppId and '' != callerAppId">
+                #{callerAppId},
+            </if>
+            <if test="null != callerUserId and '' != callerUserId">
+                #{callerUserId},
+            </if>
+            <if test="null != requestTime and '' != requestTime">
+                #{requestTime},
+            </if>
+            <if test="null != responseTime and '' != responseTime">
+                #{responseTime},
+            </if>
+            <if test="null != serviceTotalTime and '' != serviceTotalTime">
+                #{serviceTotalTime},
+            </if>
+            <if test="null != notes and '' != notes">
+                #{notes},
+            </if>
+            <if test="null != createTime and '' != createTime">
+                #{createTime}
+            </if>
+        </trim>
+    </insert>
+
+    <delete id="deleteById" parameterType="String">
+        DELETE FROM api_service_monitor
+        WHERE `id` = #{id}
+    </delete>
+
+    <update id="update" parameterType="com.inspur.bigdata.manage.open.service.data.ApiServiceMonitor">
+        UPDATE api_service_monitor
+        <set>
+            <if test="null != id and '' != id">id = #{id},</if>
+            <if test="null != apiServiceId and '' != apiServiceId">api_service_id = #{apiServiceId},</if>
+            <if test="null != apiServiceName and '' != apiServiceName">api_service_name = #{apiServiceName},</if>
+            <if test="null != openServiceInput and '' != openServiceInput">open_service_input = #{openServiceInput},
+            </if>
+            <if test="null != openServiceInputHeader and '' != openServiceInputHeader">open_service_input_header =
+                #{openServiceInputHeader},
+            </if>
+            <if test="null != openServiceOutput and '' != openServiceOutput">open_service_output =
+                #{openServiceOutput},
+            </if>
+            <if test="null != openServiceMethod and '' != openServiceMethod">open_service_method =
+                #{openServiceMethod},
+            </if>
+            <if test="null != serviceInput and '' != serviceInput">service_input = #{serviceInput},</if>
+            <if test="null != serviceInputHeader and '' != serviceInputHeader">service_input_header =
+                #{serviceInputHeader},
+            </if>
+            <if test="null != serviceOutput and '' != serviceOutput">service_output = #{serviceOutput},</if>
+            <if test="null != serviceMethod and '' != serviceMethod">service_method = #{serviceMethod},</if>
+            <if test="null != result and '' != result">result = #{result},</if>
+            <if test="null != callerIp and '' != callerIp">caller_ip = #{callerIp},</if>
+            <if test="null != callerAppId and '' != callerAppId">caller_app_id = #{callerAppId},</if>
+            <if test="null != callerUserId and '' != callerUserId">caller_user_id = #{callerUserId},</if>
+            <if test="null != requestTime and '' != requestTime">request_time = #{requestTime},</if>
+            <if test="null != responseTime and '' != responseTime">response_time = #{responseTime},</if>
+            <if test="null != serviceTotalTime and '' != serviceTotalTime">service_total_time = #{serviceTotalTime},
+            </if>
+            <if test="null != notes and '' != notes">notes = #{notes},</if>
+            <if test="null != createTime and '' != createTime">create_time = #{createTime}</if>
+        </set>
+        WHERE `id` = #{id}
+    </update>
+
+
+    <select id="load" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM api_service_monitor
+        <if test="null != id and '' != id">WHERE `id` = #{id}</if>
+    </select>
+
+    <select id="pageList" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM api_service_monitor
+        LIMIT #{offset}, #{pageSize}
+    </select>
+
+    <select id="pageListCount" resultType="java.lang.Integer">
+        SELECT count(1)
+        FROM api_service_monitor
+    </select>
+
+    <select id="query" resultMap="BaseResultMap" parameterType="map">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM api_service_monitor WHERE 1=1
+        <if test="null != id and '' != id">and id = #{id}</if>
+        <if test="null != apiServiceId and '' != apiServiceId">and api_service_id = #{apiServiceId}</if>
+        <if test="null != apiServiceName and '' != apiServiceName">and api_service_name = #{apiServiceName}</if>
+        <if test="null != openServiceInput and '' != openServiceInput">and open_service_input = #{openServiceInput}</if>
+        <if test="null != openServiceInputHeader and '' != openServiceInputHeader">and open_service_input_header =
+            #{openServiceInputHeader}
+        </if>
+        <if test="null != openServiceOutput and '' != openServiceOutput">and open_service_output =
+            #{openServiceOutput}
+        </if>
+        <if test="null != openServiceMethod and '' != openServiceMethod">and open_service_method =
+            #{openServiceMethod}
+        </if>
+        <if test="null != serviceInput and '' != serviceInput">and service_input = #{serviceInput}</if>
+        <if test="null != serviceInputHeader and '' != serviceInputHeader">and open_service_input_header =
+            #{serviceInputHeader}
+        </if>
+        <if test="null != serviceOutput and '' != serviceOutput">and service_output = #{serviceOutput}</if>
+        <if test="null != serviceMethod and '' != serviceMethod">and service_method = #{serviceMethod}</if>
+        <if test="null != result and '' != result">and result = #{result}</if>
+        <if test="null != callerIp and '' != callerIp">and caller_ip = #{callerIp}</if>
+        <if test="null != callerAppId and '' != callerAppId">and caller_app_id = #{callerAppId}</if>
+        <if test="null != callerUserId and '' != callerUserId">and caller_user_id = #{callerUserId}</if>
+        <if test="null != requestTime and '' != requestTime">and request_time = #{requestTime}</if>
+        <if test="null != responseTime and '' != responseTime">and response_time = #{responseTime}</if>
+        <if test="null != serviceTotalTime and '' != serviceTotalTime">and service_total_time = #{serviceTotalTime}</if>
+        <if test="null != notes and '' != notes">and notes = #{notes}</if>
+        <if test="null != createTime and '' != createTime">and create_time = #{createTime}</if>
+    </select>
+
+</mapper>

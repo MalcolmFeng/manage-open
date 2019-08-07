@@ -51,7 +51,7 @@ public class ServiceDefServiceImpl implements IServiceDefService{
         List<ServiceInput> list=serviceDef.getInputList();
         serviceDefMapper.insert(serviceDef);
         for(ServiceInput input:list){
-            input.setId(UUIDGenerator.getUUID().toString());
+            input.setId(UUIDGenerator.getUUID());
             input.setApiServiceId(serviceDef.getId());
             serviceInputMapper.insert(input);
         }
@@ -75,7 +75,7 @@ public class ServiceDefServiceImpl implements IServiceDefService{
         serviceOutputMapper.deleteByApiId(serviceDef.getId());
         //重新添加
         for(ServiceInput input:list){
-            input.setId(UUIDGenerator.getUUID().toString());
+            input.setId(UUIDGenerator.getUUID());
             input.setApiServiceId(serviceDef.getId());
             serviceInputMapper.insert(input);
         }
@@ -100,6 +100,11 @@ public class ServiceDefServiceImpl implements IServiceDefService{
     @Override
     public List<ServiceDef> getByApiGroupAndPath(Map map) {
         return serviceDefMapper.getByApiGroupAndPath(map);
+    }
+
+    @Override
+    public List<ServiceDef> getByGroupContextAndPath(Map map) {
+        return serviceDefMapper.getByGroupContextAndPath(map);
     }
 
     @Override
