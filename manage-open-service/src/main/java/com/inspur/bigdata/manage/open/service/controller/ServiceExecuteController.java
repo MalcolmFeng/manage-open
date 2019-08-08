@@ -245,27 +245,6 @@ public class ServiceExecuteController {
                     signature = request.getHeader(headName);
                 }
             }
-            JSONObject json = JSONObject.fromObject(headers);
-            apiServiceMonitor.setOpenServiceInputHeader(json.toString());
-            //通过context,reqPath关联查询apiService
-            ServiceDef serviceDef = checkApiService(apiContext, reqPath, apiServiceMonitor);
-            if (serviceDef == null) {
-                success =false;
-                writer.print("API分组错误或API服务错误");
-                writer.flush();
-                return;
-            }
-            String apiServiceId = serviceDef.getId();
-            apiServiceMonitor.setApiServiceId(apiServiceId);
-            apiServiceMonitor.setApiServiceName(serviceDef.getName());
-            if (!OpenServiceConstants.api_audit_pass.equals(serviceDef.getAuditStatus())) {
-                success = false;
-                writer.print("API服务当前状态不可用");
-                writer.flush();
-                apiServiceMonitor.setNotes("API服务当前状态不可用");
-                apiServiceMonitor.setResult(ASM_ERROR_SERVICE_NO_PASS);
-                return;
-            }
             List<AppInstance> appList = appManage.getAppByAppKey(appkey);
             if (appList == null || appList.size() != 1) {
                 success = false;
@@ -280,20 +259,6 @@ public class ServiceExecuteController {
             requestUserId = appList.get(0).getUserId();
             apiServiceMonitor.setCallerAppId(appId);
             apiServiceMonitor.setCallerUserId(requestUserId);
-            //TODO 通过serviceId和appId查询授权记录，无授权直接返回
-            Map applymap = new HashMap();
-            applymap.put("apiServiceId", apiServiceId);
-            applymap.put("appId", appId);
-            applymap.put("authStatus", OpenServiceConstants.auth_status_pass);
-            List<ServiceApply> alist = serviceApplyService.getList(applymap);
-            if (alist == null || alist.size() == 0) {
-                success = false;
-                writer.print("API未授权应用");
-                writer.flush();
-                apiServiceMonitor.setNotes("API未授权应用");
-                apiServiceMonitor.setResult(ASM_ERROR_SERVICE_UNAUTHORIZE_APP);
-                return;
-            }
             /**
              * 前台传入X-Ca-Key=appKey,X-Ca-Signature=appSecret 验证身份
              */
@@ -328,6 +293,43 @@ public class ServiceExecuteController {
                 apiServiceMonitor.setResult(ASM_ERROR_SIGNATURE);
                 return;
             }
+            JSONObject json = JSONObject.fromObject(headers);
+            apiServiceMonitor.setOpenServiceInputHeader(json.toString());
+            //通过context,reqPath关联查询apiService
+            ServiceDef serviceDef = checkApiService(apiContext, reqPath, apiServiceMonitor);
+            if (serviceDef == null) {
+                success =false;
+                writer.print("API分组错误或API服务错误");
+                writer.flush();
+                return;
+            }
+            String apiServiceId = serviceDef.getId();
+            apiServiceMonitor.setApiServiceId(apiServiceId);
+            apiServiceMonitor.setApiServiceName(serviceDef.getName());
+            if (!OpenServiceConstants.api_audit_pass.equals(serviceDef.getAuditStatus())) {
+                success = false;
+                writer.print("API服务当前状态不可用");
+                writer.flush();
+                apiServiceMonitor.setNotes("API服务当前状态不可用");
+                apiServiceMonitor.setResult(ASM_ERROR_SERVICE_NO_PASS);
+                return;
+            }
+
+            //TODO 通过serviceId和appId查询授权记录，无授权直接返回
+            Map applymap = new HashMap();
+            applymap.put("apiServiceId", apiServiceId);
+            applymap.put("appId", appId);
+            applymap.put("authStatus", OpenServiceConstants.auth_status_pass);
+            List<ServiceApply> alist = serviceApplyService.getList(applymap);
+            if (alist == null || alist.size() == 0) {
+                success = false;
+                writer.print("API未授权应用");
+                writer.flush();
+                apiServiceMonitor.setNotes("API未授权应用");
+                apiServiceMonitor.setResult(ASM_ERROR_SERVICE_UNAUTHORIZE_APP);
+                return;
+            }
+
             servicePrice = serviceDef.getPrice();
             if (servicePrice.compareTo(new BigDecimal(0.00)) > 0) {
                 //如果调用的API服务售价大于0 需要判断调用者账号下的余额
