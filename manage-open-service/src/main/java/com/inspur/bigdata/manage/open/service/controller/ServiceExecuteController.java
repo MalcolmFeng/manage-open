@@ -215,9 +215,12 @@ public class ServiceExecuteController {
         String requestUserId = null;
         BigDecimal servicePrice = null;
         String instream = null;
+        /**获取请求者IP*/
+        String requestIp=ApiServiceMonitorUtil.getClientIp(request);
         String requestTime = OpenServiceConstants.sf.format(new Date());
         String responseTime = null;
         ApiServiceMonitor apiServiceMonitor = new ApiServiceMonitor();
+        apiServiceMonitor.setCallerIp(requestIp);
         apiServiceMonitor.setRequestTime(requestTime);
         apiServiceMonitor.setOpenServiceInput(JSONObject.fromObject(request.getParameterMap()).toString());
         apiServiceMonitor.setOpenServiceMethod(request.getMethod());
@@ -247,6 +250,7 @@ public class ServiceExecuteController {
             //通过context,reqPath关联查询apiService
             ServiceDef serviceDef = checkApiService(apiContext, reqPath, apiServiceMonitor);
             if (serviceDef == null) {
+                success =false;
                 writer.print("API分组错误或API服务错误");
                 writer.flush();
                 return;
