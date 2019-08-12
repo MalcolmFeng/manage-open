@@ -246,7 +246,7 @@
         FROM api_service_monitor WHERE 1=1
         <if test="null != id and '' != id">and id = #{id}</if>
         <if test="null != apiServiceId and '' != apiServiceId">and api_service_id = #{apiServiceId}</if>
-        <if test="null != apiServiceName and '' != apiServiceName">and api_service_name = #{apiServiceName}</if>
+        <if test="null != apiServiceName and '' != apiServiceName">and api_service_name like '%${apiServiceName}%'</if>
         <if test="null != openServiceInput and '' != openServiceInput">and open_service_input = #{openServiceInput}</if>
         <if test="null != openServiceInputHeader and '' != openServiceInputHeader">and open_service_input_header =
             #{openServiceInputHeader}
@@ -272,6 +272,9 @@
         <if test="null != serviceTotalTime and '' != serviceTotalTime">and service_total_time = #{serviceTotalTime}</if>
         <if test="null != notes and '' != notes">and notes = #{notes}</if>
         <if test="null != createTime and '' != createTime">and create_time = #{createTime}</if>
+        <if test="null != startTime and '' != startTime">and request_time > #{startTime}</if>
+        <if test="null != endTime and '' != endTime">and request_time <![CDATA[ <= ]]> #{endTime}</if>
+        ORDER BY request_time DESC
     </select>
 
 </mapper>

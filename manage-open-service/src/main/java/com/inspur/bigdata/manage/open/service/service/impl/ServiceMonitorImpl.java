@@ -44,7 +44,7 @@ public class ServiceMonitorImpl implements IServiceMonitorService {
     }
 
     @Override
-    public List<ApiServiceMonitor> query(Map<String, Object> param) {
+    public List<ApiServiceMonitor> query(Map param) {
         return serviceMonitorMapper.query(param);
     }
 }

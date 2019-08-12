@@ -15,6 +15,6 @@ public interface IServiceMonitorService {
 
     ApiServiceMonitor load(String id);
 
-    List<ApiServiceMonitor> query(Map<String, Object> param);
+    List<ApiServiceMonitor> query(Map param);
 
 }

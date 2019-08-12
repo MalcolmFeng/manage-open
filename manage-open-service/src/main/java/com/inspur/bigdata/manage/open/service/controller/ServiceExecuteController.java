@@ -245,6 +245,7 @@ public class ServiceExecuteController {
                     signature = request.getHeader(headName);
                 }
             }
+            apiServiceMonitor.setOpenServiceInputHeader(JSONObject.fromObject(headers).toString());
             List<AppInstance> appList = appManage.getAppByAppKey(appkey);
             if (appList == null || appList.size() != 1) {
                 success = false;
@@ -293,8 +294,6 @@ public class ServiceExecuteController {
                 apiServiceMonitor.setResult(ASM_ERROR_SIGNATURE);
                 return;
             }
-            JSONObject json = JSONObject.fromObject(headers);
-            apiServiceMonitor.setOpenServiceInputHeader(json.toString());
             //通过context,reqPath关联查询apiService
             ServiceDef serviceDef = checkApiService(apiContext, reqPath, apiServiceMonitor);
             if (serviceDef == null) {
@@ -380,7 +379,7 @@ public class ServiceExecuteController {
             writer.print(result_str);
             writer.flush();
             apiServiceMonitor.setOpenServiceOutput(result_str);
-            apiServiceMonitor.setResult("200");
+            apiServiceMonitor.setResult(ASM_SUCCESS);
         } catch (Throwable e) {
             response.addHeader("Content-Type", OpenServiceConstants.content_type_html);
             success = false;
