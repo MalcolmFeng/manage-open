@@ -8,7 +8,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
-    <title>API列表</title>
+    <title>API调用列表</title>
 
     <!-- 需要引用的CSS -->
     <link rel="shortcut icon" href="<%=request.getContextPath()%>/jsp/public/images/favicon.ico"/>
@@ -119,9 +119,13 @@
         function renderName(data, type, full) {
             var html = '';
             if (data != null) {
-                html += '<a onclick="forView(\'' + full.id + '\')">' + data + '</a>&emsp;';
+                if (full.result == "200") {
+                    html += '<a onclick="forView(\'' + full.id + '\')">' + data + '</a>&emsp;';
+                } else {
+                    html += '<a style="color: red" onclick="forView(\'' + full.id + '\')">' + data + '</a>&emsp;';
+                }
             } else {
-                html += '<a onclick="forView(\'' + full.id + '\')">' + "调用接口失败" + '</a>&emsp;';
+                html += '<a style="color: red" onclick="forView(\'' + full.id + '\')">' + "调用接口失败" + '</a>&emsp;';
             }
             return html;
         }
@@ -266,7 +270,7 @@
             <thead>
             <tr>
                 <th width="5%" data-field="rowId" data-render="renderId">序号</th>
-                <th width="30%" data-field="apiServiceName" data-render="renderName">api名称</th>
+                <th width="30%" data-field="apiServiceName" data-render="renderName">API名称</th>
                 <th width="15%" data-field="auditStatus" data-render="renderStatus">状态</th>
                 <th width="15%" data-field="callerUserId">调用者</th>
                 <th width="15%" data-field="callerIp">调用者IP</th>

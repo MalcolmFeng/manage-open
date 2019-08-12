@@ -13,7 +13,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <title>测试Api-定义</title>
+    <title>API调用详情</title>
     <link rel="stylesheet" type="text/css" href="<l:asset path='css/bootstrap.css'/>"/>
     <link rel="stylesheet" type="text/css" href="<l:asset path='css/font-awesome.css'/>"/>
     <link rel="stylesheet" type="text/css" href="<l:asset path='css/form.css'/>"/>
@@ -409,7 +409,7 @@
                         class="console-grey ng-binding">HTTP Header：</span><span></span></td>
             </tr>
             <%
-                String serviceHeader = apiServiceMonitor.getOpenServiceInputHeader();
+                String serviceHeader = apiServiceMonitor.getServiceInputHeader();
                 if (serviceHeader != null) {
                     JSONObject jsonObject = JSONObject.fromObject(serviceHeader);
                     Iterator<String> it = jsonObject.keys();

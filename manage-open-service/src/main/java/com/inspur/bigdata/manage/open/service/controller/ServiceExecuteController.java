@@ -6,7 +6,7 @@ import com.inspur.bigdata.manage.open.service.data.*;
 import com.inspur.bigdata.manage.open.service.pay.data.PayAccountCapital;
 import com.inspur.bigdata.manage.open.service.pay.service.IPayService;
 import com.inspur.bigdata.manage.open.service.service.*;
-import com.inspur.bigdata.manage.open.service.util.ApiServiceMonitorUtil;
+import com.inspur.bigdata.manage.open.service.util.apimonitor.ApiServiceMonitorUtil;
 import com.inspur.bigdata.manage.open.service.util.OpenServiceConstants;
 import com.inspur.bigdata.manage.open.service.util.sign.*;
 import com.inspur.bigdata.manage.open.service.util.signconstants.Constants;
@@ -53,8 +53,11 @@ import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import static com.inspur.bigdata.manage.open.service.util.OpenServiceConstants.*;
+import static com.inspur.bigdata.manage.open.service.util.apimonitor.ApiServiceMonitorThread.getNcpu;
 
 
 @Controller
@@ -77,6 +80,9 @@ public class ServiceExecuteController {
     @Autowired
     private IServiceMonitorService monitorService;
 
+    private static final int Ncpu = getNcpu();
+
+    ExecutorService monitorExecutorService = Executors.newFixedThreadPool(Ncpu * 2);
 
     @RequestMapping("/test/{apiServiceId}")
     public ModelAndView toTest(@PathVariable("apiServiceId") String apiServiceId) {
@@ -416,7 +422,8 @@ public class ServiceExecuteController {
             apiServiceMonitor.setResponseTime(responseTime);
             apiServiceMonitor.setCreateTime(OpenServiceConstants.sf.format(new Date()));
 //            monitorService.insert(apiServiceMonitor);
-            ApiServiceMonitorUtil.insert(monitorService, apiServiceMonitor);
+//            ApiServiceMonitorUtil.insert(monitorService, apiServiceMonitor);
+            ApiServiceMonitorUtil.insertByThreadPool(monitorService, apiServiceMonitor, monitorExecutorService);
         }
     }
 

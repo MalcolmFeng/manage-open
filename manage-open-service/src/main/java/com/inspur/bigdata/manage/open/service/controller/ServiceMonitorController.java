@@ -115,7 +115,7 @@ public class ServiceMonitorController {
     }
 
     /**
-     * 查看Api详情
+     * 查看调用记录详情
      *
      * @return
      */
