@@ -108,6 +108,12 @@ public class OpenServiceConstants {
     public static String content_type_xml = "application/xml;charset=utf-8";
     public static String content_type_text_xml = "text/xml;charset=utf-8";
     public static String content_type_html = "text/html;charset=utf-8";
+    /**
+     * 加密方式
+     */
+    public static String ENCRYPT_MODE_BASE64 = "base64";
+    public static String ENCRYPT_MODE_MD5 = "md5";
+    public static String ENCRYPT_MODE_SHA = "sha";
 
     public static JSONArray getRemoteApiList(String userId) {
         String url = PropertiesUtil.getValue(OpenDataConstants.CONF_PROPERTIES, "od.domain") +
