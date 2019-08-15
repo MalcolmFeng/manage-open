@@ -139,6 +139,11 @@ function getApiDetail(id, obj) {
 }
 
 function forTest(id) {
+    if (userId == "") {
+        alert("提示：请先登录！");
+        return;
+    }
+
     /*window.open(context + "/service/api/execute/test/" + id, "_blank");*/
     /*$.ajax({
         url: context + "/service/api/execute/test/" + id,

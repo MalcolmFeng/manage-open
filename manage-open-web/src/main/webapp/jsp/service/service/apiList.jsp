@@ -3,6 +3,8 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib uri="/tags/loushang-web" prefix="l"%>
 
+<c:set var="userId" value="${provider}"/>
+
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -11,6 +13,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
     <title>API市场</title>
+
+    <script>
+        var userId = "${userId}";
+    </script>
 
     <!-- 需要引用的CSS -->
     <link rel="shortcut icon" href="<%=request.getContextPath()%>/jsp/public/images/favicon.ico" />
@@ -53,7 +59,7 @@
         </form>
     </div>
     <div class="row" id="groupList" style="margin-top:20px;margin-left:10px;">
-        <span style="margin-right: 10px;">API分组:</span>
+        <span style="margin-right: 10px;" onclick="forTest(1)">API分组:</span>
         <ul class="list-inline" style="display:inline-block">
             <li class="activedlink"><a onclick="queryAll();" >全部</a></li>
             <c:forEach items="${groupList }" var="item">
@@ -247,6 +253,7 @@
 
 <script type="text/javascript">
     var context = "<l:assetcontext/>";
+
 </script>
 
 </body>
