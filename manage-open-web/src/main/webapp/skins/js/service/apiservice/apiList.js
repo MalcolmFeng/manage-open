@@ -120,8 +120,8 @@ function getApiDetail(id, obj) {
                 $("#inputParamTbody").empty().append(temp);
 
                 try{
-                var returnExample=JSON.parse(serviceInfo.returnSample);
-                $("#returnExample").JSONView(returnExample, {collapsed: false, nl2br: true});
+                    var returnExample=JSON.parse(serviceInfo.returnSample);
+                    $("#returnExample").JSONView(returnExample, {collapsed: false, nl2br: true});
                 }catch(e){
                     document.getElementById("returnExample").innerHTML = serviceInfo.returnSample ;
                 }
@@ -139,5 +139,19 @@ function getApiDetail(id, obj) {
 }
 
 function forTest(id) {
-    window.open(context + "/service/api/execute/test/" + id, "_blank");
+    /*window.open(context + "/service/api/execute/test/" + id, "_blank");*/
+    /*$.ajax({
+        url: context + "/service/api/execute/test/" + id,
+
+    });*/
+    $.dialog({
+        type: "iframe",
+        url: context + "/service/api/execute/test/" + id,
+        title: "测试工具",
+        height: 500,
+        width: 950,
+        onclose: function () {
+
+        }
+    });
 }
