@@ -81,6 +81,7 @@ public class ServiceDefController {
         param.put("parentId",-1);
         List<ServiceGroup> groupList=serviceGroupService.getGroupList(param);
         model.put("groupList",groupList);
+        model.put("provider",OpenDataConstants.getUserId());
         return new ModelAndView("service/service/apiList",model);
     }
     /**
