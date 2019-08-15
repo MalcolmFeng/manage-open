@@ -66,14 +66,14 @@
             if("0"==auditStatus) {
                 $.dialog({
                     type: "iframe",
-                    title: "api发布",
+                    title: "API发布",
                     url: context + '/jsp/service/service/release.jsp?openServiceId=' + openServiceId,
                     width: 450,
                     height: 250,
                     onclose: function () {
                         reloadApiList();
                         if (this.returnValue) {
-                            sticky("api发布成功！");
+                            sticky("API发布成功！");
                         }
                     }
                 });
@@ -196,7 +196,7 @@
 	<div class="row">
 		<form class="form-inline" onsubmit="return false;">
 			<div class="input-group">
-				<input class="form-control ue-form" type="text" id="serviceName" placeholder="请输入api名称"/>
+				<input class="form-control ue-form" type="text" id="serviceName" placeholder="请输入API名称"/>
 				<div class="input-group-addon ue-form-btn" onclick="forQuery()">
 					<span class="fa fa-search"></span>
 				</div>
@@ -213,7 +213,7 @@
 			<thead>
 			<tr>
 				<th width="5%" data-field="id" data-render="renderId">序号</th>
-				<th width="30%" data-field="name" data-render="renderName">api名称</th>
+				<th width="30%" data-field="name" data-render="renderName">API名称</th>
 				<th width="15%" data-field="auditStatus" data-render="renderStatus">状态</th>
 				<th width="25%" data-field="description">描述</th>
 				<th width="25%" data-field="createTime">创建时间</th>
