@@ -56,9 +56,7 @@ public class OpenDataController {
 	 */
 	@RequestMapping(value = "/getPage", method = RequestMethod.GET)
 	public ModelAndView getPage() {
-		Map<String, Object> model = new HashMap<String, Object>();
-		model.put("isSuperAdmin",OpenDataConstants.isSuperAdmin(OpenDataConstants.getRealm()));
-		return new ModelAndView("data/data/list",model);
+		return new ModelAndView("data/data/list");
 	}
 	@RequestMapping(value = "/getList", method = RequestMethod.POST)
 	@ResponseBody
