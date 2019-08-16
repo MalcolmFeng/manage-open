@@ -26,6 +26,7 @@
         <if test="applicant!=null and applicant!='' ">
             and a.applicant=#{applicant}
         </if>
+        order by APPLY_TIME desc
     </select>
     <select id="getUserApplyList" resultMap="applyResult" parameterType="map">
         select * from dt_data_apply
