@@ -25,6 +25,11 @@ public class ApiServiceMonitor implements Serializable {
     private String apiServiceName;
 
     /**
+     * 调用开放平台的URL
+     */
+    private String openServiceRequestURL;
+
+    /**
      * 开放平台接收到的入参信息
      */
     private String openServiceInput;
@@ -135,6 +140,14 @@ public class ApiServiceMonitor implements Serializable {
 
     public void setApiServiceName(String apiServiceName) {
         this.apiServiceName = apiServiceName;
+    }
+
+    public String getOpenServiceRequestURL() {
+        return openServiceRequestURL;
+    }
+
+    public void setOpenServiceRequestURL(String openServiceRequestURL) {
+        this.openServiceRequestURL = openServiceRequestURL;
     }
 
     public String getOpenServiceInput() {

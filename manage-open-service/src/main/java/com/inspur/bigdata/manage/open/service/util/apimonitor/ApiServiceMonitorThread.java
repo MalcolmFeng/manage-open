@@ -16,7 +16,7 @@ public class ApiServiceMonitorThread extends Thread {
 
     @Override
     public void run() {
-        System.out.println(currentThread().getName() + "正在执行");
+//        System.out.println(currentThread().getName() + "正在执行");
         this.monitorService.insert(this.apiServiceMonitor);
     }
 

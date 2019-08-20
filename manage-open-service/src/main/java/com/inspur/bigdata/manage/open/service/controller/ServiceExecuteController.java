@@ -34,6 +34,7 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
+import org.loushang.framework.util.DateUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -52,6 +53,7 @@ import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -223,13 +225,14 @@ public class ServiceExecuteController {
         String instream = null;
         /**获取请求者IP*/
         String requestIp=ApiServiceMonitorUtil.getClientIp(request);
-        String requestTime = OpenServiceConstants.sf.format(new Date());
+        String requestTime = DateUtil.getCurrentTime2();
         String responseTime = null;
         ApiServiceMonitor apiServiceMonitor = new ApiServiceMonitor();
         apiServiceMonitor.setCallerIp(requestIp);
         apiServiceMonitor.setRequestTime(requestTime);
         apiServiceMonitor.setOpenServiceInput(JSONObject.fromObject(request.getParameterMap()).toString());
         apiServiceMonitor.setOpenServiceMethod(request.getMethod());
+        apiServiceMonitor.setOpenServiceRequestURL(request.getRequestURL().toString());
         String context_path = "/" + apiContext + "/" + reqPath;
         try {
             response.setCharacterEncoding("utf-8");
@@ -304,7 +307,7 @@ public class ServiceExecuteController {
             ServiceDef serviceDef = checkApiService(apiContext, reqPath, apiServiceMonitor);
             if (serviceDef == null) {
                 success =false;
-                writer.print("API分组错误或API服务错误");
+                writer.print("API服务不存在");
                 writer.flush();
                 return;
             }
@@ -404,7 +407,8 @@ public class ServiceExecuteController {
             apiServiceMonitor.setResult(ASM_ERROR_UNKNOWN);
         } finally {
             IOUtils.closeQuietly(writer);
-            responseTime = OpenServiceConstants.sf.format(new Date());
+//            responseTime = OpenServiceConstants.sf.format(new Date());
+            responseTime = DateUtil.getCurrentTime2();
             long serviceTime = System.currentTimeMillis() - startTime;
             if (log.isDebugEnabled()) {
                 log.debug("调用api执行的时间" + (serviceTime) + "毫秒");
@@ -420,7 +424,7 @@ public class ServiceExecuteController {
                 apiServiceMonitor.setServiceTotalTime((int) serviceTime);
             }
             apiServiceMonitor.setResponseTime(responseTime);
-            apiServiceMonitor.setCreateTime(OpenServiceConstants.sf.format(new Date()));
+            apiServiceMonitor.setCreateTime(DateUtil.getCurrentTime2());
 //            monitorService.insert(apiServiceMonitor);
 //            ApiServiceMonitorUtil.insert(monitorService, apiServiceMonitor);
             ApiServiceMonitorUtil.insertByThreadPool(monitorService, apiServiceMonitor, monitorExecutorService);
@@ -439,7 +443,7 @@ public class ServiceExecuteController {
         String context_path = "/" + apiContext + "/" + reqPath;
         List<ServiceDef> defs2 = serviceDefService.getByGroupContextAndPath(tmp);
         if (defs2 == null || defs2.size() != 1) {
-            apiServiceMonitor.setNotes("API分组错误或API服务错误,context_path=[" + context_path + "]");
+            apiServiceMonitor.setNotes("API服务不存在,context_path=[" + context_path + "]");
             apiServiceMonitor.setResult(ASM_ERROR_SERVICE);
         } else {
             serviceDef = defs2.get(0);

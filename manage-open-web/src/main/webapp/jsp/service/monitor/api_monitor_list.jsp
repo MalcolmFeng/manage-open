@@ -136,7 +136,7 @@
             } else if ("10001" == full.result) {
                 return "API分组错误";
             } else if ("10002" == full.result) {
-                return "API服务错误";
+                return "API服务不存在";
             } else if ("10003" == full.result) {
                 return "API服务当前状态不可用";
             } else if ("10004" == full.result) {
@@ -152,6 +152,22 @@
             } else if ("99999" == full.result) {
                 return "未知错误";
             }
+        }
+
+        function renderPath(data, type, full) {
+            // var url=full.openServiceRequestURL;
+            var url = data;
+            if (url.indexOf('?') > 0) {
+                url = url.split('?')[0];
+            }
+            var f = url.substr(url.indexOf('/api/execute/do') + 15);
+            var html = '';
+            if (full.result == "200") {
+                html += '<a onclick="forView(\'' + full.id + '\')">' + f + '</a>&emsp;';
+            } else {
+                html += '<a style="color: red" onclick="forView(\'' + full.id + '\')">' + f + '</a>&emsp;';
+            }
+            return html;
         }
 
         /**
@@ -227,8 +243,8 @@
                                 <option value="">请选择调用状态</option>
                                 <option value="">全部</option>
                                 <option value="200">成功</option>
-                                <option value="10001">API分组错误</option>
-                                <option value="10002">API服务错误</option>
+                                <%--                                <option value="10001">API分组错误</option>--%>
+                                <option value="10002">API服务不存在</option>
                                 <option value="10003">API服务当前状态不可用</option>
                                 <option value="10004">查询授权应用异常</option>
                                 <option value="10005">API未授权应用</option>
@@ -269,12 +285,14 @@
         <table id="myauthList" class="table table-bordered table-hover">
             <thead>
             <tr>
-                <th width="5%" data-field="rowId" data-render="renderId">序号</th>
-                <th width="30%" data-field="apiServiceName" data-render="renderName">API名称</th>
-                <th width="15%" data-field="auditStatus" data-render="renderStatus">状态</th>
-                <th width="15%" data-field="callerUserId">调用者</th>
-                <th width="15%" data-field="callerIp">调用者IP</th>
-                <th width="20%" data-field="requestTime">调用时间</th>
+                <th width="2%" data-field="rowId" data-render="renderId">序号</th>
+                <th width="25%" data-field="openServiceRequestURL" data-render="renderPath">调用地址</th>
+                <th width="15%" data-field="apiServiceName" data-render="renderName">API名称</th>
+                <th width="8%" data-field="auditStatus" data-render="renderStatus">状态</th>
+                <th width="10%" data-field="callerUserId">调用者</th>
+                <th width="10%" data-field="callerIp">调用者IP</th>
+                <th width="15%" data-field="requestTime">调用时间</th>
+                <th width="15%" data-field="responseTime">响应时间</th>
             </tr>
             </thead>
         </table>
