@@ -163,6 +163,11 @@ public class ServiceExecuteController {
         String datalist = request.getParameter("paramlist");
         JSONObject json = JSONObject.fromObject(datalist);
         for (ServiceInput serviceInput : listServiceInput) {
+            if (StringUtils.isNotEmpty(serviceInput.getFixedValue())) {
+                //有设置固定值
+                serviceInput.setValue(serviceInput.getFixedValue());
+                continue;
+            }
             for (Object key : json.keySet()) {
                 if (serviceInput.getName().equals(String.valueOf(key))) {
                     String value = URLDecoder.decode(String.valueOf(json.get(key)));
@@ -458,6 +463,11 @@ public class ServiceExecuteController {
     public void initInputList(HttpServletRequest request, List<ServiceInput> listServiceInput) throws Exception {
         Map<String, String[]> requestmap = request.getParameterMap();
         for (ServiceInput serviceInput : listServiceInput) {
+            if (StringUtils.isNotEmpty(serviceInput.getFixedValue())) {
+                //有设置固定值
+                serviceInput.setValue(serviceInput.getFixedValue());
+                continue;
+            }
             if (serviceInput.getScParamType().equals(OpenServiceConstants.SC_PARAMTYPE_HEAD)) {
                 serviceInput.setValue(request.getHeader(serviceInput.getScName()));
             }
