@@ -267,6 +267,7 @@ var register = {
                         param.scType = endList[j].type,
                         param.scRequired = new Number(endList[j].required),
                         param.scDescription = endList[j].description,
+                        param.fixedValue = endList[j].fixedValue,
                         param.scSeq = new Number(endList[j].seq),
                         param.scParamType = endList[j].paramType
                 }
@@ -287,6 +288,7 @@ var register = {
                     type: $(this).find('input[name=inputParamType]').val(),
                     required: $(this).find('select[name=inputRequired] option:selected').val(),
                     description: $(this).find('input[name=inputDescription]').val(),
+                    fixedValue: $(this).find('input[name=fixedValue]').val(),
                     backname:$(this).find('input[name=backname]').val()
                 };
                 inputParam.push(param);
@@ -306,6 +308,7 @@ var register = {
                         required: $(this).find("input[name=required]").val(),
                         seq: $(this).find("input[name=seq]").val(),
                         description: $(this).find("input[name=description]").val(),
+                        fixedValue: $(this).find('input[name=fixedValue]').val(),
                         paramType: $(this).find('select[name=paramType] option:selected').val()
                     };
                     endParam.push(param);
@@ -316,6 +319,7 @@ var register = {
                         required: $(this).find('select[name=required] option:selected').val(),
                         seq: $(this).find("input[name=seq]").val(),
                         description: $(this).find("input[name=description]").val(),
+                        fixedValue: $(this).find('input[name=fixedValue]').val(),
                         paramType: $(this).find('select[name=paramType] option:selected').val()
                     };
                     endParam.push(param);

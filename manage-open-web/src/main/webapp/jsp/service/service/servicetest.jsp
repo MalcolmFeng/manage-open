@@ -192,7 +192,7 @@
                     }
                     $("#content-area").html(html);
 				},
-				timeout:10000,
+				timeout:30000,
 				error:function(){
 				  console.log("调用超时，请稍后重试");
 				}
@@ -227,6 +227,7 @@
 		</thead>
 	<tbody>
 		{{each data as oneinfo}}
+		{{ if oneinfo.fixedValue ==null||oneinfo.fixedValue =="" }}
 		<tr>
 			<td>{{oneinfo.name}}</td>
 			<%--<td>{{oneinfo.type}}</td>--%>
@@ -238,6 +239,7 @@
 			<td>{{oneinfo.description}}</td>
 			<td><input type="text" class="description"  placeholder="请输入..."></td>
 		</tr>
+		{{ /if }}
 		{{/each}}
 	</tbody>
 	</table>

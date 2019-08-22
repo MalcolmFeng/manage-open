@@ -43,7 +43,7 @@ public class OpenServiceConstants {
     //API分组错误
     public final static String ASM_ERROR_GROUP = "10001";
 
-    //API服务错误
+    //API服务不存在
     public final static String ASM_ERROR_SERVICE = "10002";
 
     //API服务当前状态不可用

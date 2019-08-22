@@ -7,6 +7,7 @@
         <result column="id" property="id"/>
         <result column="api_service_id" property="apiServiceId"/>
         <result column="api_service_name" property="apiServiceName"/>
+        <result column="open_service_request_url" property="openServiceRequestURL"/>
         <result column="open_service_input" property="openServiceInput"/>
         <result column="open_service_input_header" property="openServiceInputHeader"/>
         <result column="open_service_output" property="openServiceOutput"/>
@@ -30,6 +31,7 @@
                 `id`,
                 `api_service_id`,
                 `api_service_name`,
+                `open_service_request_url`,
                 `open_service_input`,
                 `open_service_input_header`,
                 `open_service_output`,
@@ -61,6 +63,9 @@
             </if>
             <if test="null != apiServiceName and '' != apiServiceName">
                 `api_service_name`,
+            </if>
+            <if test="null != openServiceRequestURL and '' != openServiceRequestURL">
+                `open_service_request_url`,
             </if>
             <if test="null != openServiceInput and '' != openServiceInput">
                 `open_service_input`,
@@ -123,6 +128,9 @@
             </if>
             <if test="null != apiServiceName and '' != apiServiceName">
                 #{apiServiceName},
+            </if>
+            <if test="null != openServiceRequestURL and '' != openServiceRequestURL">
+                #{openServiceRequestURL},
             </if>
             <if test="null != openServiceInput and '' != openServiceInput">
                 #{openServiceInput},
@@ -189,6 +197,9 @@
             <if test="null != id and '' != id">id = #{id},</if>
             <if test="null != apiServiceId and '' != apiServiceId">api_service_id = #{apiServiceId},</if>
             <if test="null != apiServiceName and '' != apiServiceName">api_service_name = #{apiServiceName},</if>
+            <if test="null != openServiceRequestURL and '' != openServiceRequestURL">
+                open_service_request_url = #{openServiceRequestURL},
+            </if>
             <if test="null != openServiceInput and '' != openServiceInput">open_service_input = #{openServiceInput},
             </if>
             <if test="null != openServiceInputHeader and '' != openServiceInputHeader">open_service_input_header =
@@ -247,6 +258,12 @@
         <if test="null != id and '' != id">and id = #{id}</if>
         <if test="null != apiServiceId and '' != apiServiceId">and api_service_id = #{apiServiceId}</if>
         <if test="null != apiServiceName and '' != apiServiceName">and api_service_name like '%${apiServiceName}%'</if>
+        <if test="null != openServiceRequestURL and '' != openServiceRequestURL">
+            and open_service_request_url = #{openServiceRequestURL}
+        </if>
+        <if test="null != openServiceRequestURLLike and '' != openServiceRequestURLLike">
+            and open_service_request_url like '%${openServiceRequestURL}%'
+        </if>
         <if test="null != openServiceInput and '' != openServiceInput">and open_service_input = #{openServiceInput}</if>
         <if test="null != openServiceInputHeader and '' != openServiceInputHeader">and open_service_input_header =
             #{openServiceInputHeader}

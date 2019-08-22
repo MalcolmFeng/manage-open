@@ -306,6 +306,12 @@
                 </span></td>
             </tr>
             <tr>
+                <td colspan="3" class="ng-binding"><span class="console-grey ng-binding">调用地址：</span><span>
+                    <c:if test="${not empty apiServiceMonitor.openServiceRequestURL }">${apiServiceMonitor.openServiceRequestURL}</c:if>
+                    <c:if test="${empty apiServiceMonitor.openServiceRequestURL }">-</c:if>
+                </span></td>
+            </tr>
+            <tr>
                 <td colspan="3" class="ng-binding"><span class="console-grey ng-binding">HTTP Header：</span><span
                         id="httpHeader"></span></td>
             </tr>

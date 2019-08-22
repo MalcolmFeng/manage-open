@@ -185,6 +185,7 @@
                                 <th style="width: 12%;">后端参数类型</th>
                                 <th style="width: 12%;">后端参数位置</th>
                                 <th style="width: 8%;">是否必填</th>
+                                <th style="width: 12%;">固定值</th>
                                 <th style="width: 5%;">排序</th>
                                 <th>后端参数描述</th>
                                 <th style="width: 12%;">操作</th>
@@ -261,6 +262,9 @@
                                             </select>
                                         </td>
                                         <td>
+                                            <input type="text" name="fixedValue" value="${inparam.fixedValue}" onchange="changeEditFlag()">
+                                        </td>
+                                        <td>
                                             <input type="text" name="seq" value="${inparam.scSeq}" onchange="changeEditFlag()"/>
                                         </td>
                                         <td>
@@ -325,9 +329,10 @@
                     <div class="col-xs-12 col-md-12 param-list">
                         <table id="inputtable">
                             <tr>
-                                <th style="width: 20%">参数名</th>
-                                <th style="width: 20%">类型</th>
-                                <th style="width: 20%">是否必填</th>
+                                <th style="width: 10%">参数名</th>
+                                <th style="width: 8%">类型</th>
+                                <th style="width: 8%">是否必填</th>
+                                <th style="width: 20%;">固定值</th>
                                 <th>字段描述</th>
                                 <th style="width: 20%">后端参数</th>
                             </tr>
@@ -359,6 +364,9 @@
                                                         <c:if test="${item.required eq '0' }">selected="selected"  </c:if> >否
                                                 </option>
                                             </select>
+                                        </td>
+                                        <td>
+                                            <input type="text" name="fixedValue" value="${item.fixedValue}" onchange="changeEditFlag()">
                                         </td>
                                         <td><input type="text" name="inputDescription" value="${item.description }"/></td>
                                         <td><input type="text" name="backname" value="${item.scName }" readonly/></td>
@@ -721,6 +729,7 @@
         scType: "${item.scType}",
         scParamType: "${item.scParamType}",
         scSeq: "${item.scSeq}",
+        fixedValue: "${item.fixedValue}",
         scRequired: "${item.scRequired}",
         scDescription: "${item.scDescription}"
     }
@@ -774,6 +783,7 @@
                 <option value="0">否</option>
             </select>
         </td>
+        <td><input type="text" name="fixedValue"></td>
         <td><input type="text" name="inputDescription" value=""/></td>
         <td><a onclick="register.forColumnDel(this)">删除</a></td>
     </tr>
@@ -808,6 +818,7 @@
                 {{/if}}
             </select>
         </td>
+        <td><input type="text" name="fixedValue" value="{{inparam.fixedValue}}"></td>
         <td><input type="text" name="inputDescription" value="{{inparam.description}}"/></td>
         <td><input type="text" name="backname" value="{{inparam.name}}" readonly/></td>
     </tr>
@@ -838,6 +849,7 @@
             {{ if inparam.required=="1"}} 是 {{ /if }}
             {{ if inparam.required=="0"}} 否 {{ /if }}
         </td>
+        <td><input type="text" name="fixedValue" value="{{inparam.fixedValue}}"></td>
         <td>
             <input type="hidden" name="seq" value="{{inparam.seq}}"/>
             {{inparam.seq}}
@@ -886,6 +898,7 @@
                 <option value="0">否</option>
             </select>
         </td>
+        <td><input type="text" name="fixedValue" value="" onchange="changeEditFlag()"></td>
         <td>
             <input type="text" name="seq" value="" onchange="changeEditFlag()"/>
         </td>
