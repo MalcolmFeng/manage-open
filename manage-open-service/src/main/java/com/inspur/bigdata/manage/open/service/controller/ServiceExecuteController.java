@@ -11,6 +11,7 @@ import com.inspur.bigdata.manage.open.service.util.OpenServiceConstants;
 import com.inspur.bigdata.manage.open.service.util.sign.*;
 import com.inspur.bigdata.manage.open.service.util.signconstants.Constants;
 import com.inspur.bigdata.manage.utils.OpenDataConstants;
+import com.inspur.bigdata.manage.utils.SM3;
 import com.inspur.bigdata.manage.utils.StringUtil;
 import net.sf.json.JSONObject;
 import org.apache.commons.io.IOUtils;
@@ -53,14 +54,13 @@ import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
-import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import static com.inspur.bigdata.manage.open.service.util.OpenServiceConstants.*;
 import static com.inspur.bigdata.manage.open.service.util.apimonitor.ApiServiceMonitorThread.getNcpu;
-
+import static com.inspur.bigdata.manage.utils.EncryptionUtil.*;
 
 @Controller
 @RequestMapping("/api/execute")
@@ -229,7 +229,7 @@ public class ServiceExecuteController {
         BigDecimal servicePrice = null;
         String instream = null;
         /**获取请求者IP*/
-        String requestIp=ApiServiceMonitorUtil.getClientIp(request);
+        String requestIp = ApiServiceMonitorUtil.getClientIp(request);
         String requestTime = DateUtil.getCurrentTime2();
         String responseTime = null;
         ApiServiceMonitor apiServiceMonitor = new ApiServiceMonitor();
@@ -311,7 +311,7 @@ public class ServiceExecuteController {
             //通过context,reqPath关联查询apiService
             ServiceDef serviceDef = checkApiService(apiContext, reqPath, apiServiceMonitor);
             if (serviceDef == null) {
-                success =false;
+                success = false;
                 writer.print("API服务不存在");
                 writer.flush();
                 return;
@@ -543,34 +543,36 @@ public class ServiceExecuteController {
             if (OpenDataConstants.is_null_no == serviceInput.getRequired() && StringUtils.isBlank(serviceInput.getValue()) && !serviceInput.getScType().equals("text/xml") && !serviceInput.getScType().equals("application/json")) {
                 throw new Exception("请传入必填参数" + serviceInput.getName());
             }
-            checkData(serviceInput.getScType(), serviceInput.getValue(), serviceInput.getScName());//判断参数类型是否正确
+            String decryptedParam = decryptedParam(serviceInput.getValue(), serviceDef.getEncryptionType());
+            serviceInputParam.put(serviceInput.getScName(), decryptedParam);
+            checkData(serviceInput.getScType(), decryptedParam, serviceInput.getScName());//判断参数类型是否正确
             String paramType = serviceInput.getScParamType();
             if (paramType.equalsIgnoreCase(OpenServiceConstants.SC_PARAMTYPE_PATH)) {
-                httpurl.append("/").append(serviceInput.getValue());
+                httpurl.append("/").append(decryptedParam);
             } else if (paramType.equalsIgnoreCase(OpenServiceConstants.SC_PARAMTYPE_BODY)) {
                 if (!serviceInput.getScType().equals(OpenServiceConstants.SC_TYPE_APPLICATION_JSON) && !serviceInput.getScType().equals(OpenServiceConstants.SC_TYPE_TEXT_XML)) {
-                    if (StringUtils.isNotBlank(serviceInput.getValue())) {
-                        bodys.put(serviceInput.getScName(), serviceInput.getValue());
+                    if (StringUtils.isNotBlank(decryptedParam)) {
+                        bodys.put(serviceInput.getScName(), decryptedParam);
                     }
                 } else {
-                    if (StringUtils.isEmpty(instream) && StringUtils.isNotBlank(serviceInput.getValue())) {
-                        instream = serviceInput.getValue();
+                    if (StringUtils.isEmpty(instream) && StringUtils.isNotBlank(decryptedParam)) {
+                        instream = decryptedParam;
                     }
                     scType = serviceInput.getScType();
                 }
             } else if (paramType.equalsIgnoreCase(OpenServiceConstants.SC_PARAMTYPE_QUERY)) {
                 if (firstQueryParam) {
-                    if (StringUtils.isNotBlank(serviceInput.getValue())) {
-                        httpurl.append("?").append(serviceInput.getScName()).append("=").append(URLEncoder.encode(serviceInput.getValue()));
+                    if (StringUtils.isNotBlank(decryptedParam)) {
+                        httpurl.append("?").append(serviceInput.getScName()).append("=").append(URLEncoder.encode(decryptedParam));
                         firstQueryParam = false;
                     }
                 } else {
-                    if (StringUtils.isNotBlank(serviceInput.getValue())) {
-                        httpurl.append("&").append(serviceInput.getScName()).append("=").append(URLEncoder.encode(serviceInput.getValue()));
+                    if (StringUtils.isNotBlank(decryptedParam)) {
+                        httpurl.append("&").append(serviceInput.getScName()).append("=").append(URLEncoder.encode(decryptedParam));
                     }
                 }
             } else if (paramType.equalsIgnoreCase(OpenServiceConstants.SC_PARAMTYPE_HEAD)) {
-                header.put(serviceInput.getScName(), serviceInput.getValue());
+                header.put(serviceInput.getScName(), decryptedParam);
             }
         }
         int timeout = 30000;
@@ -590,7 +592,78 @@ public class ServiceExecuteController {
                 result = "{error:404}";
         }
         apiServiceMonitor.setServiceOutput(result);
+        //TODO:暂时将返回值全部加密，具体加密解密形式再继续探讨
+        result = encryptionResult(result, serviceDef.getEncryptionType());
         return result;
+    }
+
+    /**
+     * 解密参数
+     *
+     * @param param
+     * @param encryptionType
+     * @return
+     * @throws Exception
+     */
+    private static String decryptedParam(String param, String encryptionType) throws Exception {
+        String decryptedParamStr = "";
+        if (StringUtil.isNotEmpty(encryptionType) && StringUtil.isNotEmpty(ENCRYPTION_MAP.get(encryptionType))) {
+            switch (encryptionType) {
+                case ENCRYPT_MODE_NO:
+                    decryptedParamStr = param;
+                    break;
+                case ENCRYPT_MODE_KEY_BASE64:
+                    decryptedParamStr = decryptBASE64String(param);
+                    break;
+                case ENCRYPT_MODE_KEY_SM3:
+                    throw new Exception("暂不支持国密SM3解密，param = [" + param + "]");
+                case ENCRYPT_MODE_KEY_MD5:
+                    throw new Exception("暂不支持MD5解密，param = [" + param + "]");
+                case ENCRYPT_MODE_KEY_SHA_1:
+                    throw new Exception("暂不支持SHA-1解密，param = [" + param + "]");
+                default:
+                    throw new Exception("暂不支持对所选加密方式解密，param = [" + param + "],encryptionType = [" + encryptionType + "]");
+            }
+        } else {
+            throw new Exception("传入加密方式不正确，请检查后重试，param = [" + param + "],encryptionType = [" + encryptionType + "]");
+        }
+        return decryptedParamStr;
+    }
+
+    /**
+     * 加密返回值
+     *
+     * @param result
+     * @param encryptionType
+     * @return
+     * @throws Exception
+     */
+    private static String encryptionResult(String result, String encryptionType) throws Exception {
+        String encryptionResultStr = "";
+        if (StringUtil.isNotEmpty(encryptionType) && StringUtil.isNotEmpty(ENCRYPTION_MAP.get(encryptionType))) {
+            switch (encryptionType) {
+                case ENCRYPT_MODE_NO:
+                    encryptionResultStr = result;
+                    break;
+                case ENCRYPT_MODE_KEY_BASE64:
+                    encryptionResultStr = encryptBASE64String(result);
+                    break;
+                case ENCRYPT_MODE_KEY_SM3:
+                    encryptionResultStr = SM3.byteArrayToHexString(SM3.hash(result.getBytes()));
+                    break;
+                case ENCRYPT_MODE_KEY_MD5:
+                    encryptionResultStr = encryptMD5String(result);
+                    break;
+                case ENCRYPT_MODE_KEY_SHA_1:
+                    encryptionResultStr = encryptSHA1(result);
+                    break;
+                default:
+                    throw new Exception("暂不支持所选加密方式，param = [" + result + "],encryptionType = [" + encryptionType + "]");
+            }
+        } else {
+            throw new Exception("传入加密方式不正确，请检查后重试，param = [" + result + "],encryptionType = [" + encryptionType + "]");
+        }
+        return encryptionResultStr;
     }
 
     /**

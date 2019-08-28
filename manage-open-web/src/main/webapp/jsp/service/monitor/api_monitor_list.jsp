@@ -155,17 +155,21 @@
         }
 
         function renderPath(data, type, full) {
-            // var url=full.openServiceRequestURL;
-            var url = data;
-            if (url.indexOf('?') > 0) {
-                url = url.split('?')[0];
-            }
-            var f = url.substr(url.indexOf('/api/execute/do') + 15);
             var html = '';
-            if (full.result == "200") {
-                html += '<a onclick="forView(\'' + full.id + '\')">' + f + '</a>&emsp;';
+            if (data != null) {
+                var url = data;
+                if (url.indexOf('?') > 0) {
+                    url = url.split('?')[0];
+                }
+                var f = url.substr(url.indexOf('/api/execute/do') + 15);
+
+                if (full.result == "200") {
+                    html += '<a onclick="forView(\'' + full.id + '\')">' + f + '</a>&emsp;';
+                } else {
+                    html += '<a style="color: red" onclick="forView(\'' + full.id + '\')">' + f + '</a>&emsp;';
+                }
             } else {
-                html += '<a style="color: red" onclick="forView(\'' + full.id + '\')">' + f + '</a>&emsp;';
+                html += '<a style="color: red" onclick="forView(\'' + full.id + '\')">' + "——" + '</a>&emsp;';
             }
             return html;
         }

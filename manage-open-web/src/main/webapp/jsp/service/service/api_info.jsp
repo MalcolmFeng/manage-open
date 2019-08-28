@@ -241,7 +241,7 @@
 
     <div class="div2 " id="testOnline"><a href="javascript:void(0)" onclick="test();">在线测试</a></div>
 
-    <div class="div2 " id="back"><span class="fa fa-reply"></span><a onclick="javascript:history.back(-1);">返回</a></div>
+    <div class="div2 " id="back"><span class="fa fa-reply"></span><a onclick="history.back(-1);">返回</a></div>
 
 
     <div class="console-panel console-bottom">
@@ -282,8 +282,15 @@
                         id="protocol">${serviceDef.protocol}</span></td>
             </tr>
             <tr>
-                <td colspan="2" class="ng-binding"><span class="console-grey ng-binding">HTTP Method：</span><span
+                <td width="50%" class="ng-binding"><span class="console-grey ng-binding">HTTP Method：</span><span
                         id="httpmethod">${serviceDef.httpMethod}</span></td>
+                <td class="ng-binding"><span class="console-grey ng-binding">加密类型：</span><span
+                        id="encryptionType"> ${serviceDef.encryptionType}</span></td>
+            </tr>
+            <tr>
+                <td width="50%" class="ng-binding"><span class="console-grey ng-binding">API限流：</span><span
+                        id="encryptionType2"> ${serviceDef.limitCount} 次/秒</span></td>
+                <%--                        id="encryptionType2"> ${serviceDef.maxQps} 次/秒</span></td>--%>
             </tr>
 
             </tbody>

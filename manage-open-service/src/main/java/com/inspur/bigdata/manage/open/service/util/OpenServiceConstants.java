@@ -8,6 +8,9 @@ import org.loushang.framework.util.HttpRequestUtils;
 import sdk.security.authc.AuthenticationProvider;
 
 import java.text.SimpleDateFormat;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by huzhensheng on 2019/1/22.
@@ -111,10 +114,26 @@ public class OpenServiceConstants {
     /**
      * 加密方式
      */
-    public static String ENCRYPT_MODE_BASE64 = "base64";
-    public static String ENCRYPT_MODE_MD5 = "md5";
-    public static String ENCRYPT_MODE_SHA = "sha";
+    public final static String ENCRYPT_MODE_NO = "0";
+    public final static String ENCRYPT_MODE_KEY_BASE64 = "BASE64";
+    public final static String ENCRYPT_MODE_KEY_MD5 = "MD5";
+    public final static String ENCRYPT_MODE_KEY_SHA_1 = "SHA-1";
+    public final static String ENCRYPT_MODE_KEY_SHA_256 = "SHA-256";
+    public final static String ENCRYPT_MODE_KEY_SHA_384 = "SHA-384";
+    public final static String ENCRYPT_MODE_KEY_SHA_512 = "SHA-512";
+    public final static String ENCRYPT_MODE_KEY_SM3 = "SM3";
 
+    public static final Map<String, String> ENCRYPTION_MAP;
+
+    static {
+        Map aMap = new HashMap();
+        aMap.put(ENCRYPT_MODE_NO, "不加密");
+        aMap.put(ENCRYPT_MODE_KEY_BASE64, ENCRYPT_MODE_KEY_BASE64);
+        aMap.put(ENCRYPT_MODE_KEY_MD5, ENCRYPT_MODE_KEY_MD5);
+        aMap.put(ENCRYPT_MODE_KEY_SHA_1, ENCRYPT_MODE_KEY_SHA_1);
+        aMap.put(ENCRYPT_MODE_KEY_SM3, ENCRYPT_MODE_KEY_SM3);
+        ENCRYPTION_MAP = Collections.unmodifiableMap(aMap);
+    }
     public static JSONArray getRemoteApiList(String userId) {
         String url = PropertiesUtil.getValue(OpenDataConstants.CONF_PROPERTIES, "od.domain") +
                 "/service/rest/service/getServiceListByUser?userId=" + userId;

@@ -15,6 +15,17 @@ var register = {
             }
         });
     },
+    encryptionTypeList: function (encryptionType) {
+        $.ajax({
+            type: "post",
+            url: context + "/service/open/api/encryptionList",
+            success: function (data) {
+                var html = template("encryptionTypeList", data);
+                $("#encryptionDiv").empty().append(html);
+                $("#encryptionTypeSelect").val(encryptionType);
+            }
+        });
+    },
     loadSubServiceGroupList: function (parentId) {
         // 清空子分组列表
         $("#subgrouplistDiv").empty();
@@ -24,6 +35,18 @@ var register = {
 
     selectServiceGroup: function (obj) {
         $("#groupId").val($("#subgroupSelect").val());
+    },
+
+
+    loadSubEncryptionTypeList: function (parentId) {
+        // 清空子分组列表
+        $("#encryptionListDiv").empty();
+        var encryptionType = $("#encryptionTypeSelect option:selected").val();//获取父组
+        $("#encryptionType").val(encryptionType);
+    },
+
+    selectEncryptionType: function (obj) {
+        $("#encryptionType").val($("#encryptionTypeSelect").val());
     },
 
     setNeedAuth: function (needAuth, authUser) {
@@ -126,7 +149,7 @@ var register = {
         var endList = register.getBackendParamList();
         //判断编辑还是新增
         if(register.checkNeedLoadEdit(endList)){
-            var data={data:endList}
+            var data = {data: endList};
             $("#inputtabletbody").html("").append(template('inputitemlist',data));
         }
     },
@@ -212,6 +235,8 @@ var register = {
         serviceInfo.apiGroup = $("#groupId").val();
         serviceInfo.description = $("#description").val();
         serviceInfo.authType = $('input[name=authType]:checked').val();//授权方式
+        serviceInfo.encryptionType = $("#encryptionType").val();
+        serviceInfo.maxQps = $("#maxQps").val();
 
         // serviceInfo.protocol = $('input[name=protocol]:checked').val();//请求协议
         serviceInfo.protocol = "http";//请求协议
@@ -258,17 +283,17 @@ var register = {
             var param = {
                 name: inList[i].name,
                 type: inList[i].type,
-                required: new Number(inList[i].required),
+                required: Number(inList[i].required),
                 description: inList[i].description
             };
             for (var j in endList) {
                 if (backname == endList[j].name) {
                         param.scName = endList[j].name,
                         param.scType = endList[j].type,
-                        param.scRequired = new Number(endList[j].required),
+                            param.scRequired = Number(endList[j].required),
                         param.scDescription = endList[j].description,
                         param.fixedValue = endList[j].fixedValue,
-                        param.scSeq = new Number(endList[j].seq),
+                            param.scSeq = Number(endList[j].seq),
                         param.scParamType = endList[j].paramType
                 }
             }

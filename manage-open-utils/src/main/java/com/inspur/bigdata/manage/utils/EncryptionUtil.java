@@ -1,8 +1,10 @@
 package com.inspur.bigdata.manage.utils;
 
+import org.apache.commons.codec.digest.DigestUtils;
 import sun.misc.BASE64Decoder;
 import sun.misc.BASE64Encoder;
 
+import java.io.IOException;
 import java.security.MessageDigest;
 
 /**
@@ -48,6 +50,7 @@ public class EncryptionUtil {
 
         return md5.digest();
     }
+
     /**
      * SHA加密
      *
@@ -64,4 +67,82 @@ public class EncryptionUtil {
 
     }
 
+    /**
+     * BASE64解密,入参出参为String
+     *
+     * @param key
+     * @return
+     * @throws Exception
+     */
+    public static String decryptBASE64String(String key) throws Exception {
+        BASE64Decoder decoder = new BASE64Decoder();
+        return new String(decoder.decodeBuffer(key));
+    }
+
+    /**
+     * BASE64加密,入参出参为String
+     *
+     * @param data
+     * @return
+     * @throws Exception
+     */
+    public static String encryptBASE64String(String data) throws Exception {
+        BASE64Encoder encoder = new BASE64Encoder();
+        return encoder.encode(data.getBytes());
+    }
+
+    /**
+     * MD5加密,入参出参为String
+     *
+     * @param data
+     * @return
+     * @throws Exception
+     */
+    public static String encryptMD5String(String data) {
+        return DigestUtils.md5Hex(data);
+    }
+
+    /**
+     * SHA-1加密,入参出参为String
+     *
+     * @param data
+     * @return
+     * @throws Exception
+     */
+    public static String encryptSHA1(String data) {
+        return DigestUtils.sha1Hex(data);
+    }
+
+    /**
+     * SHA-256加密,入参出参为String
+     *
+     * @param data
+     * @return
+     * @throws Exception
+     */
+    public static String encryptSHA256(String data) {
+        return DigestUtils.sha256Hex(data);
+    }
+
+    /**
+     * SHA-384加密,入参出参为String
+     *
+     * @param data
+     * @return
+     * @throws Exception
+     */
+    public static String encryptSHA384(String data) {
+        return DigestUtils.sha384Hex(data);
+    }
+
+    /**
+     * SHA-512加密,入参出参为String
+     *
+     * @param data
+     * @return
+     * @throws Exception
+     */
+    public static String encryptSHA512(String data) {
+        return DigestUtils.sha512Hex(data);
+    }
 }
