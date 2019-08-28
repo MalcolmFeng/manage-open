@@ -378,6 +378,18 @@ public class ServiceDefController {
         serviceDef.setUpdateTime(OpenServiceConstants.sf.format(new Date()));
         try {
             serviceDefService.update(serviceDef);
+            //上线服务 调用服务网关
+            JSONObject jo = new JSONObject();
+            jo.put("group", serviceDef.getGroupId());
+            jo.put("limitCount", serviceDef.getLimitCount());
+            jo.put("reqPath", serviceDef.getReqPath());
+            jo.put("serviceId", serviceDef.getId());
+            jo.put("url", serviceDef.getScAddr());
+            List<Object> list=new ArrayList<>();
+            list.add(jo);
+            Map<String,String> headers=new HashMap<>();
+            headers.put("Content-Type",OpenServiceConstants.content_type_json);
+            HttpUtil.execPost(PropertiesUtil.getValue(OpenDataConstants.CONF_PROPERTIES, "service_gateway_register_url"), headers, list.toString());
         } catch (Exception e) {
             log.error("api审核失败", e);
             return false;
