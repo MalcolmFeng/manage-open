@@ -953,13 +953,14 @@ public class ServiceDefController {
         List<Map<String, String>> list = new ArrayList<>();
         for (Map.Entry<String, String> entry : ENCRYPTION_MAP.entrySet()) {
             //暂时只支持BASE64和不加密
-            if (!ENCRYPT_MODE_KEY_BASE64.equals(entry.getKey()) || !ENCRYPT_MODE_NO.equals(entry.getKey())) {
-                continue;
+            if (ENCRYPT_MODE_KEY_BASE64.equals(entry.getKey())
+                    || ENCRYPT_MODE_NO.equals(entry.getKey())) {
+                Map<String, String> temp = new HashMap<>();
+                temp.put("id", entry.getKey());
+                temp.put("name", entry.getValue());
+                list.add(temp);
             }
-            Map<String, String> temp = new HashMap<>();
-            temp.put("id", entry.getKey());
-            temp.put("name", entry.getValue());
-            list.add(temp);
+
             System.out.println("key = " + entry.getKey() + ", value = " + entry.getValue());
         }
         Map<String, Object> result = new HashMap<String, Object>();
