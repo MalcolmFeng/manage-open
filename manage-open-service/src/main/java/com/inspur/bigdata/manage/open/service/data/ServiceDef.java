@@ -152,7 +152,7 @@ public class ServiceDef implements Serializable {
     /**
      * 最大限流大小，单位次/秒
      */
-    @Column(name = "limitCount")
+    @Column(name = "limit_count")
     private Double limitCount;
 
     @Transient
