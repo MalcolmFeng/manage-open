@@ -67,6 +67,13 @@ public class OpenServiceConstants {
     //输入参数异常
     public final static String ASM_ERROR_PARAMETER = "10008";
 
+    // ip在黑名单里
+    public final static String ASM_ERROR_IP = "10009";
+
+    // 超过限流值
+    public final static String ASM_ERROR_LIMIT = "10010";
+
+
     //未知错误
     public final static String ASM_ERROR_UNKNOWN = "99999";
 
