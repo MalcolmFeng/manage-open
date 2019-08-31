@@ -285,7 +285,10 @@
                 <td width="50%" class="ng-binding"><span class="console-grey ng-binding">HTTP Method：</span><span
                         id="httpmethod">${serviceDef.httpMethod}</span></td>
                 <td class="ng-binding"><span class="console-grey ng-binding">加密类型：</span><span
-                        id="encryptionType"> ${serviceDef.encryptionType}</span></td>
+                        id="encryptionType">
+                    <c:if test="${serviceDef.encryptionType eq '0' }">未加密</c:if>
+                    <c:if test="${!serviceDef.encryptionType eq '0' }">${serviceDef.encryptionType}</c:if>
+                </span></td>
             </tr>
             <tr>
                 <td width="50%" class="ng-binding"><span class="console-grey ng-binding">API限流：</span><span
