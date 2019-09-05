@@ -380,7 +380,7 @@ public class ServiceDefController {
             serviceDefService.update(serviceDef);
             //上线服务 调用服务网关
             JSONObject jo = new JSONObject();
-            jo.put("group", serviceDef.getGroupId());
+            jo.put("group", serviceDef.getApiGroup());
             jo.put("limitCount", serviceDef.getLimitCount());
             jo.put("reqPath", serviceDef.getReqPath());
             jo.put("serviceId", serviceDef.getId());

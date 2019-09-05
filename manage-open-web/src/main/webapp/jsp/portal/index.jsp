@@ -36,14 +36,14 @@
       $(function(){
           var protocal = window.location.protocol;
           var HostIp = protocal+"//"+window.location.host;
-          data_service=HostIp+"/dev/jsp/servicedev/console.jsp?realm="+'${realm}';
+          data_service=HostIp+"/open-platform/jsp/servicedev/console.jsp?realm="+'${realm}';
           if(protocal.indexOf("172")>0){
             //内网访问
-            data_url="http://172.19.221.1:9181/odmgr";
-            data_dev="http://172.19.221.1/dev/?realm="+'${realm}';
+            data_url="http://172.19.221.54:9181/odmgr";
+            data_dev="http://172.19.221.54/open-platform/?realm="+'${realm}';
           }else{
             data_url='${dataurl}';
-            data_dev=HostIp+"/dev/?realm="+'${realm}';
+            data_dev=HostIp+"/open-platform/?realm="+'${realm}';
           }
           document.getElementById("datasource").href=data_url;
           document.getElementById("dataservice").href=data_service;
