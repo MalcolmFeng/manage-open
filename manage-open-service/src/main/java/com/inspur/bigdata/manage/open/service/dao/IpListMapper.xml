@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.inspur.bigdata.manage.open.service.dao.IpListMapper">
+
+    <resultMap id="BaseResultMap" type="com.inspur.bigdata.manage.open.service.data.IpList">
+        <result column="id" property="id"/>
+        <result column="type" property="type"/>
+        <result column="create_time" property="createTime"/>
+        <result column="provider" property="provider"/>
+        <result column="ip_v4" property="ipV4"/>
+        <result column="ip_v6" property="ipV6"/>
+        <result column="active" property="active"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+                `id`,
+                `type`,
+                `create_time`,
+                `provider`,
+                `ip_v4`,
+                `ip_v6`,
+                `active`
+    </sql>
+
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM ip_list
+        WHERE `id` = #{id}
+    </select>
+
+    <select id="pageList" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM ip_list
+        LIMIT #{offset}, #{pageSize}
+    </select>
+
+    <delete id="deleteById">
+        DELETE FROM ip_list
+        WHERE `id` = #{id}
+    </delete>
+
+    <select id="pageListCount" resultType="java.lang.Integer">
+        SELECT count(1)
+        FROM ip_list
+    </select>
+
+
+    <select id="getIpList" resultMap="BaseResultMap" parameterType="map">
+        select
+        <include refid="Base_Column_List"/>
+        from ip_list where 1=1
+        <if test="ipV4!=null and ipV4!=''">and ip_v4 LIKE '%${ipV4}%'</if>
+        <if test="ipV6!=null and ipV6!=''">and ip_v6 LIKE '%${ipV6}%'</if>
+        <if test="type!=null and type!=''">and type = #{type}</if>
+        <if test="active!=null and active!='' ">and active = #{active}</if>
+        <if test="provider!=null and provider!='' ">and provider = #{provider}</if>
+        <if test="null != startTime and '' != startTime">and create_time > #{startTime}</if>
+        <if test="null != endTime and '' != endTime">and create_time <![CDATA[ <= ]]> #{endTime}</if>
+    </select>
+
+    <update id="updateIpList" parameterType="com.inspur.bigdata.manage.open.service.data.IpList">
+        UPDATE ip_list
+        <set>
+            <trim prefix="" suffix="" suffixOverrides=",">
+                <if test="ipV4!=null and ipV4!=''">ip_v4 = #{ipV4},</if>
+                <if test="ipV6!=null and ipV6!=''">ip_v6 = #{ipV6},</if>
+                <if test="type!=null and type!=''">type = #{type},</if>
+                <if test="active!=null and active!='' ">active = #{active},</if>
+                <if test="provider!=null and provider!='' ">provider = #{provider}</if>
+            </trim>
+        </set>
+        WHERE `id` = #{id}
+    </update>
+</mapper>

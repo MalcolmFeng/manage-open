@@ -117,7 +117,6 @@
                         <input type="text" style="width: 25%" class="form-control ue-form Validform_input"
                                id="limitCount"
                                name="name" value="${serviceDef.limitCount}" placeholder="API限流次数"
-                        <%--                               name="name" value="${serviceDef.maxQps}" placeholder="API限流次数"--%>
                                datatype="checknum" errormsg="请输入正确的数字" nullmsg="必填"/>
                         <span class="Validform_checktip Validform_span">次/秒</span>
                     </div>

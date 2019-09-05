@@ -151,6 +151,8 @@
                 return "输入参数异常";
             } else if ("99999" == full.result) {
                 return "未知错误";
+            } else {
+                return "未知系统错误";
             }
         }
 
