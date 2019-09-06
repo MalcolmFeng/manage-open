@@ -25,4 +25,6 @@ public interface IServiceDefService {
     List<ServiceDef> getByGroupContextAndPath(Map map);
     List<ServiceDef> listAPIByProvider(Map map);
     List<ServiceDef> queryByRemoteId(String remoteId);
+
+    int updateServiceDefCount(Map<String, String> map);
 }

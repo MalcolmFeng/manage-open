@@ -10,6 +10,7 @@ import sdk.security.authc.AuthenticationProvider;
 import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -118,6 +119,16 @@ public class OpenServiceConstants {
     public static String content_type_xml = "application/xml;charset=utf-8";
     public static String content_type_text_xml = "text/xml;charset=utf-8";
     public static String content_type_html = "text/html;charset=utf-8";
+
+    /**
+     * 每个调用者接口调用上限时间粒度
+     */
+    public final static String TOP_LIMIT_UNIT_HOUR = "hour";
+    public final static String TOP_LIMIT_UNIT_DAY = "day";
+    public final static String TOP_LIMIT_UNIT_WEEK = "week";
+    public final static String TOP_LIMIT_UNIT_MONTH = "month";
+
+    public static final Map<String, String> TOP_LIMIT_UNIT_MAP;
     /**
      * 加密方式
      */
@@ -140,6 +151,13 @@ public class OpenServiceConstants {
         aMap.put(ENCRYPT_MODE_KEY_SHA_1, ENCRYPT_MODE_KEY_SHA_1);
         aMap.put(ENCRYPT_MODE_KEY_SM3, ENCRYPT_MODE_KEY_SM3);
         ENCRYPTION_MAP = Collections.unmodifiableMap(aMap);
+
+        Map bMap = new LinkedHashMap();
+        bMap.put(TOP_LIMIT_UNIT_HOUR, "每小时");
+        bMap.put(TOP_LIMIT_UNIT_DAY, "每天");
+        bMap.put(TOP_LIMIT_UNIT_WEEK, "每星期");
+        bMap.put(TOP_LIMIT_UNIT_MONTH, "每月");
+        TOP_LIMIT_UNIT_MAP = Collections.unmodifiableMap(bMap);
     }
     public static JSONArray getRemoteApiList(String userId) {
         String url = PropertiesUtil.getValue(OpenDataConstants.CONF_PROPERTIES, "od.domain") +

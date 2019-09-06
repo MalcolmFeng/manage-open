@@ -84,18 +84,29 @@ public class ServiceIpListController {
     @ResponseBody
     public JSONObject addIpList(@RequestBody IpList ipList) {
         JSONObject result = new JSONObject();
-        try {
-            ipList.setId(UUIDGenerator.getUUID());
-            ipList.setProvider(getUserId());
-            if (StringUtil.isEmpty(ipList.getCreateTime())) {
-                ipList.setCreateTime(getCurrentTime2());
-            }
-            serviceIpListService.addIpList(ipList);
-            result.put("code", "200");
-        } catch (Exception e) {
-            log.warn(e.getMessage());
+        if (StringUtil.isEmpty(ipList.getIpV4()) && StringUtil.isEmpty(ipList.getIpV6())) {
             result.put("code", "500");
-            result.put("error", e.getMessage());
+            result.put("error", "IP地址不存在!");
+        } else if (StringUtil.isEmpty(ipList.getType()) || (!ipList.getType().equals("black") && !ipList.getType().equals("white"))) {
+            result.put("code", "500");
+            result.put("error", "黑白名单类型不正确!");
+        } else if (StringUtil.isEmpty(ipList.getActive()) || (!ipList.getActive().equals("true") && !ipList.getActive().equals("false"))) {
+            result.put("code", "500");
+            result.put("error", "是否生效类型不正确!");
+        } else {
+            try {
+                ipList.setId(UUIDGenerator.getUUID());
+                ipList.setProvider(getUserId());
+                if (StringUtil.isEmpty(ipList.getCreateTime())) {
+                    ipList.setCreateTime(getCurrentTime2());
+                }
+                serviceIpListService.addIpList(ipList);
+                result.put("code", "200");
+            } catch (Exception e) {
+                log.warn(e.getMessage());
+                result.put("code", "500");
+                result.put("error", e.getMessage());
+            }
         }
         return result;
     }

@@ -7,7 +7,9 @@ import com.inspur.bigdata.manage.open.service.data.ServiceDef;
 import com.inspur.bigdata.manage.open.service.data.ServiceInput;
 import com.inspur.bigdata.manage.open.service.data.ServiceOutput;
 import com.inspur.bigdata.manage.open.service.service.IServiceDefService;
+import com.inspur.bigdata.manage.utils.StringUtil;
 import org.apache.commons.lang.StringUtils;
+import org.loushang.framework.util.DateUtil;
 import org.loushang.framework.util.UUIDGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -119,5 +121,13 @@ public class ServiceDefServiceImpl implements IServiceDefService{
        return serviceDefMapper.queryByRemoteId(remoteId);
     }
 
+
+    @Override
+    public int updateServiceDefCount(Map<String, String> map) {
+        if (StringUtil.isEmpty(map.getOrDefault("updateTime", ""))) {
+            map.put("updateTime", DateUtil.getCurrentTime2());
+        }
+        return serviceDefMapper.updateServiceDefCount(map);
+    }
 
 }

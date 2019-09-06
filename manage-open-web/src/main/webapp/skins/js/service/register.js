@@ -26,6 +26,17 @@ var register = {
             }
         });
     },
+    loadTopLimitUnitList: function (topLimitUnitList) {
+        $.ajax({
+            type: "post",
+            url: context + "/service/open/api/topLimitUnitList",
+            success: function (data) {
+                var html = template("loadTopLimitUnitList", data);
+                $("#topLimitUnitDiv").empty().append(html);
+                $("#topLimitUnitSelect").val(topLimitUnitList);
+            }
+        });
+    },
     loadSubServiceGroupList: function (parentId) {
         // 清空子分组列表
         $("#subgrouplistDiv").empty();
@@ -44,9 +55,18 @@ var register = {
         var encryptionType = $("#encryptionTypeSelect option:selected").val();//获取父组
         $("#encryptionType").val(encryptionType);
     },
-
     selectEncryptionType: function (obj) {
         $("#encryptionType").val($("#encryptionTypeSelect").val());
+    },
+
+    loadSubTopLimitUnitList: function (parentId) {
+        // 清空子分组列表
+        $("#topLimitUnitListDiv").empty();
+        var topLimitUnit = $("#topLimitUnitSelect option:selected").val();//获取父组
+        $("#topLimitUnit").val(topLimitUnit);
+    },
+    selectTopLimitUnitType: function (obj) {
+        $("#topLimitUnit").val($("#topLimitUnitSelect").val());
     },
 
     setNeedAuth: function (needAuth, authUser) {

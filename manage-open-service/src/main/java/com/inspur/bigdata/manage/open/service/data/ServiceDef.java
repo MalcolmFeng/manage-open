@@ -155,6 +155,18 @@ public class ServiceDef implements Serializable {
     @Column(name = "limit_count")
     private Double limitCount;
 
+    /**
+     * 每个调用者的接口调用上限
+     */
+    @Column(name = "top_limit_count")
+    private Integer topLimitCount;
+
+    /**
+     * 每个调用者接口调用上限时间粒度
+     */
+    @Column(name = "top_limit_unit")
+    private String topLimitUnit;
+
     @Transient
     private List<ServiceInput> inputList;
 
@@ -397,5 +409,21 @@ public class ServiceDef implements Serializable {
 
     public void setLimitCount(Double limitCount) {
         this.limitCount = limitCount;
+    }
+
+    public Integer getTopLimitCount() {
+        return topLimitCount;
+    }
+
+    public void setTopLimitCount(Integer topLimitCount) {
+        this.topLimitCount = topLimitCount;
+    }
+
+    public String getTopLimitUnit() {
+        return topLimitUnit;
+    }
+
+    public void setTopLimitUnit(String topLimitUnit) {
+        this.topLimitUnit = topLimitUnit;
     }
 }

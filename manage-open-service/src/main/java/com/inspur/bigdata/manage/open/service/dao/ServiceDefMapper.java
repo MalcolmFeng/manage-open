@@ -28,4 +28,5 @@ public interface ServiceDefMapper extends EntityMapper<ServiceDef> {
 
     List<ServiceDef> queryByRemoteId(String remoteId);
 
+    int updateServiceDefCount(Map<String, String> map);
 }

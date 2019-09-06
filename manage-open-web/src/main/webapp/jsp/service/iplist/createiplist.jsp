@@ -222,25 +222,6 @@
                 </div>
 
                 <div class="form-group">
-                    <div class="col-xs-2 col-md-2 control-label">
-                        <label class="control-label">备注</label>
-                    </div>
-                    <div class="col-xs-10 col-md-10 text-left radio" style="margin-top: 5px;">
-                        <input type="text" style="width: 25%" class="form-control ue-form Validform_input" id="price"
-                               name="price" value="${serviceDef.price}" placeholder="价格"/>
-                    </div>
-                </div>
-
-                <%--                <div class="form-group">--%>
-                <%--                    <label class="col-xs-3 col-md-3 control-label"></label>--%>
-                <%--                    <div class="col-xs-9 col-md-9">--%>
-                <%--                        <button type="button" class="btn ue-btn-primary" id="saveBtn">添加</button>&ensp;--%>
-                <%--                        <button type="button" class="btn ue-btn" id="closeBtn">取消</button>--%>
-                <%--                        <span id="msgdemo"></span>--%>
-                <%--                    </div>--%>
-                <%--                </div>--%>
-
-                <div class="form-group">
                     <label class="col-xs-2 col-md-2 control-label"></label>
                     <div class="col-xs-10 col-md-10">
                         <input type="submit" class="btn ue-btn-primary" value="添加">&emsp;

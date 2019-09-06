@@ -64,6 +64,18 @@
 		where id= #{id}
 	</update>
 
+	<update id="updateServiceDefCount" parameterType="map">
+		update api_service_def
+		set
+		<trim prefix="" suffix="" suffixOverrides=",">
+			<if test="updateTime!=null and updateTime!='' ">update_time=#{updateTime},</if>
+			<if test="limitCount!=null and limitCount!='' ">limit_count=#{limitCount},</if>
+			<if test="topLimitCount!=null and topLimitCount!='' ">top_limit_count=#{topLimitCount},</if>
+			<if test="topLimitUnit!=null and topLimitUnit!='' ">top_limit_unit=#{topLimitUnit}</if>
+		</trim>
+		where id= #{id}
+	</update>
+
 	<delete id="deleteById" parameterType="string">
 		DELETE FROM
 		api_service_def

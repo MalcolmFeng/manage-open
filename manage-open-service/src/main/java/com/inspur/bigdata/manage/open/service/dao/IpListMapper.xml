@@ -59,6 +59,7 @@
         <if test="provider!=null and provider!='' ">and provider = #{provider}</if>
         <if test="null != startTime and '' != startTime">and create_time > #{startTime}</if>
         <if test="null != endTime and '' != endTime">and create_time <![CDATA[ <= ]]> #{endTime}</if>
+        ORDER BY create_time DESC
     </select>
 
     <update id="updateIpList" parameterType="com.inspur.bigdata.manage.open.service.data.IpList">

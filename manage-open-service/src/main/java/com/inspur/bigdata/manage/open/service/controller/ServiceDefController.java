@@ -385,10 +385,10 @@ public class ServiceDefController {
             jo.put("reqPath", serviceDef.getReqPath());
             jo.put("serviceId", serviceDef.getId());
             jo.put("url", serviceDef.getScAddr());
-            List<Object> list=new ArrayList<>();
+            List<Object> list = new ArrayList<>();
             list.add(jo);
-            Map<String,String> headers=new HashMap<>();
-            headers.put("Content-Type",OpenServiceConstants.content_type_json);
+            Map<String, String> headers = new HashMap<>();
+            headers.put("Content-Type", OpenServiceConstants.content_type_json);
             HttpUtil.execPost(PropertiesUtil.getValue(OpenDataConstants.CONF_PROPERTIES, "service_gateway_register_url"), headers, list.toString());
         } catch (Exception e) {
             log.error("api审核失败", e);
@@ -539,6 +539,17 @@ public class ServiceDefController {
             map.put("message", "API限流次数数值不正确");
             return map;
         }
+        if (StringUtil.isEmpty(TOP_LIMIT_UNIT_MAP.get(serviceDef.getTopLimitUnit()))) {
+            map.put("result", false);
+            map.put("message", "时间粒度不正确");
+            return map;
+        }
+        if (serviceDef.getTopLimitCount() <= 0) {
+            map.put("result", false);
+            map.put("message", "API限流次数数值不能小于等于0");
+            return map;
+        }
+
         if (StringUtil.isEmpty(serviceDef.getName())) {
             map.put("result", false);
             map.put("message", "名称为空");
@@ -960,8 +971,22 @@ public class ServiceDefController {
                 temp.put("name", entry.getValue());
                 list.add(temp);
             }
+//            System.out.println("key = " + entry.getKey() + ", value = " + entry.getValue());
+        }
+        Map<String, Object> result = new HashMap<String, Object>();
+        result.put("data", list);
+        return result;
+    }
 
-            System.out.println("key = " + entry.getKey() + ", value = " + entry.getValue());
+    @RequestMapping(value = "/topLimitUnitList")
+    @ResponseBody
+    public Map<String, Object> getTopLimitUnitList() {
+        List<Map<String, String>> list = new ArrayList<>();
+        for (Map.Entry<String, String> entry : TOP_LIMIT_UNIT_MAP.entrySet()) {
+            Map<String, String> temp = new HashMap<>();
+            temp.put("id", entry.getKey());
+            temp.put("name", entry.getValue());
+            list.add(temp);
         }
         Map<String, Object> result = new HashMap<String, Object>();
         result.put("data", list);

@@ -122,6 +122,29 @@
                     </div>
                 </div>
                 <div class="form-group">
+                    <div class="col-xs-2 col-md-2 control-label">
+                        <label class="control-label">API调用上限<span class="required">*</span></label>
+                    </div>
+                    <div class="col-xs-10 col-md-10">
+                        <input type="hidden" id="topLimitUnit" name="topLimitUnit"
+                               value="${serviceDef.topLimitUnit }"/>
+                        <div id="topLimitUnitDiv" style="width: 25%; display: inline-block"></div>
+                        <div id="topLimitUnitListDiv" style="width: 10%; display:none"></div>
+                        <span class="Validform_checktip Validform_span" style="float: none"></span>
+                    </div>
+                    <div class="col-xs-2 col-md-2 control-label">
+                        <label class="control-label"><span class="required"></span></label>
+                    </div>
+                    <div class="col-xs-10 col-md-10">
+                        <input type="text" style="width: 25%" class="form-control ue-form Validform_input"
+                               id="topLimitCount"
+                               name="name" value="${serviceDef.topLimitCount}" placeholder="API限流次数"
+                               datatype="/^[1-9]\d{0,8}$/" errormsg="请输入正确的数字(1~9位正整数)" nullmsg="必填"/>
+                        <span class="Validform_checktip Validform_span">次</span>
+                    </div>
+
+                </div>
+                <div class="form-group">
                     <label class="col-xs-2 col-md-2 control-label">服务描述<span class="required">*</span></label>
                     <div class="col-xs-10 col-md-10">
 					<textarea id="description" name="description" rows="3" cols="80" style="width:80%;"
@@ -479,6 +502,7 @@
         reNavBar();
         register.loadServiceGroupList("${serviceDef.apiGroup}");//初始化分组
         register.encryptionTypeList("${serviceDef.apiGroup}");//初始化分组
+        register.loadTopLimitUnitList("${serviceDef.apiGroup}");//初始化分组
         $("#saveForm").uValidform({
             datatype: {
                 "verifyExample": verifyExample
@@ -982,6 +1006,24 @@
 </script>
 <script id="subEncryptionTypeList" type="text/html">
     <select id="subEncryptionTypeSelect" class="form-control ue-form" onchange="register.selectEncryptionType();">
+        {{each data as group}}
+        <option value="{{group.id}}">{{group.name}}</option>
+        {{/each}}
+    </select>
+</script>
+
+
+<script id="loadTopLimitUnitList" type="text/html">
+    <select id="topLimitUnitSelect" class="form-control ue-form" onchange="register.loadSubTopLimitUnitList();"
+            datatype="s" nullmsg="必填">
+        <option value="">请选择时间粒度</option>
+        {{each data as group}}
+        <option value="{{group.id}}">{{group.name}}</option>
+        {{/each}}
+    </select>
+</script>
+<script id="subTopLimitUnitList" type="text/html">
+    <select id="subTopLimitUnitSelect" class="form-control ue-form" onchange="register.selectTopLimitUnitType();">
         {{each data as group}}
         <option value="{{group.id}}">{{group.name}}</option>
         {{/each}}
