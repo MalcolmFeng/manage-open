@@ -622,6 +622,22 @@ public class ServiceDefController {
         try {
             serviceDefService.updateServiceDef(info);
             map.put("result", true);
+            try {
+                //调用服务网关
+                JSONObject jo = new JSONObject();
+                jo.put("group", info.getApiGroup());
+                jo.put("limitCount", info.getLimitCount());
+                jo.put("reqPath", info.getReqPath());
+                jo.put("serviceId", info.getId());
+                jo.put("url", info.getScAddr());
+                List<Object> listTemp = new ArrayList<>();
+                listTemp.add(jo);
+                Map<String, String> headers = new HashMap<>();
+                headers.put("Content-Type", OpenServiceConstants.content_type_json);
+                HttpUtil.execPost(PropertiesUtil.getValue(OpenDataConstants.CONF_PROPERTIES, "service_gateway_update_limit_count_url"), headers, listTemp.toString());
+            } catch (Exception e) {
+                log.warn(e.getMessage());
+            }
         } catch (Exception e) {
             e.printStackTrace();
             map.put("result", false);

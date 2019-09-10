@@ -257,6 +257,8 @@ var register = {
         serviceInfo.authType = $('input[name=authType]:checked').val();//授权方式
         serviceInfo.encryptionType = $("#encryptionType").val();
         serviceInfo.limitCount = $("#limitCount").val();
+        serviceInfo.topLimitCount = $("#topLimitCount").val();
+        serviceInfo.topLimitUnit = $("#topLimitUnit").val();
 
         // serviceInfo.protocol = $('input[name=protocol]:checked').val();//请求协议
         serviceInfo.protocol = "http";//请求协议

@@ -1,3 +1,4 @@
+<%@ page import="com.inspur.bigdata.manage.open.service.data.ServiceDef" %>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" isELIgnored="false" %>
 <%@ taglib uri="/tags/loushang-web" prefix="l" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
@@ -127,7 +128,7 @@
                     </div>
                     <div class="col-xs-10 col-md-10">
                         <input type="hidden" id="topLimitUnit" name="topLimitUnit"
-                               value="${serviceDef.topLimitUnit }"/>
+                               value="${serviceDef.topLimitUnit}"/>
                         <div id="topLimitUnitDiv" style="width: 25%; display: inline-block"></div>
                         <div id="topLimitUnitListDiv" style="width: 10%; display:none"></div>
                         <span class="Validform_checktip Validform_span" style="float: none"></span>
@@ -138,7 +139,7 @@
                     <div class="col-xs-10 col-md-10">
                         <input type="text" style="width: 25%" class="form-control ue-form Validform_input"
                                id="topLimitCount"
-                               name="name" value="${serviceDef.topLimitCount}" placeholder="API限流次数"
+                               name="topLimitCount" value="${serviceDef.topLimitCount}" placeholder="API限流次数"
                                datatype="/^[1-9]\d{0,8}$/" errormsg="请输入正确的数字(1~9位正整数)" nullmsg="必填"/>
                         <span class="Validform_checktip Validform_span">次</span>
                     </div>
@@ -501,8 +502,8 @@
     $(function () {
         reNavBar();
         register.loadServiceGroupList("${serviceDef.apiGroup}");//初始化分组
-        register.encryptionTypeList("${serviceDef.apiGroup}");//初始化分组
-        register.loadTopLimitUnitList("${serviceDef.apiGroup}");//初始化分组
+        register.encryptionTypeList("${serviceDef.encryptionType}");//初始化分组
+        register.loadTopLimitUnitList("${serviceDef.topLimitUnit}");//初始化分组
         $("#saveForm").uValidform({
             datatype: {
                 "verifyExample": verifyExample
@@ -660,6 +661,7 @@
         }
         return true;
     }
+
     function verifyReqPath(gets, obj, curform, datatye) {
         var context = $("#reqPath").val();
 //            var version = $("#version").val();
@@ -832,6 +834,7 @@
                 <option value="boolean">Boolean</option>
                 <option value="application/json">application/json</option>
                 <option value="text/xml">text/xml</option>
+                <option value="file">file</option>
             </select>
         </td>
         <td>
@@ -939,6 +942,7 @@
                 <option value="boolean">Boolean</option>
                 <option value="application/json">application/json</option>
                 <option value="text/xml">text/xml</option>
+                <option value="file">file</option>
             </select>
         </td>
         <td>

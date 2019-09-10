@@ -123,6 +123,7 @@ public class OpenServiceConstants {
     /**
      * 每个调用者接口调用上限时间粒度
      */
+    public final static String TOP_LIMIT_UNIT_MINUTE = "minute";
     public final static String TOP_LIMIT_UNIT_HOUR = "hour";
     public final static String TOP_LIMIT_UNIT_DAY = "day";
     public final static String TOP_LIMIT_UNIT_WEEK = "week";
@@ -153,6 +154,7 @@ public class OpenServiceConstants {
         ENCRYPTION_MAP = Collections.unmodifiableMap(aMap);
 
         Map bMap = new LinkedHashMap();
+        bMap.put(TOP_LIMIT_UNIT_MINUTE, "每分钟");
         bMap.put(TOP_LIMIT_UNIT_HOUR, "每小时");
         bMap.put(TOP_LIMIT_UNIT_DAY, "每天");
         bMap.put(TOP_LIMIT_UNIT_WEEK, "每星期");
