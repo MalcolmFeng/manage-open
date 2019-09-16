@@ -1,0 +1,26 @@
+.all-total-count {
+    background-color: #0099FF;
+    height: 120px;
+    margin-top: 15px;
+    border: none;
+}
+
+.count {
+    font-size: 16px;
+    color: #FFFFFF;
+    margin-bottom: 5px;
+    width: 100%;
+}
+
+.count-text {
+    color: #FFFFFF;
+    font-size: 50px;
+    font-weight: bold;
+    float: right
+}
+
+.count-outher {
+    color: #FFFFFF;
+    font-size: 18px;
+    float: right
+}

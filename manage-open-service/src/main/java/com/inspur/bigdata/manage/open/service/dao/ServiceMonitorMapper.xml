@@ -27,6 +27,8 @@
         <result column="create_time" property="createTime"/>
     </resultMap>
 
+    <resultMap type="java.util.Map" id="countMap"/>
+
     <sql id="Base_Column_List">
                 `id`,
                 `api_service_id`,
@@ -231,7 +233,6 @@
         WHERE `id` = #{id}
     </update>
 
-
     <select id="load" resultMap="BaseResultMap">
         SELECT
         <include refid="Base_Column_List"/>
@@ -292,6 +293,51 @@
         <if test="null != startTime and '' != startTime">and request_time > #{startTime}</if>
         <if test="null != endTime and '' != endTime">and request_time <![CDATA[ <= ]]> #{endTime}</if>
         ORDER BY request_time DESC
+    </select>
+
+    <select id="getAllCount" resultMap="countMap">
+        SELECT
+        COUNT(id) AS totalCount
+        ,SUM(result='200') AS totalSuccessCount
+        FROM api_service_monitor
+	</select>
+
+    <select id="getDayCount" parameterType="map" resultMap="countMap">
+        SELECT
+        SUBSTRING(request_time,1,10) as day
+        ,COUNT(id) AS totalCount
+        ,SUM(result=#{result}) AS totalSuccessCount
+        FROM api_service_monitor
+        WHERE request_time>=#{days}
+        GROUP BY SUBSTRING(request_time,1,10)
+	</select>
+
+    <select id="getTopApiCount" parameterType="map" resultMap="countMap">
+
+        SELECT
+        api_service_id
+        ,api_service_name
+        ,COUNT(api_service_id) AS totalCount
+        FROM api_service_monitor
+        WHERE request_time >=#{days}
+        GROUP BY api_service_id
+        ORDER BY totalCount DESC
+        <if test="null != pageSize and '' != pageSize">LIMIT 0,${pageSize}</if>
+
+    </select>
+
+
+    <select id="getTopIpCount" parameterType="map" resultMap="countMap">
+
+        SELECT
+        caller_ip
+        ,caller_user_id
+        ,COUNT(caller_ip) AS totalCount
+        FROM api_service_monitor
+        WHERE request_time >=#{days}
+        GROUP BY api_service_id
+        ORDER BY totalCount DESC
+        <if test="null != pageSize and '' != pageSize">LIMIT 0,${pageSize}</if>
     </select>
 
 </mapper>

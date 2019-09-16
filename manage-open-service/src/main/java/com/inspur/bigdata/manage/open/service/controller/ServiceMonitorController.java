@@ -1,14 +1,10 @@
 package com.inspur.bigdata.manage.open.service.controller;
 
+import com.alibaba.fastjson.JSONObject;
 import com.inspur.bigdata.manage.open.service.data.ApiServiceMonitor;
-import com.inspur.bigdata.manage.open.service.data.ServiceInput;
 import com.inspur.bigdata.manage.open.service.service.IServiceMonitorService;
-import com.inspur.bigdata.manage.open.service.util.OpenServiceConstants;
-import com.inspur.bigdata.manage.utils.StringUtil;
-import net.sf.json.JSONObject;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.loushang.framework.mybatis.PageUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -99,19 +95,7 @@ public class ServiceMonitorController {
     @RequestMapping(value = "/getApiMonitorList", method = RequestMethod.POST)
     @ResponseBody
     public Map<String, Object> getApiMonitorList(@RequestBody Map<String, String> parameters) {
-        Map<String, Object> mpMap = new HashMap<String, Object>();
-//        parameters.put("provider", OpenServiceConstants.getUserId());
-        List<ApiServiceMonitor> ApiServiceMonitors = serviceMonitorService.query(parameters);
-        if (StringUtil.isEmpty(ApiServiceMonitors)) {
-            mpMap.put("total", 0);
-            mpMap.put("data", new ArrayList<ApiServiceMonitor>());
-            return mpMap;
-        }
-        int total = PageUtil.getTotalCount();
-        mpMap.put("total", total != -1 ? total : ApiServiceMonitors.size());
-        mpMap.put("data", ApiServiceMonitors);
-
-        return mpMap;
+        return serviceMonitorService.getApiMonitorList(parameters);
     }
 
     /**
@@ -122,54 +106,49 @@ public class ServiceMonitorController {
     @RequestMapping("/getInfo/{id}")
     @ResponseBody
     public ModelAndView getInfoById(@PathVariable("id") String monitorId) {
-        boolean canViewBackEnd = false;
-        Map<String, Object> model = new HashMap<String, Object>();
-        Map<String, String> queryParam = new HashMap<String, String>();
-        queryParam.put("id", monitorId);
-        List<ApiServiceMonitor> apiServiceMonitors = serviceMonitorService.query(queryParam);
-        ApiServiceMonitor apiServiceMonitor = null;
-        List<ServiceInput> inputParam = new ArrayList<>();
-        List<ServiceInput> serviceInputsParam = new ArrayList<>();
-        if (apiServiceMonitors != null || apiServiceMonitors.size() == 1) {
-            apiServiceMonitor = apiServiceMonitors.get(0);
-            String openServiceInput = apiServiceMonitor.getOpenServiceInput();
-            inputParam = jsonToServiceInputList(openServiceInput);
-            String ServiceInput = apiServiceMonitor.getServiceInput();
-            serviceInputsParam = jsonToServiceInputList(ServiceInput);
-            if (OpenServiceConstants.getUserId().equals(apiServiceMonitor.getCallerUserId()) || OpenServiceConstants.isSuperAdmin(OpenServiceConstants.getRealm())) {
-                canViewBackEnd = true;
-            }
-        } else {
-            apiServiceMonitor = new ApiServiceMonitor();
-        }
-
-//        canViewBackEnd=true;
-        model.put("canViewBackEnd", canViewBackEnd);
-        model.put("apiServiceMonitor", apiServiceMonitor);
-        model.put("inputParam", inputParam);
-        model.put("serviceInputsParam", serviceInputsParam);
-        return new ModelAndView("service/monitor/api_monitor_info", model);
-
+        return serviceMonitorService.getInfoById(monitorId);
     }
 
-    private List<ServiceInput> jsonToServiceInputList(String jsonString) {
-        List<ServiceInput> inputParam = new ArrayList<>();
-        if (StringUtil.isNotEmpty(jsonString)) {
-            try {
-                JSONObject jsonObject = JSONObject.fromObject(jsonString);
-                Iterator<String> it = jsonObject.keys();
-                while (it.hasNext()) {
-                    String key = it.next();
-                    ServiceInput input = new ServiceInput();
-                    String value = jsonObject.getString(key);
-                    input.setName(key);
-                    input.setValue(value);
-                    inputParam.add(input);
-                }
-            } catch (Exception e) {
-                log.info("jsonToServiceInputList error:" + e.getMessage());
-            }
-        }
-        return inputParam;
+    /**
+     * 查看调用记录统计
+     *
+     * @return
+     */
+    @RequestMapping("/getMonitorInfo")
+    @ResponseBody
+    public JSONObject getMonitorInfo() {
+        return serviceMonitorService.getMonitorInfo();
+    }
+
+    /**
+     * 查看调用记录Top5Api统计
+     *
+     * @return
+     */
+    @RequestMapping("/getTopApiInfo")
+    @ResponseBody
+    public JSONObject getTopApiInfo() {
+        return serviceMonitorService.getTopApiInfo();
+    }
+
+    /**
+     * 查看调用记录Top5 IP统计
+     *
+     * @return
+     */
+    @RequestMapping("/getTopIpInfo")
+    @ResponseBody
+    public JSONObject getTopIpInfo() {
+        return serviceMonitorService.getTopIpInfo();
+    }
+
+    /**
+     * 跳转调用记录列表主页面
+     *
+     * @return
+     */
+    @RequestMapping(value = "/getApiMonitorInfoPage")
+    public String getApiMonitorInfoPage() {
+        return "service/monitor/api_monitor_view";
     }
 }
