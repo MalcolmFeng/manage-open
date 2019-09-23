@@ -320,6 +320,14 @@
         ,COUNT(api_service_id) AS totalCount
         FROM api_service_monitor
         WHERE request_time >=#{days}
+        <choose>
+            <when test="null != result and '' != result">
+                AND result=#{result}
+            </when>
+            <otherwise>
+                AND result = '200'
+            </otherwise>
+        </choose>
         GROUP BY api_service_id
         ORDER BY totalCount DESC
         <if test="null != pageSize and '' != pageSize">LIMIT 0,${pageSize}</if>
@@ -335,6 +343,14 @@
         ,COUNT(caller_ip) AS totalCount
         FROM api_service_monitor
         WHERE request_time >=#{days}
+        <choose>
+            <when test="null != result and '' != result">
+                AND result=#{result}
+            </when>
+            <otherwise>
+                AND result = '200'
+            </otherwise>
+        </choose>
         GROUP BY api_service_id
         ORDER BY totalCount DESC
         <if test="null != pageSize and '' != pageSize">LIMIT 0,${pageSize}</if>

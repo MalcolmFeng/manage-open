@@ -144,7 +144,7 @@ function initTopApiCountEcharts() {
 
     var option = {
         title: {
-            text: '热门API TOP5',
+            text: '热门API TOP5七日榜',
             subtext: ''
         },
         tooltip: {
@@ -173,14 +173,15 @@ function initTopApiCountEcharts() {
         },
         yAxis: {
             type: 'category',
-            data: ['', '', '', '', '', '']
+            data: ['', '', '', '', '']
         },
         series: [
             {
+                color: '#2ec7c9',
                 name: '调用量',
                 type: 'bar',
                 barWidth: 30,
-                data: [0, 0, 0, 0, 0, 0]
+                data: [0, 0, 0, 0, 0]
             }
         ]
     };
@@ -198,12 +199,11 @@ function updateTopApiCountEcharts() {
             data: dayList
         },
         yAxis: {
-            data: topApiNameList
+            data: topApiNameList.length == 0 ? ['', '', '', '', ''] : topApiNameList
         },
         series: [{
-            color: '#2ec7c9',
             name: '调用量',
-            data: topApiNumList
+            data: topApiNumList.length == 0 ? [0, 0, 0, 0, 0] : topApiNumList
         }]
     });
     topApiChart.hideLoading();
