@@ -39,16 +39,32 @@
   <security-constraint>
     <web-resource-collection>
       <web-resource-name>exclude</web-resource-name>
-	  <url-pattern>/service/api/execute/do/*</url-pattern>
-	  <url-pattern>/jsp/service/service/apiList.jsp</url-pattern>
-	  <url-pattern>/service/open/api/getApiListPage</url-pattern>
-	  <url-pattern>/service/open/api/getApplyList</url-pattern>
-	  <url-pattern>/service/open/api/get/*</url-pattern>
-	  <url-pattern>/service/api/execute/test/*</url-pattern>
-	  <url-pattern>/service/open/api/queryServiceByRemoteId</url-pattern>
+
+        <url-pattern>/jsp/service/service/apiList.jsp</url-pattern>
+
         <url-pattern>/service/api/execute/getAppList/*</url-pattern>
         <url-pattern>/service/api/execute/getserviceinput/*</url-pattern>
         <url-pattern>/service/api/execute/getAppInfo/*</url-pattern>
+        <url-pattern>/service/api/execute/test/*</url-pattern>
+        <url-pattern>/service/api/execute/do/*</url-pattern>
+
+        <url-pattern>/service/open/api/getApiListPage</url-pattern>
+        <url-pattern>/service/open/api/getApplyList</url-pattern>
+        <url-pattern>/service/open/api/queryServiceByRemoteId</url-pattern>
+        <url-pattern>/service/open/api/create</url-pattern>
+        <url-pattern>/service/open/api/dab10903244749cda04beb36516f6755/aaa</url-pattern>
+        <url-pattern>/service/open/api/dab10903244749cda04beb36516f6755/bbb</url-pattern>
+        <url-pattern>/service/open/api/dab10903244749cda04beb36516f6755/ccc</url-pattern>
+        <url-pattern>/service/open/api/add</url-pattern>
+
+        <url-pattern>/service/open/api/get/*</url-pattern>
+        <url-pattern>/service/open/data/getApplyPage</url-pattern>
+        <url-pattern>/service/open/data/getApplyList</url-pattern>
+        <url-pattern>/service/open/data/get/*/apply</url-pattern>
+
+        <url-pattern>/service/dev/group/listNoPage</url-pattern>
+
+
         <url-pattern>/service/pay/payNotifyUrl</url-pattern>
         <url-pattern>/service/pay/payReturnUrl</url-pattern>
     </web-resource-collection>

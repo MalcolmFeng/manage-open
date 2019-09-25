@@ -172,7 +172,7 @@ public class ServiceDef implements Serializable {
     private String scFrame;
     @Column(name = "NAME_SPACE")
     private String nameSpace;
-    @Column(name = "sc_ws_function")
+    @Column(name = "SC_WS_FUNCTION")
     private String sc_ws_function;
 
 

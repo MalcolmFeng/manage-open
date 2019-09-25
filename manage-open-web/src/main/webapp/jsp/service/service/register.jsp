@@ -28,7 +28,7 @@
     <script type="text/javascript" src="<l:asset path='loushang-framework.js'/>"></script>
     <script type="text/javascript" src="<l:asset path='ui.js'/>"></script>
     <script type="text/javascript" src="<l:asset path='ztree.js'/>"></script>
-    <script type="text/javascript" src="<l:asset path='service/register_old_old.js'/>"></script>
+    <script type="text/javascript" src="<l:asset path='service/register.js'/>"></script>
 
 <title>API创建</title>
 <style type="text/css">
