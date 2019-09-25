@@ -239,7 +239,7 @@ public class ServiceExecuteController {
     @RequestMapping("/do/{apiContext}/{reqPath}")
     @ResponseBody
     public void execute(@PathVariable("apiContext") String apiContext, @PathVariable("reqPath") String reqPath,
-                        HttpServletRequest request, HttpServletResponse response, @RequestBody Map<String, Object> param) {
+                        HttpServletRequest request, HttpServletResponse response) {
         PrintWriter writer = null;
         boolean success = true;
         long startTime = 0;
@@ -407,17 +407,15 @@ public class ServiceExecuteController {
             }
             startTime = System.currentTimeMillis();
 
-//            String result_str = doRequest(instream, serviceDef, listServiceInput, apiServiceMonitor);
-
             String result_str = "";
             Cookie[] cookies = request.getCookies();
             if (serviceDef.getScProtocol().equals("webService")) {
                 String type = serviceDef.getScFrame();
                 if ("Axiom".equals(type)) {
 
-                    result_str = executeAxis2(serviceDef, listServiceInput, param);
+                    result_str = executeAxis2(serviceDef, listServiceInput, null);
                 } else if ("RPC".equals(type)) {
-                    result_str = executeRPC(serviceDef, listServiceInput, param);
+                    result_str = executeRPC(serviceDef, listServiceInput, null);
                 }
             } else {
 //                result_str = doRequest(serviceDef, listServiceInput, cookies);
@@ -569,20 +567,26 @@ public class ServiceExecuteController {
         options.setAction(ws.getSc_ws_function());
         QName qname = new QName(ws.getNameSpace(), ws.getSc_ws_function());
 
-        Object[] parameters = new Object[param.size()];
-        if (serviceInputList.size() > 0 || param.size() > 0) {
+        Object[] parameters = null;
+        if (param !=null){
+            parameters = new Object[param.size()];
+            if (serviceInputList.size() > 0 || param.size() > 0) {
 
-            int j = 0;
-            for (Map.Entry<String, Object> entry : param.entrySet()) {
-                String mapKey = (String)entry.getKey();
-                String mapValue = entry.getValue().toString();
-                System.out.println(mapKey + ":" + mapValue);
+                int j = 0;
+                for (Map.Entry<String, Object> entry : param.entrySet()) {
+                    String mapKey = (String)entry.getKey();
+                    String mapValue = entry.getValue().toString();
+                    System.out.println(mapKey + ":" + mapValue);
 
-                parameters[j++] = mapValue;
+                    parameters[j++] = mapValue;
+                }
+            } else {
+                parameters = new Object[] { null };
             }
-        } else {
+        }else{
             parameters = new Object[] { null };
         }
+
         OMElement element = serviceClient.invokeBlocking(qname, parameters);
 
         List result = getResults(element);
@@ -945,4 +949,6 @@ public class ServiceExecuteController {
         sc.init(null, new TrustManager[]{trustManager}, null);
         return sc;
     }
+
+
 }
