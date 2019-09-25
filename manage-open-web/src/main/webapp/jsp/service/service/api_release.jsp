@@ -19,7 +19,7 @@
     <link rel="stylesheet" type="text/css" href="<l:asset path='css/datatables.css'/>"/>
     <link rel="stylesheet" type="text/css" href="<l:asset path='css/ztree.css'/>" />
     <link rel="stylesheet" type="text/css" href="<l:asset path='data/datadev.css'/>" />
-   <link rel="stylesheet" type="text/css" href="<l:asset path='data/register.css'/>"/>
+   <link rel="stylesheet" type="text/css" href="<l:asset path='data/register_old.css'/>"/>
 
     <script type="text/javascript" src="<l:asset path='jquery.js'/>" ></script>
     <script type="text/javascript" src="<l:asset path='bootstrap.js'/>" ></script>

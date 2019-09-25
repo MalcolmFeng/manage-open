@@ -92,7 +92,8 @@
     </init-param>
    <init-param>
       <param-name>securityRequestWrapperExcludes</param-name>
-      <param-value>/service/nifi/database/insertHiveTables</param-value>
+<!--      <param-value>/service/nifi/database/insertHiveTables</param-value>-->
+        <param-value>/service/nifi/database/insertHiveTables;.*/api/execute.*;</param-value>
     </init-param>
   </filter>
 

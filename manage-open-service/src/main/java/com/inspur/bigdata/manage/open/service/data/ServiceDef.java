@@ -167,6 +167,16 @@ public class ServiceDef implements Serializable {
     @Column(name = "top_limit_unit")
     private String topLimitUnit;
 
+    // 新增加的三个 支持webservice
+    @Column(name = "SC_FRAME")
+    private String scFrame;
+    @Column(name = "NAME_SPACE")
+    private String nameSpace;
+    @Column(name = "sc_ws_function")
+    private String sc_ws_function;
+
+
+
     @Transient
     private List<ServiceInput> inputList;
 
@@ -425,5 +435,29 @@ public class ServiceDef implements Serializable {
 
     public void setTopLimitUnit(String topLimitUnit) {
         this.topLimitUnit = topLimitUnit;
+    }
+
+    public String getScFrame() {
+        return scFrame;
+    }
+
+    public void setScFrame(String scFrame) {
+        this.scFrame = scFrame;
+    }
+
+    public String getNameSpace() {
+        return nameSpace;
+    }
+
+    public void setNameSpace(String nameSpace) {
+        this.nameSpace = nameSpace;
+    }
+
+    public String getSc_ws_function() {
+        return sc_ws_function;
+    }
+
+    public void setSc_ws_function(String sc_ws_function) {
+        this.sc_ws_function = sc_ws_function;
     }
 }

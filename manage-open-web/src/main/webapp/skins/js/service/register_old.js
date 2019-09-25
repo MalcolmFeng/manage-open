@@ -1,4 +1,4 @@
-var register = {
+var register_old = {
     loadServiceGroupList: function (groupId) {
         $.ajax({
             type: "post",
@@ -15,6 +15,28 @@ var register = {
             }
         });
     },
+    encryptionTypeList: function (encryptionType) {
+        $.ajax({
+            type: "post",
+            url: context + "/service/open/api/encryptionList",
+            success: function (data) {
+                var html = template("encryptionTypeList", data);
+                $("#encryptionDiv").empty().append(html);
+                $("#encryptionTypeSelect").val(encryptionType);
+            }
+        });
+    },
+    loadTopLimitUnitList: function (topLimitUnitList) {
+        $.ajax({
+            type: "post",
+            url: context + "/service/open/api/topLimitUnitList",
+            success: function (data) {
+                var html = template("loadTopLimitUnitList", data);
+                $("#topLimitUnitDiv").empty().append(html);
+                $("#topLimitUnitSelect").val(topLimitUnitList);
+            }
+        });
+    },
     loadSubServiceGroupList: function (parentId) {
         // 清空子分组列表
         $("#subgrouplistDiv").empty();
@@ -24,6 +46,27 @@ var register = {
 
     selectServiceGroup: function (obj) {
         $("#groupId").val($("#subgroupSelect").val());
+    },
+
+
+    loadSubEncryptionTypeList: function (parentId) {
+        // 清空子分组列表
+        $("#encryptionListDiv").empty();
+        var encryptionType = $("#encryptionTypeSelect option:selected").val();//获取父组
+        $("#encryptionType").val(encryptionType);
+    },
+    selectEncryptionType: function (obj) {
+        $("#encryptionType").val($("#encryptionTypeSelect").val());
+    },
+
+    loadSubTopLimitUnitList: function (parentId) {
+        // 清空子分组列表
+        $("#topLimitUnitListDiv").empty();
+        var topLimitUnit = $("#topLimitUnitSelect option:selected").val();//获取父组
+        $("#topLimitUnit").val(topLimitUnit);
+    },
+    selectTopLimitUnitType: function (obj) {
+        $("#topLimitUnit").val($("#topLimitUnitSelect").val());
     },
 
     setNeedAuth: function (needAuth, authUser) {
@@ -51,7 +94,7 @@ var register = {
                             $("#groupSelect").val(groupId);
                         } else {
                             $("#groupSelect").val(data.parentId);
-                            register.loadSubServiceGroupList(data.parentId);
+                            register_old.loadSubServiceGroupList(data.parentId);
                         }
                     }
                 }
@@ -68,7 +111,7 @@ var register = {
                 $("#apiListDiv").empty().append(html);
                 if (serviceId) {//编辑
                     $("#apiSelect").val($("#remoteId").val());
-                    register.loadApiDetail(serviceId);
+                    register_old.loadApiDetail(serviceId);
                 }
             }
         });
@@ -90,7 +133,7 @@ var register = {
                     $("#serviceHttpMethod").val("get").attr("disabled","disabled");//默认get请求
                     $("#remoteId").val(apiId);
                     //初始化后端参数
-                    register.addBackendInputParam(data.inputParam);
+                    register_old.addBackendInputParam(data.inputParam);
                 }
             });
         }
@@ -123,10 +166,10 @@ var register = {
         $("#inputtable").append(template('inputitem'));
     },
     addInputParamList: function () {
-        var endList = register.getBackendParamList();
+        var endList = register_old.getBackendParamList();
         //判断编辑还是新增
-        if(register.checkNeedLoadEdit(endList)){
-            var data={data:endList}
+        if(register_old.checkNeedLoadEdit(endList)){
+            var data = {data: endList};
             $("#inputtabletbody").html("").append(template('inputitemlist',data));
         }
     },
@@ -143,6 +186,9 @@ var register = {
     },
     addbackendInputParamTr: function () {
         $("#backendinputtbody").append(template('backendinputitemtr'));
+    },
+    addOutParamTr: function () {
+        $("#outbody").append(template('outputitem'));
     },
     addBackendInputParam: function (inputParam) {
         // var arry = [];
@@ -171,7 +217,7 @@ var register = {
         }
     },
     forSave: function () {
-        var serviceInfo = register.getServiceInfo();
+        var serviceInfo = register_old.getServiceInfo();
         var url = context + "/service/open/api/add";
         $.ajax({
             type: 'post',
@@ -205,32 +251,37 @@ var register = {
         serviceInfo.id = $("#id").val();
         serviceInfo.remoteId = $("#remoteId").val();
         serviceInfo.name = $("#name").val();
+        serviceInfo.price = $("#price").val();
         serviceInfo.apiGroup = $("#groupId").val();
         serviceInfo.description = $("#description").val();
         serviceInfo.authType = $('input[name=authType]:checked').val();//授权方式
+        serviceInfo.encryptionType = $("#encryptionType").val();
+        serviceInfo.limitCount = $("#limitCount").val();
+        serviceInfo.topLimitCount = $("#topLimitCount").val();
+        serviceInfo.topLimitUnit = $("#topLimitUnit").val();
 
-        serviceInfo.protocol = "http";//后端请求协议
+        // serviceInfo.protocol = $('input[name=protocol]:checked').val();//请求协议
+        serviceInfo.protocol = "http";//请求协议
         serviceInfo.reqPath = $('#reqPath').val();//请求path
         serviceInfo.httpMethod = $('#httpMethod').val();//httpMethod
 
 
         // serviceInfo.scProtocol = $('input[name=serviceProtocol]:checked').val();//后端请求协议
-        serviceInfo.scProtocol = $('input[name=scProtocol]:checked').val();//请求协议
-        serviceInfo.scFrame = $('input[name=scFrame]:checked').val();//框架
-        serviceInfo.sc_ws_function = $('#sc_ws_function').val();//请求方法名
-        serviceInfo.nameSpace = $("#sc_ws_namespace").val();//命名空间
-        
+        serviceInfo.scProtocol = "http";//后端请求协议
         serviceInfo.scAddr = $('#serviceAddr').val();//后端服务地址
         serviceInfo.scHttpMethod = $('#serviceHttpMethod').val();//后端httpMethod
         serviceInfo.contentType = $('#responseContentType').val();//返回ContentType
         serviceInfo.returnSample = $('#returnSample').val();
 
-        serviceInfo.inputList = register.initInputParam();
+        serviceInfo.inputList = register_old.initInputParam();
+        serviceInfo.outputList = register_old.getOutputParamList($("#id").val());
+
+
         return serviceInfo;
     },
     initInputParam: function () {
-        var inList = register.getInputParamList();
-        var endList = register.getBackendParamList();
+        var inList = register_old.getInputParamList();
+        var endList = register_old.getBackendParamList();
         var inputParam = [];
         // if (inList.length == 0) { //如果没有请求参数直接使用后端参数
         //     for (var i in endList) {
@@ -254,16 +305,17 @@ var register = {
             var param = {
                 name: inList[i].name,
                 type: inList[i].type,
-                required: new Number(inList[i].required),
+                required: Number(inList[i].required),
                 description: inList[i].description
             };
             for (var j in endList) {
                 if (backname == endList[j].name) {
                         param.scName = endList[j].name,
                         param.scType = endList[j].type,
-                        param.scRequired = new Number(endList[j].required),
+                            param.scRequired = Number(endList[j].required),
                         param.scDescription = endList[j].description,
-                        param.scSeq = new Number(endList[j].seq),
+                        param.fixedValue = endList[j].fixedValue,
+                            param.scSeq = Number(endList[j].seq),
                         param.scParamType = endList[j].paramType
                 }
             }
@@ -283,6 +335,7 @@ var register = {
                     type: $(this).find('input[name=inputParamType]').val(),
                     required: $(this).find('select[name=inputRequired] option:selected').val(),
                     description: $(this).find('input[name=inputDescription]').val(),
+                    fixedValue: $(this).find('input[name=fixedValue]').val(),
                     backname:$(this).find('input[name=backname]').val()
                 };
                 inputParam.push(param);
@@ -302,6 +355,7 @@ var register = {
                         required: $(this).find("input[name=required]").val(),
                         seq: $(this).find("input[name=seq]").val(),
                         description: $(this).find("input[name=description]").val(),
+                        fixedValue: $(this).find('input[name=fixedValue]').val(),
                         paramType: $(this).find('select[name=paramType] option:selected').val()
                     };
                     endParam.push(param);
@@ -312,6 +366,7 @@ var register = {
                         required: $(this).find('select[name=required] option:selected').val(),
                         seq: $(this).find("input[name=seq]").val(),
                         description: $(this).find("input[name=description]").val(),
+                        fixedValue: $(this).find('input[name=fixedValue]').val(),
                         paramType: $(this).find('select[name=paramType] option:selected').val()
                     };
                     endParam.push(param);
@@ -320,21 +375,24 @@ var register = {
         });
         return endParam;
     },
-    getOutputParamList: function () {
+    getOutputParamList: function(openServiceId) {
         var outputParam = [];
-        $("#outputtable tr:gt(0)").each(function (i, e) {
+        $("#outtable tr:gt(0)").each(function(i, e) {
             var name = $(this).find("input[name=name]").val();
-            if (name != null && name != '') {
+            if(name != null && name != '') {
                 var param = {
                     id: $(this).find("input[name=id]").val(),
+                    openServiceId:openServiceId,
                     name: $(this).find("input[name=name]").val(),
                     description: $(this).find("input[name=description]").val(),
+                    type: $(this).find('select[name=type] option:selected').val(),
                     seq: i
                 };
                 outputParam.push(param);
             }
         });
-        return JSON.stringify(outputParam);
+        // return JSON.stringify(outputParam);
+        return outputParam;
     },
 
     getHttpAddressList: function () {
@@ -395,19 +453,4 @@ function sticky(msg, style, position) {
         position: place,
         style: type
     });
-}
-
-function chooseProtocol(msg, style, position) {
-    var scProtocol = $("input[name='scProtocol']:checked").val();//请求协议
-    if('http' == scProtocol){
-    	$("#httpMethodDiv").show();
-    	$("#scFrameDiv").hide();
-    	$("#sc_ws_functionDiv").hide();
-    	$("#sc_ws_namespaceDiv").hide();
-    }else{
-    	$("#httpMethodDiv").hide();
-    	$("#scFrameDiv").show();
-    	$("#sc_ws_functionDiv").show();
-    	$("#sc_ws_namespaceDiv").show();
-    }
 }
