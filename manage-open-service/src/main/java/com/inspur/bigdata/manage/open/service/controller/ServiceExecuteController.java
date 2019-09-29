@@ -865,7 +865,7 @@ public class ServiceExecuteController {
             str = EntityUtils.toString(entity, "utf-8");
             EntityUtils.consume(entity);
         } catch (Exception e) {
-            str = "API网关POST method failed to access URL，URL：" + url + "," + e.getMessage();
+            str = "API网关POST method failed to access URL！";
             log.error("API网关GET method failed to access URL，URL：" + url, e);
         }
         return str;
@@ -923,7 +923,7 @@ public class ServiceExecuteController {
             str = EntityUtils.toString(entity, "UTF-8");
             EntityUtils.consume(entity);
         } catch (Exception e) {
-            str = "API网关POST method failed to access URL，URL：" + url + "," + e.getMessage();
+            str = "API网关POST method failed to access URL!";
             e.printStackTrace();
             log.error("API网关POST method failed to access URL，URL：" + url, e);
         }
