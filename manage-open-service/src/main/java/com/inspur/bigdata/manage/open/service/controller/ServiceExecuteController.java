@@ -413,9 +413,9 @@ public class ServiceExecuteController {
                 String type = serviceDef.getScFrame();
                 if ("Axiom".equals(type)) {
 
-                    result_str = executeAxis2(serviceDef, listServiceInput, null);
+                    result_str = executeAxis2(serviceDef, listServiceInput);
                 } else if ("RPC".equals(type)) {
-                    result_str = executeRPC(serviceDef, listServiceInput, null);
+                    result_str = executeRPC(serviceDef, listServiceInput);
                 }
             } else {
 //                result_str = doRequest(serviceDef, listServiceInput, cookies);
@@ -556,7 +556,7 @@ public class ServiceExecuteController {
     }
 
 
-    private String executeRPC(ServiceDef ws, List<ServiceInput> serviceInputList, Map<String, Object> param) throws AxisFault {
+    private String executeRPC(ServiceDef ws, List<ServiceInput> serviceInputList) throws AxisFault {
         RPCServiceClient serviceClient = new RPCServiceClient();
 
         EndpointReference targetEPR = new EndpointReference(ws.getScAddr());
@@ -568,24 +568,34 @@ public class ServiceExecuteController {
         QName qname = new QName(ws.getNameSpace(), ws.getSc_ws_function());
 
         Object[] parameters = null;
-        if (param !=null){
-            parameters = new Object[param.size()];
-            if (serviceInputList.size() > 0 || param.size() > 0) {
+        if (serviceInputList !=null){
+            parameters = new Object[serviceInputList.size()];
 
-                int j = 0;
-                for (Map.Entry<String, Object> entry : param.entrySet()) {
-                    String mapKey = (String)entry.getKey();
-                    String mapValue = entry.getValue().toString();
-                    System.out.println(mapKey + ":" + mapValue);
-
-                    parameters[j++] = mapValue;
-                }
-            } else {
-                parameters = new Object[] { null };
+            int j = 0;
+            for (ServiceInput item : serviceInputList) {
+                parameters[j++] = item.getValue();
             }
         }else{
             parameters = new Object[] { null };
         }
+//        if (param !=null){
+//            parameters = new Object[param.size()];
+//            if (serviceInputList.size() > 0 || param.size() > 0) {
+//
+//                int j = 0;
+//                for (Map.Entry<String, Object> entry : param.entrySet()) {
+//                    String mapKey = (String)entry.getKey();
+//                    String mapValue = entry.getValue().toString();
+//                    System.out.println(mapKey + ":" + mapValue);
+//
+//                    parameters[j++] = mapValue;
+//                }
+//            } else {
+//                parameters = new Object[] { null };
+//            }
+//        }else{
+//            parameters = new Object[] { null };
+//        }
 
         OMElement element = serviceClient.invokeBlocking(qname, parameters);
 
@@ -622,7 +632,7 @@ public class ServiceExecuteController {
         return list;
     }
 
-    private String executeAxis2(ServiceDef ws, List<ServiceInput> listServiceInput, Map<String, Object> param) throws AxisFault {
+    private String executeAxis2(ServiceDef ws, List<ServiceInput> listServiceInput) throws AxisFault {
         try {
             String[] params = new String[listServiceInput.size()];
             int i = 0;
@@ -635,14 +645,20 @@ public class ServiceExecuteController {
                 }
             }
 
-            String[] paramValues = new String[param.size()];
+            String[] paramValues = new String[listServiceInput.size()];
             int j = 0;
-            for (Map.Entry<String, Object> entry : param.entrySet()) {
-                String mapKey = (String)entry.getKey();
-                String mapValue = entry.getValue().toString();
-                System.out.println(mapKey + ":" + mapValue);
-                paramValues[j++] = mapValue;
+            for (ServiceInput item : listServiceInput) {
+                paramValues[j++] = item.getValue();
             }
+
+//            String[] paramValues = new String[param.size()];
+//            int j = 0;
+//            for (Map.Entry<String, Object> entry : param.entrySet()) {
+//                String mapKey = (String)entry.getKey();
+//                String mapValue = entry.getValue().toString();
+//                System.out.println(mapKey + ":" + mapValue);
+//                paramValues[j++] = mapValue;
+//            }
             OMElement getPricePayload = buildParam(ws.getNameSpace(), params, paramValues, "tn", ws.getSc_ws_function(), "tn");
 
             Options options = new Options();
