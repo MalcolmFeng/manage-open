@@ -71,7 +71,7 @@ var register = {
                 /*$("#groupSelect4").find("option:contains("+tableName+")").attr("selected",true);*/
                 // $("#groupSelect4").val(remoteId);
                 // if(remoteId !=null && remoteId!=''){
-                //   register_old.loadTableDetail(remoteId);
+                //   register.loadTableDetail(remoteId);
                 // }
             }
         });
@@ -238,7 +238,7 @@ var register = {
     var serviceInfo = register.getServiceInfo();
     $.ajax({
       type: 'post',
-      url: context + "/service/scdev/myservice/register_old",
+      url: context + "/service/scdev/myservice/register",
       data: serviceInfo,
       success: function(msg) {
         if (msg == true) {
@@ -256,7 +256,7 @@ var register = {
   forPublish: function() {
     var serviceInfo = register.getServiceInfo();
     serviceInfo.remote=remote;
-    var url=context + "/service/open/data/register_old";
+    var url=context + "/service/open/data/register";
     $.ajax({
       type: 'post',
       url: url,
@@ -304,7 +304,7 @@ var register = {
     serviceInfo.description = $("#description").val();
     serviceInfo.dataDetailUrl = $("#dataDetailUrl").val();
     // serviceInfo.dataExample = $("#dataExample").val();
-    // serviceInfo.columnList = register_old.getColumnList();
+    // serviceInfo.columnList = register.getColumnList();
     serviceInfo.authType = $('input[name=authType]:checked').val();//授权方式
 
     // serviceInfo.remoteId = $("#tableDiv option:selected").val();

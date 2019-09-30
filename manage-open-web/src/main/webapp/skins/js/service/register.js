@@ -10,7 +10,7 @@ var register = {
                 $("#groupDiv").empty().append(html);
                 $("#groupSelect").val(groupId);
                 // if (groupId != null && groupId != '') {
-                //     register_old.setGroupId(groupId);
+                //     register.setGroupId(groupId);
                 // }
             }
         });

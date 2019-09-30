@@ -19,7 +19,7 @@
 	<link rel="stylesheet" type="text/css" href="<l:asset path='css/datatables.css'/>"/>
 	<link rel="stylesheet" type="text/css" href="<l:asset path='css/ztree.css'/>" />
 	<link rel="stylesheet" type="text/css" href="<l:asset path='data/datadev.css'/>" />
-	<link rel="stylesheet" type="text/css" href="<l:asset path='data/register_old.css'/>"/>
+	<link rel="stylesheet" type="text/css" href="<l:asset path='data/register.css'/>"/>
 
 	<script type="text/javascript" src="<l:asset path='jquery.js'/>" ></script>
 	<script type="text/javascript" src="<l:asset path='bootstrap.js'/>" ></script>
@@ -29,7 +29,7 @@
 	<script type="text/javascript" src="<l:asset path='loushang-framework.js'/>"></script>
 	<script type="text/javascript" src="<l:asset path='ui.js'/>"></script>
 	<script type="text/javascript" src="<l:asset path='ztree.js'/>"></script>
-	<script type="text/javascript" src="<l:asset path='data/register_old_old.js'/>"></script>
+	<script type="text/javascript" src="<l:asset path='data/register.js'/>"></script>
 
 	<title>数据编辑</title>
 	<style type="text/css">
@@ -291,7 +291,7 @@
 			</select>
 		</td>
 		<td><input type="text" name="description" value=""/></td>
-		<%-- <td><a onclick="register_old.forColumnDel(this)">删除</a></td>--%>
+		<%-- <td><a onclick="register.forColumnDel(this)">删除</a></td>--%>
 	</tr>
 </script>
 
@@ -369,7 +369,7 @@
 
 		</td>
 		<td><input type="text" name="description" value="{{oneinfo.columnDescription }}"/></td>
-		<%--<td><a onclick="register_old.forColumnDel(this)">删除</a></td>--%>
+		<%--<td><a onclick="register.forColumnDel(this)">删除</a></td>--%>
 	</tr>
 	{{/each}}
 </script>

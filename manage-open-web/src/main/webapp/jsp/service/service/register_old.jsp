@@ -19,7 +19,7 @@
     <link rel="stylesheet" type="text/css" href="<l:asset path='css/datatables.css'/>"/>
     <link rel="stylesheet" type="text/css" href="<l:asset path='css/ztree.css'/>"/>
     <link rel="stylesheet" type="text/css" href="<l:asset path='data/datadev.css'/>"/>
-    <link rel="stylesheet" type="text/css" href="<l:asset path='data/register_old.css'/>"/>
+    <link rel="stylesheet" type="text/css" href="<l:asset path='data/register.css'/>"/>
 
     <script type="text/javascript" src="<l:asset path='jquery.js'/>"></script>
     <script type="text/javascript" src="<l:asset path='bootstrap.js'/>"></script>
@@ -29,7 +29,7 @@
     <script type="text/javascript" src="<l:asset path='loushang-framework.js'/>"></script>
     <script type="text/javascript" src="<l:asset path='ui.js'/>"></script>
     <script type="text/javascript" src="<l:asset path='ztree.js'/>"></script>
-    <script type="text/javascript" src="<l:asset path='service/register_old_old.js'/>"></script>
+    <script type="text/javascript" src="<l:asset path='service/register.js'/>"></script>
 
     <title>服务编辑</title>
     <style type="text/css">
@@ -418,13 +418,13 @@
                                         </td>
                                         <td><input type="text" name="inputDescription" value="${item.description }"/></td>
                                         <td><input type="text" name="backname" value="${item.scName }" readonly/></td>
-                                            <%--<td><a onclick="register_old.forColumnDel(this)">删除</a></td>--%>
+                                            <%--<td><a onclick="register.forColumnDel(this)">删除</a></td>--%>
                                     </tr>
                                 </c:forEach>
                             </c:if>
                             </tbody>
                         </table>
-                        <%--<div class="pull-right addrow"><a onclick="register_old.addInputParam()">增加一行</a></div>--%>
+                        <%--<div class="pull-right addrow"><a onclick="register.addInputParam()">增加一行</a></div>--%>
                     </div>
                 </div>
             </div>
@@ -560,7 +560,7 @@
                 $("#_submit").show();
             }
             if (_step == 1) {
-//                    register_old.loadApiList();
+//                    register.loadApiList();
             }
             if (_step == 2) {
                 register.addInputParamList();
