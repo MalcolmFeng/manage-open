@@ -1,5 +1,6 @@
 package com.inspur.bigdata.manage.open.service.controller;
 
+import com.alibaba.fastjson.JSON;
 import com.inspur.bigdata.manage.common.utils.PropertiesUtil;
 import com.inspur.bigdata.manage.open.service.data.*;
 import com.inspur.bigdata.manage.open.service.service.*;
@@ -10,6 +11,7 @@ import com.inspur.bigdata.manage.utils.StringUtil;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.loushang.framework.mybatis.PageUtil;
+import org.loushang.framework.util.DateUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -53,13 +55,80 @@ public class ServiceDefController {
 
     @Autowired
     private IAppManage appManage;
+
     @Autowired
     private IServiceInputService serviceInputService;
 
     @Autowired
     private IServiceOutputService serviceOutputService;
 
+    @Autowired
+    ServiceApplyController serviceApplyController;
+
+    @Autowired
+    AppManageController appManageController;
+
+    @RequestMapping(value = "/doApply")
+    @ResponseBody
+    public String doApply(String[] ids){
+        // 根据userId查询所有APP
+//        String userId = "uuuuuuuuser";
+        String userId = OpenDataConstants.getUserId();
+        Map<String, Object> param = new HashMap<String, Object>();
+        param.put("userId", userId);
+        List<AppInstance> appInstances = appManage.getAppList(param);
+        AppInstance appInstance = null;
+        if (appInstances!=null){
+            if (appInstances.size() == 0 ){
+                // 无APP，创建一个
+                Map<String,String> param_app = new HashMap<String,String>();
+                param_app.put("appName",userId+"-app");
+                param_app.put("appDescription","auto create by system.");
+                // 直接调用原来的创建app方法
+                appManageController.saveApp(param_app);
+                // 创建后再一次查询APP
+                appInstances = appManage.getAppList(param);
+                appInstance = appInstances.get(0);
+            }else{
+                // 有app，直接获取
+                appInstance = appInstances.get(0);
+            }
+        }
+        // 遍历所有 API id
+        for (int i = 0; i < ids.length; i++) {
+            System.out.println(ids[i]);
+            // 调用申请
+            Map<String, String> parameters = new HashMap<>();
+            parameters.put("openServiceId",ids[i]);
+            parameters.put("applyFlag","0");
+            parameters.put("userId",userId);
+            parameters.put("appId",appInstance.getAppId());
+            parameters.put("appName",appInstance.getAppName());
+            // 直接调用原来的申请方法
+            boolean flag = serviceApplyController.AppServiceApply(parameters);
+        }
+
+        return JSON.toJSONString("{}");
+    }
+
     /**
+     * 列表
+     *
+     * @return
+     */
+    @RequestMapping(value = "/getAPIListPublishedPage", method = RequestMethod.GET)
+    public ModelAndView getAPIListPublishedPage() {
+        Map<String, Object> model = new HashMap<String, Object>();
+
+        Map<String, Object> parameters = new HashMap<String, Object>();
+        parameters.put("auditStatus", OpenServiceConstants.api_audit_pass);
+        List<ServiceDef> serviceDefs = serviceDefService.listServiceDefs(parameters);
+
+        model.put("serviceDefs", serviceDefs);
+        return new ModelAndView("service/service/publishedList", model);
+    }
+
+    /******************************************************************************************************
      * 市场列表页
      *
      * @return
@@ -512,43 +581,43 @@ public class ServiceDefController {
             map.put("message", "数据不存在");
             return map;
         }
-        if (StringUtil.isEmpty(serviceDef.getEncryptionType())) {
-            map.put("result", false);
-            map.put("message", "加密方式为空");
-            return map;
-        }
-        if (StringUtil.isEmpty(ENCRYPTION_MAP.get(serviceDef.getEncryptionType()))) {
-            map.put("result", false);
-            map.put("message", "加密方式不正确");
-            return map;
-        }
-        if (serviceDef.getLimitCount() == null) {
-            map.put("result", false);
-            map.put("message", "API限流次数为空");
-            return map;
-        }
-        try {
-            if (new BigDecimal(serviceDef.getLimitCount()).compareTo(BigDecimal.ZERO) < 1) {
-                map.put("result", false);
-                map.put("message", "API限流次数数值不能小于等于0");
-                return map;
-            }
-        } catch (Exception e) {
-            log.warn(e.getMessage());
-            map.put("result", false);
-            map.put("message", "API限流次数数值不正确");
-            return map;
-        }
-        if (StringUtil.isEmpty(TOP_LIMIT_UNIT_MAP.get(serviceDef.getTopLimitUnit()))) {
-            map.put("result", false);
-            map.put("message", "时间粒度不正确");
-            return map;
-        }
-        if (serviceDef.getTopLimitCount() <= 0) {
-            map.put("result", false);
-            map.put("message", "API限流次数数值不能小于等于0");
-            return map;
-        }
+//        if (StringUtil.isEmpty(serviceDef.getEncryptionType())) {
+//            map.put("result", false);
+//            map.put("message", "加密方式为空");
+//            return map;
+//        }
+//        if (StringUtil.isEmpty(ENCRYPTION_MAP.get(serviceDef.getEncryptionType()))) {
+//            map.put("result", false);
+//            map.put("message", "加密方式不正确");
+//            return map;
+//        }
+//        if (serviceDef.getLimitCount() == null) {
+//            map.put("result", false);
+//            map.put("message", "API限流次数为空");
+//            return map;
+//        }
+//        try {
+//            if (new BigDecimal(serviceDef.getLimitCount()).compareTo(BigDecimal.ZERO) < 1) {
+//                map.put("result", false);
+//                map.put("message", "API限流次数数值不能小于等于0");
+//                return map;
+//            }
+//        } catch (Exception e) {
+//            log.warn(e.getMessage());
+//            map.put("result", false);
+//            map.put("message", "API限流次数数值不正确");
+//            return map;
+//        }
+//        if (StringUtil.isEmpty(TOP_LIMIT_UNIT_MAP.get(serviceDef.getTopLimitUnit()))) {
+//            map.put("result", false);
+//            map.put("message", "时间粒度不正确");
+//            return map;
+//        }
+//        if (serviceDef.getTopLimitCount() <= 0) {
+//            map.put("result", false);
+//            map.put("message", "API限流次数数值不能小于等于0");
+//            return map;
+//        }
 
         if (StringUtil.isEmpty(serviceDef.getName())) {
             map.put("result", false);
