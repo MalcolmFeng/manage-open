@@ -22,25 +22,29 @@
        <link rel="stylesheet" type="text/css" href="<l:asset path='css/ztree.css'/>" />
        <link rel="stylesheet" type="text/css" href="<l:asset path='data/datadev.css'/>" />
        <link rel="stylesheet" type="text/css" href="<l:asset path='data/datalist/css/datalist.css'/>" />
-    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
-    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
-    <!--[if lt IE 9]>
-      <script src="<l:asset path='html5shiv.js'/>"></script>
-      <script src="<l:asset path='respond.js'/>"></script>
-    <![endif]-->
-    <script type="text/javascript" src="<l:asset path='jquery.js'/>" ></script>
-    <script type="text/javascript" src="<l:asset path='bootstrap.js'/>" ></script>
-	<script type="text/javascript" src="<l:asset path='form.js'/>" ></script>
-	<script type="text/javascript" src="<l:asset path='arttemplate.js'/>" ></script>	
-	<script type="text/javascript" src="<l:asset path='datatables.js'/>"></script>
-    <script type="text/javascript" src="<l:asset path='loushang-framework.js'/>"></script>
-    <script type="text/javascript" src="<l:asset path='ui.js'/>"></script>
-    <script type="text/javascript" src="<l:asset path='ztree.js'/>"></script>
+		<!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+		<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+		<!--[if lt IE 9]>
+		  <script src="<l:asset path='html5shiv.js'/>"></script>
+		  <script src="<l:asset path='respond.js'/>"></script>
+		<![endif]-->
+		<script type="text/javascript" src="<l:asset path='jquery.js'/>" ></script>
+		<script type="text/javascript" src="<l:asset path='bootstrap.js'/>" ></script>
+		<script type="text/javascript" src="<l:asset path='form.js'/>" ></script>
+		<script type="text/javascript" src="<l:asset path='arttemplate.js'/>" ></script>
+		<script type="text/javascript" src="<l:asset path='datatables.js'/>"></script>
+		<script type="text/javascript" src="<l:asset path='loushang-framework.js'/>"></script>
+		<script type="text/javascript" src="<l:asset path='ui.js'/>"></script>
+		<script type="text/javascript" src="<l:asset path='ztree.js'/>"></script>
 	    <title>API市场</title>
+		<style>
+
+		</style>
 	</head>
 	<body>
-		<div class="container" style="width: 98%; padding-top:10px;">
-		    <div class="row" style="display: flex">
+	<div class="row" style="height: 30px;color: white;background-color: mediumblue;margin: 0px;padding: 0px;padding-left: 40px;line-height: 30px;font-size: 16px;">选择申请的API</div>
+	<div class="container" style="width: 98%; padding-top:10px;">
+			<div class="row" style="display: flex">
 				<form class="form-inline" onsubmit="return false;">
 					<div class="input-group">
 						<input type="hidden" value="${groupId }" id="groupId"/>
@@ -53,7 +57,7 @@
 				<div style="height: 53px;line-height: 62px;text-align: center">
 					<button class="btn btn-primary" onclick="doApply()">申请</button>
 
-					<button style="margin-left: 50px;" class="btn btn-default">返回</button>
+					<button style="margin-left: 50px;" class="btn btn-default" onclick="resetCheckbox()">返回</button>
 				</div>
 			</div>
 			<div class="row" id="subGroupList" style="margin-left:10px;"></div>
@@ -179,22 +183,31 @@
 					async:false,
 					traditional: true,//这里设置为true
 					dataType:"json",
-					success: function(result) {
-						console.log(JSON.stringify(result));
+					success: function(data) {
+						alert(data.result);
 					},
-					error : function (result) {
-						console.log(JSON.stringify(result));
+					error : function (data) {
+						alert(data.result);
 					}
 				});
 			}
+
+			function resetCheckbox(){
+				$(".iteratorDiv").each(function(index,object){
+					var div = $(object).children()[0];
+					var input = $(div).children()[0];
+					$(input).removeAttr("checked"); ;
+				});
+			}
+
 		</script>
 		<script id="servicelist" type="text/html">
             {{each data as item i}}
                <ul class="ue-list-n">
 			     <li>
-					 <div class="iteratorDiv" style="height: 20px;width: 100%;display: flex;align-items: center;" value="{{item.id}}">
-						 <div style="height: 20px;line-height: 20px;margin-right: 30px;"><input type="checkbox"/></div>
-						 <div style="height: 20px;line-height: 20px;"><a onclick="loadServiceInfo('{{item.id}}')">{{item.name}}</a></div>
+					 <div class="iteratorDiv" style="width: 100%;display: flex;align-items: center;" value="{{item.id}}">
+						 <div style="height: 12px;line-height: 12px;margin-right: 30px;"><input type="checkbox"/></div>
+						 <div style="height: 12px;line-height: 12px;"><a onclick="loadServiceInfo('{{item.id}}')">{{item.name}}</a></div>
 					 </div>
 			    </li>
 			  </ul>

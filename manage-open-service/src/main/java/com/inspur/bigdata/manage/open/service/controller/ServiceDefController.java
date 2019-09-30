@@ -70,45 +70,56 @@ public class ServiceDefController {
 
     @RequestMapping(value = "/doApply")
     @ResponseBody
-    public String doApply(String[] ids){
+    public com.alibaba.fastjson.JSONObject doApply(String[] ids){
+        com.alibaba.fastjson.JSONObject result = new com.alibaba.fastjson.JSONObject();
         // 根据userId查询所有APP
 //        String userId = "uuuuuuuuser";
         String userId = OpenDataConstants.getUserId();
-        Map<String, Object> param = new HashMap<String, Object>();
-        param.put("userId", userId);
-        List<AppInstance> appInstances = appManage.getAppList(param);
-        AppInstance appInstance = null;
-        if (appInstances!=null){
-            if (appInstances.size() == 0 ){
-                // 无APP，创建一个
-                Map<String,String> param_app = new HashMap<String,String>();
-                param_app.put("appName",userId+"-app");
-                param_app.put("appDescription","auto create by system.");
-                // 直接调用原来的创建app方法
-                appManageController.saveApp(param_app);
-                // 创建后再一次查询APP
-                appInstances = appManage.getAppList(param);
-                appInstance = appInstances.get(0);
-            }else{
-                // 有app，直接获取
-                appInstance = appInstances.get(0);
+        if (userId ==null){
+            result.put("result","please login first!");
+            return result;
+        }
+        try{
+            Map<String, Object> param = new HashMap<String, Object>();
+            param.put("userId", userId);
+            List<AppInstance> appInstances = appManage.getAppList(param);
+            AppInstance appInstance = null;
+            if (appInstances!=null){
+                if (appInstances.size() == 0 ){
+                    // 无APP，创建一个
+                    Map<String,String> param_app = new HashMap<String,String>();
+                    param_app.put("appName",userId+"-app");
+                    param_app.put("appDescription","auto create by system.");
+                    // 直接调用原来的创建app方法
+                    appManageController.saveApp(param_app);
+                    // 创建后再一次查询APP
+                    appInstances = appManage.getAppList(param);
+                    appInstance = appInstances.get(0);
+                }else{
+                    // 有app，直接获取
+                    appInstance = appInstances.get(0);
+                }
             }
-        }
-        // 遍历所有 API id
-        for (int i = 0; i < ids.length; i++) {
-            System.out.println(ids[i]);
-            // 调用申请
-            Map<String, String> parameters = new HashMap<>();
-            parameters.put("openServiceId",ids[i]);
-            parameters.put("applyFlag","0");
-            parameters.put("userId",userId);
-            parameters.put("appId",appInstance.getAppId());
-            parameters.put("appName",appInstance.getAppName());
-            // 直接调用原来的申请方法
-            boolean flag = serviceApplyController.AppServiceApply(parameters);
-        }
+            // 遍历所有 API id
+            for (int i = 0; i < ids.length; i++) {
+                System.out.println(ids[i]);
+                // 调用申请
+                Map<String, String> parameters = new HashMap<>();
+                parameters.put("openServiceId",ids[i]);
+                parameters.put("applyFlag","0");
+                parameters.put("userId",userId);
+                parameters.put("appId",appInstance.getAppId());
+                parameters.put("appName",appInstance.getAppName());
+                // 直接调用原来的申请方法
+                boolean flag = serviceApplyController.AppServiceApply(parameters);
+            }
+            result.put("result","success");
 
-        return JSON.toJSONString("{}");
+        }catch ( Exception e){
+            System.out.println(e.toString());
+            result.put("result","fail");
+        }
+        return result;
     }
 
     /**
