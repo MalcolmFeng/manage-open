@@ -133,6 +133,7 @@ public class AppManageController {
         app.setAppName(param.get("appName"));
         app.setAppDescription(param.get("appDescription"));
         String userId= OpenDataConstants.getUserId();
+//        String userId = "uuuuuuuuser";
         //String userId= "test11-realm1234";
         app.setUserId(userId);
         boolean isRegisted = appManage.isRegisted(app.getAppName(),userId);

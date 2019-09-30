@@ -57,6 +57,11 @@
         <url-pattern>/service/open/api/dab10903244749cda04beb36516f6755/ccc</url-pattern>
         <url-pattern>/service/open/api/add</url-pattern>
 
+        <!--   全民健康信息发布平台    -->
+        <url-pattern>/service/open/api/getAPIListPublished</url-pattern>
+        <url-pattern>/service/open/api/getAPIListPublishedPage</url-pattern>
+        <url-pattern>/service/open/api/doApply</url-pattern>
+
         <url-pattern>/service/open/api/get/*</url-pattern>
         <url-pattern>/service/open/data/getApplyPage</url-pattern>
         <url-pattern>/service/open/data/getApplyList</url-pattern>

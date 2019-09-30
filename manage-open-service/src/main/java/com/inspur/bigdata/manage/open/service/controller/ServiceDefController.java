@@ -112,7 +112,7 @@ public class ServiceDefController {
     }
 
     /**
-     * 列表
+     * 批量申请页面
      *
      * @return
      */
