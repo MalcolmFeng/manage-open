@@ -100,6 +100,8 @@ public class ServiceDefController {
                     appInstance = appInstances.get(0);
                 }
             }
+            // 为当前批量申请创建一个批量id
+            String batch_apply_id = UUIDGenerator.getUUID();
             // 遍历所有 API id
             for (int i = 0; i < ids.length; i++) {
                 System.out.println(ids[i]);
@@ -111,7 +113,7 @@ public class ServiceDefController {
                 parameters.put("appId",appInstance.getAppId());
                 parameters.put("appName",appInstance.getAppName());
                 // 直接调用原来的申请方法
-                boolean flag = serviceApplyController.AppServiceApply(parameters);
+                boolean flag = serviceApplyController.AppServiceApply(parameters,batch_apply_id);
             }
             result.put("result","success");
 

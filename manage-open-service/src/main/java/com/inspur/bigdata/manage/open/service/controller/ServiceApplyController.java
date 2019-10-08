@@ -191,7 +191,7 @@ public class ServiceApplyController {
     //app申请api市场
     @RequestMapping(value = "/apply",method = RequestMethod.POST)
     @ResponseBody
-    public boolean AppServiceApply(@RequestParam Map<String, String> parameters) {
+    public boolean AppServiceApply(@RequestParam Map<String, String> parameters,String batch_apply_id) {
         boolean flag=false;
         SimpleDateFormat df = OpenServiceConstants.sf;
         ServiceApply serviceApply=new ServiceApply();
@@ -225,6 +225,7 @@ public class ServiceApplyController {
         log.error("====================>:"+service_app);
         if(0==service_app.size())
         {//添加
+            serviceApply.setBatch_apply_id(batch_apply_id);
             String insert_flag=serviceApplyService.insert(serviceApply);
             if("true".equals(insert_flag))
             {
