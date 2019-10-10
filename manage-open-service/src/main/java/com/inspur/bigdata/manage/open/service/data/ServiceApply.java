@@ -38,6 +38,9 @@ public class ServiceApply implements Serializable{
     @Column(name="APPLY_FLAG")
     private String apply_flag;
 
+    @Column(name="BATCH_APPLY_ID")
+    private String batch_apply_id;
+
     @Transient
     private String version;
     @Transient
@@ -184,5 +187,13 @@ public class ServiceApply implements Serializable{
     }
     public String getApiStatus(){
         return this.apiStatus;
+    }
+
+    public String getBatch_apply_id() {
+        return batch_apply_id;
+    }
+
+    public void setBatch_apply_id(String batch_apply_id) {
+        this.batch_apply_id = batch_apply_id;
     }
 }

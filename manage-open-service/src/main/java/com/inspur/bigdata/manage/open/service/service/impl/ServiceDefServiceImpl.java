@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -51,6 +52,9 @@ public class ServiceDefServiceImpl implements IServiceDefService{
      */
     public void addServiceDef(ServiceDef serviceDef) {
         List<ServiceInput> list=serviceDef.getInputList();
+        if (list == null){
+            list = new ArrayList<>();
+        }
         serviceDefMapper.insert(serviceDef);
         for(ServiceInput input:list){
             input.setId(UUIDGenerator.getUUID());
@@ -58,6 +62,9 @@ public class ServiceDefServiceImpl implements IServiceDefService{
             serviceInputMapper.insert(input);
         }
         List<ServiceOutput> outputs=serviceDef.getOutputList();
+        if (outputs == null){
+            outputs = new ArrayList<>();
+        }
         for (ServiceOutput output:outputs){
             output.setId(UUIDGenerator.getUUID());
             output.setOpenServiceId(serviceDef.getId());

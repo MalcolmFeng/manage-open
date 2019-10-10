@@ -38,10 +38,10 @@
 		var context = "<l:assetcontext/>";
 
 		$(document).ready(function() {
-			if( $("#workspace-header",parent.document))
-			{
-				$("#workspace-header",parent.document).html('API列表');
-			}
+			// if( $("#workspace-header",parent.document))
+			// {
+			// 	$("#workspace-header",parent.document).html('API列表');
+			// }
 
 			var options = {
 				info: true,

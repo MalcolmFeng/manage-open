@@ -2,6 +2,7 @@ package com.inspur.bigdata.manage.open.service.controller;
 
 import com.alibaba.druid.support.logging.Log;
 import com.alibaba.druid.support.logging.LogFactory;
+import com.alibaba.fastjson.JSON;
 import com.inspur.bigdata.manage.open.service.data.*;
 import com.inspur.bigdata.manage.open.service.pay.data.PayAccountCapital;
 import com.inspur.bigdata.manage.open.service.pay.service.IPayService;
@@ -14,6 +15,8 @@ import com.inspur.bigdata.manage.utils.OpenDataConstants;
 import com.inspur.bigdata.manage.utils.SM3;
 import com.inspur.bigdata.manage.utils.StringUtil;
 import net.sf.json.JSONObject;
+import org.apache.axis2.client.Options;
+import org.apache.axis2.rpc.client.RPCServiceClient;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpEntity;
@@ -44,6 +47,7 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.PrintWriter;
@@ -61,6 +65,20 @@ import java.util.concurrent.Executors;
 import static com.inspur.bigdata.manage.open.service.util.OpenServiceConstants.*;
 import static com.inspur.bigdata.manage.open.service.util.apimonitor.ApiServiceMonitorThread.getNcpu;
 import static com.inspur.bigdata.manage.utils.EncryptionUtil.*;
+
+
+import javax.xml.namespace.QName;
+import net.sf.json.JSONObject;
+import org.apache.axiom.om.OMAbstractFactory;
+import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.OMFactory;
+import org.apache.axiom.om.OMNamespace;
+import org.apache.axis2.AxisFault;
+import org.apache.axis2.addressing.EndpointReference;
+import org.apache.axis2.client.Options;
+import org.apache.axis2.client.ServiceClient;
+import org.apache.axis2.rpc.client.RPCServiceClient;
+
 
 @Controller
 @RequestMapping("/api/execute")
@@ -388,7 +406,21 @@ public class ServiceExecuteController {
                 return;
             }
             startTime = System.currentTimeMillis();
-            String result_str = doRequest(instream, serviceDef, listServiceInput, apiServiceMonitor);
+
+            String result_str = "";
+            Cookie[] cookies = request.getCookies();
+            if (serviceDef.getScProtocol().equals("webService")) {
+                String type = serviceDef.getScFrame();
+                if ("Axiom".equals(type)) {
+
+                    result_str = executeAxis2(serviceDef, listServiceInput);
+                } else if ("RPC".equals(type)) {
+                    result_str = executeRPC(serviceDef, listServiceInput);
+                }
+            } else {
+//                result_str = doRequest(serviceDef, listServiceInput, cookies);
+                result_str = doRequest(instream, serviceDef, listServiceInput, apiServiceMonitor);
+            }
             response.addHeader("Content-Type", OpenServiceConstants.getContentType(serviceDef.getContentType()));
             writer.print(result_str);
             writer.flush();
@@ -522,6 +554,149 @@ public class ServiceExecuteController {
             }
         }
     }
+
+
+    private String executeRPC(ServiceDef ws, List<ServiceInput> serviceInputList) throws AxisFault {
+        RPCServiceClient serviceClient = new RPCServiceClient();
+
+        EndpointReference targetEPR = new EndpointReference(ws.getScAddr());
+        Options options = serviceClient.getOptions();
+
+        options.setTo(targetEPR);
+
+        options.setAction(ws.getSc_ws_function());
+        QName qname = new QName(ws.getNameSpace(), ws.getSc_ws_function());
+
+        Object[] parameters = null;
+        if (serviceInputList !=null){
+            parameters = new Object[serviceInputList.size()];
+
+            int j = 0;
+            for (ServiceInput item : serviceInputList) {
+                parameters[j++] = item.getValue();
+            }
+        }else{
+            parameters = new Object[] { null };
+        }
+//        if (param !=null){
+//            parameters = new Object[param.size()];
+//            if (serviceInputList.size() > 0 || param.size() > 0) {
+//
+//                int j = 0;
+//                for (Map.Entry<String, Object> entry : param.entrySet()) {
+//                    String mapKey = (String)entry.getKey();
+//                    String mapValue = entry.getValue().toString();
+//                    System.out.println(mapKey + ":" + mapValue);
+//
+//                    parameters[j++] = mapValue;
+//                }
+//            } else {
+//                parameters = new Object[] { null };
+//            }
+//        }else{
+//            parameters = new Object[] { null };
+//        }
+
+        OMElement element = serviceClient.invokeBlocking(qname, parameters);
+
+        List result = getResults(element);
+
+        String str = JSON.toJSON(result).toString();
+        System.out.println("result" + str);
+        return str;
+    }
+
+    public static List<Map<String, String>> getResults(OMElement element) {
+        if (element == null) {
+            return null;
+        }
+
+        Iterator iterator = element.getChildElements();
+
+        List<Map<String, String>> list = new ArrayList<Map<String, String>>();
+        OMElement result = null;
+        Map<String, String> data = new HashMap<String, String>();
+        while (iterator.hasNext()) {
+            result = (OMElement)iterator.next();
+
+            Iterator innerItr = result.getChildElements();
+            while (innerItr.hasNext()) {
+                OMElement elem = (OMElement)innerItr.next();
+
+                System.out.println("\t\t" + elem.getLocalName() + ": " + elem.getText());
+                data.put(elem.getLocalName(), elem.getText());
+                list.add(data);
+                data = new HashMap<String, String>();
+            }
+        }
+        return list;
+    }
+
+    private String executeAxis2(ServiceDef ws, List<ServiceInput> listServiceInput) throws AxisFault {
+        try {
+            String[] params = new String[listServiceInput.size()];
+            int i = 0;
+            for (ServiceInput serviceInput : listServiceInput) {
+                checkData(serviceInput.getScType(), serviceInput.getValue(), serviceInput.getScName());
+                String paramType = serviceInput.getScParamType();
+                if (paramType.equalsIgnoreCase("body")) {
+                    System.out.println(serviceInput.getScType() + ":" + serviceInput.getValue());
+                    params[i++] = serviceInput.getName();
+                }
+            }
+
+            String[] paramValues = new String[listServiceInput.size()];
+            int j = 0;
+            for (ServiceInput item : listServiceInput) {
+                paramValues[j++] = item.getValue();
+            }
+
+//            String[] paramValues = new String[param.size()];
+//            int j = 0;
+//            for (Map.Entry<String, Object> entry : param.entrySet()) {
+//                String mapKey = (String)entry.getKey();
+//                String mapValue = entry.getValue().toString();
+//                System.out.println(mapKey + ":" + mapValue);
+//                paramValues[j++] = mapValue;
+//            }
+            OMElement getPricePayload = buildParam(ws.getNameSpace(), params, paramValues, "tn", ws.getSc_ws_function(), "tn");
+
+            Options options = new Options();
+            options.setTo(new EndpointReference(ws.getScAddr()));
+            options.setTransportInProtocol("http");
+
+
+            ServiceClient sender = new ServiceClient();
+            sender.setOptions(options);
+
+
+            OMElement result = sender.sendReceive(getPricePayload);
+            String response = result.getFirstElement().getText();
+            System.out.println("Current price of WSO: " + response);
+            return response;
+        } catch (AxisFault e) {
+            log.error("axis2执行异常", e);
+            throw e;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+
+    private static OMElement buildParam(String nameSpace, String[] params, String[] paramValues, String paramPrefix, String method, String wsMethodPrefix) {
+        OMFactory fac = OMAbstractFactory.getOMFactory();
+        OMNamespace omNs = fac.createOMNamespace(nameSpace, wsMethodPrefix);
+        OMNamespace omNsParam = (paramPrefix == null) ? null : fac.createOMNamespace(nameSpace, paramPrefix);
+        OMElement data = fac.createOMElement(method, omNs);
+        for (int i = 0; i < params.length; i++) {
+            OMElement inner = fac.createOMElement(params[i], omNsParam);
+            inner.setText(paramValues[i]);
+            data.addChild(inner);
+        }
+        return data;
+    }
+
 
     private String doRequest(String instream, ServiceDef serviceDef, List<ServiceInput> listServiceInput, ApiServiceMonitor apiServiceMonitor) throws Exception {
         String scType = null;
@@ -690,7 +865,7 @@ public class ServiceExecuteController {
             str = EntityUtils.toString(entity, "utf-8");
             EntityUtils.consume(entity);
         } catch (Exception e) {
-            str = "API网关POST method failed to access URL，URL：" + url + "," + e.getMessage();
+            str = "API网关POST method failed to access URL！";
             log.error("API网关GET method failed to access URL，URL：" + url, e);
         }
         return str;
@@ -748,7 +923,7 @@ public class ServiceExecuteController {
             str = EntityUtils.toString(entity, "UTF-8");
             EntityUtils.consume(entity);
         } catch (Exception e) {
-            str = "API网关POST method failed to access URL，URL：" + url + "," + e.getMessage();
+            str = "API网关POST method failed to access URL!";
             e.printStackTrace();
             log.error("API网关POST method failed to access URL，URL：" + url, e);
         }
@@ -790,4 +965,6 @@ public class ServiceExecuteController {
         sc.init(null, new TrustManager[]{trustManager}, null);
         return sc;
     }
+
+
 }

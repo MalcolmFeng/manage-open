@@ -70,7 +70,8 @@
         auth_status,
         auth_time,
         auth_user,
-        apply_flag
+        apply_flag,
+        batch_apply_id
         ) VALUES (
         #{id},
         #{app_id},
@@ -83,7 +84,8 @@
         #{auth_status},
         #{auth_time},
         #{auth_user},
-        #{apply_flag}
+        #{apply_flag},
+        #{batch_apply_id}
         )
     </insert>
 

@@ -21994,7 +21994,7 @@
 */
 //     data processing stage is blocked in stream.
 //     See <module:echarts/stream/Scheduler#performDataProcessorTasks>
-// (2) Only register once when import repeatly.
+// (2) Only register_old once when import repeatly.
 //     Should be executed before after series filtered and before stack calculation.
 
     var dataStack = function (ecModel) {
@@ -27247,7 +27247,7 @@
                     this.trigger(eveName, params);
                 }
             }; // Consider that some component (like tooltip, brush, ...)
-            // register zr event handler, but user event handler might
+            // register_old zr event handler, but user event handler might
             // do anything, such as call `setOption` or `dispatchAction`,
             // which probably update any of the content and probably
             // cause problem if it is called previous other inner handlers.
@@ -52062,7 +52062,7 @@
                     var normalText = retrieve2(mapModel.getFormattedLabel(fullIndex, 'normal'), name);
                     var emphasisText = retrieve2(mapModel.getFormattedLabel(fullIndex, 'emphasis'), normalText);
                     var highDownRecord = regionGroup[HIGH_DOWN_PROP];
-                    var recordVersion = Math.random(); // Prevent from register listeners duplicatedly when roaming.
+                    var recordVersion = Math.random(); // Prevent from register_old listeners duplicatedly when roaming.
 
                     if (!highDownRecord) {
                         highDownRecord = regionGroup[HIGH_DOWN_PROP] = {};
