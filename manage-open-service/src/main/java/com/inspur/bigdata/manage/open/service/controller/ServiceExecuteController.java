@@ -38,6 +38,7 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
+import org.apache.tools.ant.taskdefs.EchoXML;
 import org.loushang.framework.util.DateUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -50,6 +51,7 @@ import javax.net.ssl.X509TrustManager;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.ByteArrayInputStream;
 import java.io.PrintWriter;
 import java.math.BigDecimal;
 import java.net.URLDecoder;
@@ -61,6 +63,8 @@ import java.security.cert.X509Certificate;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static com.inspur.bigdata.manage.open.service.util.OpenServiceConstants.*;
 import static com.inspur.bigdata.manage.open.service.util.apimonitor.ApiServiceMonitorThread.getNcpu;
@@ -68,6 +72,9 @@ import static com.inspur.bigdata.manage.utils.EncryptionUtil.*;
 
 
 import javax.xml.namespace.QName;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+
 import net.sf.json.JSONObject;
 import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
@@ -78,7 +85,8 @@ import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.client.Options;
 import org.apache.axis2.client.ServiceClient;
 import org.apache.axis2.rpc.client.RPCServiceClient;
-
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
 
 @Controller
 @RequestMapping("/api/execute")
@@ -559,14 +567,16 @@ public class ServiceExecuteController {
     private String executeRPC(ServiceDef ws, List<ServiceInput> serviceInputList) throws AxisFault {
         RPCServiceClient serviceClient = new RPCServiceClient();
 
+        System.out.println("***************************:  " + ws.getScAddr());
         EndpointReference targetEPR = new EndpointReference(ws.getScAddr());
         Options options = serviceClient.getOptions();
 
         options.setTo(targetEPR);
 
-        options.setAction(ws.getSc_ws_function());
+        options.setAction(ws.getNameSpace() + "/" + ws.getSc_ws_function());
         QName qname = new QName(ws.getNameSpace(), ws.getSc_ws_function());
 
+        System.out.println("%%%%%%%%%%%%%%%%%%%%%%%%%%%:  " + ws.getNameSpace() + "/" + ws.getSc_ws_function());
         Object[] parameters = null;
         if (serviceInputList !=null){
             parameters = new Object[serviceInputList.size()];
@@ -596,40 +606,54 @@ public class ServiceExecuteController {
 //        }else{
 //            parameters = new Object[] { null };
 //        }
+        try{
+            System.out.println("############################:  " + parameters[0]);
+        }catch (Exception e){
+            System.out.println(e.toString());
+        }
 
         OMElement element = serviceClient.invokeBlocking(qname, parameters);
 
-        List result = getResults(element);
+        String result = getResults(element);
 
-        String str = JSON.toJSON(result).toString();
-        System.out.println("result" + str);
-        return str;
+        System.out.println("result::::::::::::::::::::::" + result);
+        return result;
     }
 
-    public static List<Map<String, String>> getResults(OMElement element) {
+    public static String getResults(OMElement element) {
         if (element == null) {
             return null;
         }
 
-        Iterator iterator = element.getChildElements();
+        Iterator<OMElement> iterator = element.getChildElements();
 
         List<Map<String, String>> list = new ArrayList<Map<String, String>>();
         OMElement result = null;
         Map<String, String> data = new HashMap<String, String>();
         while (iterator.hasNext()) {
-            result = (OMElement)iterator.next();
+            OMElement item = iterator.next();
+            String xmlOld = item.toString();
+            System.out.println("xmlOld:" + xmlOld);
+            if (xmlOld.contains("jythis")){
+                String xmlNew1 = xmlOld.replace("&lt;","<").replace("&#xd","").replace(";","").replace("</ns1:out>","");
 
-            Iterator innerItr = result.getChildElements();
-            while (innerItr.hasNext()) {
-                OMElement elem = (OMElement)innerItr.next();
+                Pattern pat = Pattern.compile("<ns1:out.*?>");
+                Matcher mat = pat.matcher(xmlNew1);
+                String xmlNew = mat.replaceAll("");
+                return xmlNew;
+            }else{
+                Iterator innerItr = item.getChildElements();
+                while (innerItr.hasNext()) {
+                    OMElement elem = (OMElement)innerItr.next();
 
-                System.out.println("\t\t" + elem.getLocalName() + ": " + elem.getText());
-                data.put(elem.getLocalName(), elem.getText());
-                list.add(data);
-                data = new HashMap<String, String>();
+                    System.out.println("\t\t" + elem.getLocalName() + ": " + elem.getText());
+                    data.put(elem.getLocalName(), elem.getText());
+                    list.add(data);
+                    data = new HashMap<String, String>();
+                }
             }
         }
-        return list;
+        return JSON.toJSONString(list);
     }
 
     private String executeAxis2(ServiceDef ws, List<ServiceInput> listServiceInput) throws AxisFault {
@@ -964,6 +988,73 @@ public class ServiceExecuteController {
         };
         sc.init(null, new TrustManager[]{trustManager}, null);
         return sc;
+    }
+
+    public static void main(String[] args) throws Exception {
+//        RPCServiceClient serviceClient = new RPCServiceClient();
+//
+//        EndpointReference targetEPR = new EndpointReference("http://222.74.69.242:8090/ws/service/hisForHzfwhMessage");
+//        Options options = serviceClient.getOptions();
+//
+//        options.setTo(targetEPR);
+//
+//        options.setAction("http://itf.bussiness.jythis.com/interfaceAPC");
+//        QName qname = new QName("http://itf.bussiness.jythis.com", "interfaceAPC");
+//
+//        Object[] parameters = new Object[]{"<req> \n" +
+//                "<methodCode>getDoctorInfo001</methodCode> \n" +
+//                "<methodParam> \n" +
+//                "<hospitalId>747554124</hospitalId> \n" +
+//                "<signature>80C428E098CE42258084F9C502AEA206</signature> \n" +
+//                "<nonceStr>D3332E9938464648847CA0F450E9294A</nonceStr> \n" +
+//                "<openId>Udffsdfsdfdsf81</openId> \n" +
+//                "<deptId>8000001</deptId> \n" +
+//                "<doctorId/> \n" +
+//                "</methodParam> \n" +
+//                "</req>"};
+//
+//            OMElement element = serviceClient.invokeBlocking(qname, parameters);
+//
+//        List result = getResults(element);
+//
+//        String str = JSON.toJSON(result).toString();
+//        System.out.println("result" + str);
+
+
+        // axis2 服务端
+//        String url = "http://222.74.69.242:8090/founderWebs/services/ICalculateService";
+//        // 使用RPC方式调用WebService
+//        RPCServiceClient serviceClient = new RPCServiceClient();
+//        EndpointReference targetEPR = new EndpointReference(url);
+//        Options options = serviceClient.getOptions();
+//
+//        options.setTo(targetEPR);
+//
+////        options.setAction("urn:FounderRequestData");
+//
+//        QName qname = new QName("http://services.founder.com", "FounderRequestData");
+//
+//
+//        Object[] parameters = new Object[] { "?","?","?","<![CDATA[<Request> <ServiceName>getDeptInfo001</ServiceName> <hospitalId>747554124</hospitalId> <signature>80C428E098CE42258084F9C502AEA206</signature> <nonceStr>D3332E9938464648847CA0F450E9294A</nonceStr> <openId>Udffsdfsdfdsf81</openId> <deptId>1001011</deptId> </Request>]]>" };
+//        OMElement element = serviceClient.invokeBlocking(qname, parameters);
+//        List result = getResults(element);
+//        String str = JSON.toJSON(result).toString();
+//        System.out.println("result" + str);
+
+        String str = "<ns1:out xmlns:ns1=\"http://itf.bussiness.jythis.com\">&lt;?xml version=\"1.0\" encoding=\"utf-8\"?>&lt;res>&#xd;\n" +
+                "&lt;returnCode>0&lt;/returnCode>&#xd;\n" +
+                "&lt;returnMsg>成功&lt;/returnMsg>&#xd;\n" +
+                "&lt;returnData>&lt;doctorInfo>&lt;doctorId>00001&lt;/doctorId>&lt;octorName>崔其福&lt;/octorName>&lt;branchId/>&lt;branchName/>&lt;deptClassId/>&lt;deptClassName/>&lt;deptId>8000001&lt;/deptId>&lt;deptName>崔其福院长办公室&lt;/deptName>&lt;doctorTitle>主任医师&lt;/doctorTitle>&lt;doctorRemark/>&lt;doctorGender>未知&lt;/doctorGender>&lt;betterFor/>&lt;urlPic/>&lt;visitTimeInfo/>&lt;doctorDesc/>&lt;/doctorInfo>&lt;/returnData>&#xd;\n" +
+                "&lt;/res>&#xd;\n" +
+                "</ns1:out>";
+        String xml = str.replace("&lt;","<").replace("&#xd","").replace(";","").replace("</ns1:out>","");;
+
+        Pattern pat = Pattern.compile("<ns1:out.*?>");
+        Matcher mat = pat.matcher(xml);
+        String result = mat.replaceAll("");
+        System.out.println(result);
+
+
     }
 
 
