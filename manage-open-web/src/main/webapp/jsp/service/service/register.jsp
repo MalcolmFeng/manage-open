@@ -8,7 +8,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
-    
+
     <!-- 需要引用的CSS -->
 	<link rel="shortcut icon" href="<%=request.getContextPath()%>/jsp/public/images/favicon.ico" />
 	<link rel="stylesheet" type="text/css" href="<l:asset path='css/bootstrap.css'/>" />
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="<l:asset path='jquery.js'/>" ></script>
     <script type="text/javascript" src="<l:asset path='bootstrap.js'/>" ></script>
 	<script type="text/javascript" src="<l:asset path='form.js'/>" ></script>
-	<script type="text/javascript" src="<l:asset path='arttemplate.js'/>" ></script>	
+	<script type="text/javascript" src="<l:asset path='arttemplate.js'/>" ></script>
 	<script type="text/javascript" src="<l:asset path='datatables.js'/>"></script>
     <script type="text/javascript" src="<l:asset path='loushang-framework.js'/>"></script>
     <script type="text/javascript" src="<l:asset path='ui.js'/>"></script>
@@ -41,7 +41,7 @@
 <body>
 	<div>
 		<div class="demo1"></div>
-	  <div class="col-xs-12 col-md-12">	  
+	  <div class="col-xs-12 col-md-12">
 		<form class="form-horizontal" id="saveForm" name="saveForm" onsubmit="return false;">
 			<div id="step_0" class="_step">
 		    <h3 class="text-left htext">基本信息</h3>
@@ -88,6 +88,15 @@
 					<label><input type="radio" name="authType" value="1" <c:if test="${serviceDef.authType eq 1 || !edit}"> checked="checked"</c:if>/>需要授权&emsp;</label>
 				</div>
 		    </div>
+				<div class="form-group">
+					<div class="col-xs-2 col-md-2 control-label">
+						<label class="control-label">服务价格</label>
+					</div>
+					<div class="col-xs-10 col-md-10 text-left radio" style="margin-top: 5px;">
+						<input type="text" style="width: 25%" class="form-control ue-form Validform_input" id="price"
+							   name="price" value="${serviceDef.price}" placeholder="价格"/>
+					</div>
+				</div>
 			<div class="form-group">
 				<label class="col-xs-2 col-md-2 control-label">服务描述<span class="required">*</span></label>
 				<div class="col-xs-10 col-md-10">
@@ -147,8 +156,8 @@
 						<label class="control-label">框架<span class="required">*</span></label>
 					</div>
 					<div class="col-xs-10 col-md-10 text-left radio" style="margin-top: 5px;">
-						<label><input type="radio" name="scFrame" value="RPC" datatype="verifyFrame" nullmsg="必填" <c:if test="${serviceDef.scFrame eq 'RPC' }"> checked="checked"</c:if>/>RPC</label>
-						<label><input type="radio" name="scFrame" value="Axiom" datatype="verifyFrame" nullmsg="必填" <c:if test="${serviceDef.scFrame eq 'Axiom' }"> checked="checked"</c:if>/>Axiom</label>
+						<label><input type="radio" name="scFrame" value="RPC"  nullmsg="必填" <c:if test="${serviceDef.scFrame eq 'RPC' }"> checked="checked"</c:if>/>RPC</label>
+						<label><input type="radio" name="scFrame" value="Axiom"  nullmsg="必填" <c:if test="${serviceDef.scFrame eq 'Axiom' }"> checked="checked"</c:if>/>Axiom</label>
 						<span class="Validform_checktip"></span>
 					</div>
 				</div>
@@ -160,7 +169,7 @@
 					<div class="col-xs-10 col-md-10 text-left radio" style="margin-top: 5px;">
 						<input  type="text" class="form-control ue-form Validform_input" id="sc_ws_namespace"
 								name="sc_ws_namespace" value="${serviceDef.nameSpace}"
-								datatype="verifyScwsNameSpace" nullmsg="必填"/>
+								 nullmsg="必填"/>
 						<span class="Validform_checktip"></span>
 					</div>
 				</div>
@@ -172,11 +181,11 @@
 					<div class="col-xs-10 col-md-10 text-left radio" style="margin-top: 5px;">
 						<input  type="text" class="form-control ue-form Validform_input" id="sc_ws_function"
 								name="sc_ws_function" value="${serviceDef.sc_ws_function}"
-								datatype="verifyScwsfunction" nullmsg="必填"/>
+								 nullmsg="必填"/>
 						<span class="Validform_checktip"></span>
 					</div>
 				</div>
-				
+
 				<div class="form-group" id="httpMethodDiv" hidden="true">
 					<div class="col-xs-2 col-md-2 control-label">
 						<label class="control-label">HTTP Method<span class="required">*</span></label>
@@ -221,6 +230,7 @@
 								<th style="width: 12%;">后端参数类型</th>
 								<th style="width: 12%;">后端参数位置</th>
 								<th style="width: 8%;">是否必填</th>
+								<th style="width: 12%;">固定值</th>
 								<th style="width: 5%;">排序</th>
 								<th>后端参数描述</th>
 								<th style="width: 12%;">操作</th>
@@ -249,6 +259,9 @@
 											<input type="hidden" name="required" value="${inparam.scRequired}" />
 											<c:if test="${inparam.scRequired =='1'}">是</c:if>
 											<c:if test="${inparam.scRequired =='0'}">否</c:if>
+										</td>
+										<td>
+											<input type="text" name="fixedValue" value="${inparam.fixedValue}" onchange="changeEditFlag()">
 										</td>
 										<td>
 											<input type="hidden" name="seq" readonly value="${inparam.scSeq}" />
@@ -292,6 +305,9 @@
 												<option value="1" <c:if test="${inparam.scRequired =='1'}">selected="selected"</c:if> >是</option>
 												<option value="0" <c:if test="${inparam.scRequired =='1'}">selected="selected"</c:if> >否</option>
 											</select>
+										</td>
+										<td>
+											<input type="text" name="fixedValue" value="${inparam.fixedValue}" onchange="changeEditFlag()">
 										</td>
 										<td>
 											<input type="text" name="seq" value="${inparam.scSeq}" onchange="changeEditFlag()" />
@@ -358,9 +374,10 @@
 				<div class="col-xs-12 col-md-12 param-list">
 		          <table id="inputtable">
 		           <tr>
-		              <th style="width: 20%">参数名</th>
-		              <th style="width: 20%">类型</th>
-		              <th style="width: 20%">是否必填</th>
+		              <th style="width: 10%">参数名</th>
+		              <th style="width: 8%">类型</th>
+		              <th style="width: 8%">是否必填</th>
+					   <th style="width: 20%;">固定值</th>
 		              <th >字段描述</th>
 		              <th style="width: 20%">后端参数</th>
 		           </tr>
@@ -389,11 +406,14 @@
 									  <option value="0" <c:if test="${item.required eq '0' }">selected="selected"  </c:if> >否</option>
 								  </select>
 				              </td>
+							   <td>
+								   <input type="text" name="fixedValue" value="${item.fixedValue}" onchange="changeEditFlag()">
+							   </td>
 				              <td><input type="text" name="inputDescription" value="${item.description }"/></td>
 							   <td><input type="text" name="backname" value="${item.scName }" readonly/></td>
 				              <%--<td><a onclick="register.forColumnDel(this)">删除</a></td>--%>
 				           </tr>
-		               </c:forEach>	
+		               </c:forEach>
 		           </c:if>
 					</tbody>
 				  </table>
@@ -430,6 +450,23 @@
 						<span class="Validform_checktip Validform_span"></span>
 					</div>
 				</div>
+				<h3 class="text-left htext">返回值释义</h3>
+				<hr class="fenge"/>
+				<div class="form-group">
+					<div class="col-xs-12 col-md-12 param-list">
+						<table id="outtable">
+							<tr>
+								<th style="width: 12%;">参数名称</th>
+								<th style="width: 12%;">后端参数类型</th>
+								<th>参数描述</th>
+								<th style="width: 12%;">操作</th>
+							</tr>
+							<tbody id="outbody">
+							</tbody>
+						</table>
+						<div id="addOutParam" class="pull-right addrow"><a onclick="register.addOutParamTr()">增加一行</a></div>
+					</div>
+				</div>
 			</div>
 			<div class="form-group" >
 			  <div class="col-xs-12 col-md-12" style="text-align: center">
@@ -449,7 +486,7 @@
 	    var context = "<l:assetcontext/>";
 	    var defGroupId='${serviceDef.apiGroup}';
         var serviceId='${serviceDef.id}';
-		//编辑时的初始值 	
+		//编辑时的初始值
 		var initContext='${serviceDef.reqPath}';
         var initRemoteId='${serviceDef.remoteId}';
 	 	var initVersion;
@@ -464,7 +501,7 @@
 	            $.dialog({
 	                type: 'confirm',
 	                content: '您确定要提交表单吗？',
-	                ok: function () { 
+	                ok: function () {
 	                  register.forSave();
 	                },
 	                cancel: function () {}
@@ -489,10 +526,10 @@
                 datatype: {
                     "verifyReqPath" : verifyReqPath,
                     "verifyProtocol" : verifyProtocol,
-                    "verifyFrame" : verifyFrame,
+                    // "verifyFrame" : verifyFrame,
                     "verifyParam" : verifyParam,
-                    "verifyScwsNameSpace":verifyScwsNameSpace,
-                    "verifyScwsfunction":verifyScwsfunction
+                    // "verifyScwsNameSpace":verifyScwsNameSpace,
+                    // "verifyScwsfunction":verifyScwsfunction
                 }
             });
             $("#nextStep").click(function(){
@@ -588,6 +625,7 @@
             }
             return true
         }
+
         function verifyMs(gets, obj, curform, datatye){
             var re = /^[1-9]+[0-9]*]*$/;
             if(re.test(gets)&&gets>30000){
@@ -596,6 +634,7 @@
 			}
             return re.test(gets)
         }
+
 		function checkname(gets, obj, curform, datatye){
             if(gets.length>20 || gets.length<3){
                 obj.attr("errormsg", "名称限制在3-20个字符!");
@@ -635,7 +674,7 @@
             }
             return true;
         }
-        
+
         function verifyProtocol(gets, obj, curform, datatye){
             var scProtocol = $("input[name='scProtocol']:checked").val();//请求协议
         	if(!scProtocol){
@@ -643,7 +682,7 @@
                 return false;
         	}
         }
-        
+
         function verifyFrame(gets, obj, curform, datatye){
             var scFrame = $("input[name='scFrame']:checked").val();//框架
         	if(!scFrame){
@@ -674,7 +713,7 @@
             }
             return true
         }
-        
+
         function verifyVersion(gets, obj, curform, datatye) {
             var context = $("#reqPath").val();
             var version = $("#version").val();
@@ -714,7 +753,7 @@
 	        return false;
 	      }
 	    }
-	    
+
 	    function verifyDescritpion(gets, obj, curform, datatye) {
 	    	if(gets.length>200 || gets.length<5){
 	    		 obj.attr("errormsg", "数据描述字数限制在5-200个!");
@@ -722,7 +761,7 @@
 	    	}
 	    	return true;
 	    }
-	    
+
 	    function verifyExample(gets, obj, curform, datatye) {
 	    	if(gets.length<5){
 	    		 obj.attr("errormsg", "返回内容描述不能小于5个字符!");
@@ -753,7 +792,7 @@
 		   }
             return true;
         }
-        
+
         var initInputList=[];
         <c:forEach items="${serviceDef.inputList}" var="item">
         var param={
@@ -765,6 +804,7 @@
             scType:"${item.scType}",
             scParamType:"${item.scParamType}",
             scSeq:"${item.scSeq}",
+			fixedValue: "${item.fixedValue}",
             scRequired:"${item.scRequired}",
             scDescription:"${item.scDescription}"
         }
@@ -774,6 +814,25 @@
         function changeEditFlag(){
             editFlag=true;
         }
+	</script>
+
+
+
+	<script id="outputitem" type="text/html">
+		<tr>
+			<td>
+				<input type="hidden" name="id"/>
+				<input type="text" name="name" value=""/>
+			</td>
+			<td>
+				<select name="type">
+					<option value="string" selected="selected">字符串</option>
+					<option value="number">数值型</option>
+				</select>
+			</td>
+			<td><input type="text" name="description" value=""/></td>
+			<td><a onclick="register.forColumnDel(this)">删除</a></td>
+		</tr>
 	</script>
     <script id="inputitem" type="text/html">
 	    <tr>
@@ -800,6 +859,7 @@
 		      <option value="0">否</option>
 		    </select>
 		  </td>
+			<td><input type="text" name="fixedValue"></td>
 		  <td><input type="text" name="inputDescription" value=""/></td>
 		  <td><a onclick="register.forColumnDel(this)">删除</a></td>
 		</tr>
@@ -834,6 +894,7 @@
 					{{/if}}
 				</select>
 			</td>
+			<td><input type="text" name="fixedValue" value="{{inparam.fixedValue}}"></td>
 			<td><input type="text" name="inputDescription" value="{{inparam.description}}"/></td>
 			<td><input type="text" name="backname" value="{{inparam.name}}" readonly/></td>
 		</tr>
@@ -864,6 +925,7 @@
 				{{ if inparam.required=="1"}} 是 {{ /if }}
 				{{ if inparam.required=="0"}} 否 {{ /if }}
 			</td>
+			<td><input type="text" name="fixedValue" value="{{inparam.fixedValue}}"></td>
 			<td>
 				<input type="hidden" name="seq" value="{{inparam.seq}}" />
 				{{inparam.seq}}
@@ -913,6 +975,7 @@
 					<option value="0">否</option>
 				</select>
 			</td>
+			<td><input type="text" name="fixedValue" value="" onchange="changeEditFlag()"></td>
 			<td>
 				<input type="text" name="seq" value="" onchange="changeEditFlag()" />
 			</td>
@@ -935,7 +998,7 @@
           {{/each}}
         </select>
     </script>
-    
+
     <script id="subgrouplist2" type="text/html">
     	<select id="subgroupSelect" class="form-control ue-form" onchange="register.selectServiceGroup();">
           {{each data as group}}
