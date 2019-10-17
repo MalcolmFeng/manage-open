@@ -87,7 +87,19 @@
 					<label><input type="radio" name="authType" value="0" <c:if test="${serviceDef.authType eq 0 }"> checked="checked"</c:if>/>无需授权&emsp;</label>
 					<label><input type="radio" name="authType" value="1" <c:if test="${serviceDef.authType eq 1 || !edit}"> checked="checked"</c:if>/>需要授权&emsp;</label>
 				</div>
-		    </div>
+			</div>
+				<div class="form-group">
+					<input type="hidden" id="encryptionType" name="encryptionType"
+						   value="${serviceDef.encryptionType }"/>
+					<div class="col-xs-2 col-md-2 control-label">
+						<label class="control-label">加密类型<span class="required">*</span></label>
+					</div>
+					<div class="col-xs-10 col-md-10">
+						<div id="encryptionDiv" style="width: 25%; display: inline-block"></div>
+						<div id="encryptionListDiv" style="width: 25%; display:none"></div>
+						<span class="Validform_checktip Validform_span" style="float: none"></span>
+					</div>
+				</div>
 				<div class="form-group">
 					<div class="col-xs-2 col-md-2 control-label">
 						<label class="control-label">服务价格</label>
@@ -96,6 +108,41 @@
 						<input type="text" style="width: 25%" class="form-control ue-form Validform_input" id="price"
 							   name="price" value="${serviceDef.price}" placeholder="价格"/>
 					</div>
+				</div>
+				<div class="form-group">
+					<div class="col-xs-2 col-md-2 control-label">
+						<label class="control-label">API限流<span class="required">*</span></label>
+					</div>
+					<div class="col-xs-10 col-md-10">
+						<input type="text" style="width: 25%" class="form-control ue-form Validform_input"
+							   id="limitCount"
+							   name="name" value="${serviceDef.limitCount}" placeholder="API限流次数"
+							   datatype="checknum" errormsg="请输入正确的数字" nullmsg="必填"/>
+						<span class="Validform_checktip Validform_span">次/秒</span>
+					</div>
+				</div>
+				<div class="form-group">
+					<div class="col-xs-2 col-md-2 control-label">
+						<label class="control-label">API调用上限<span class="required">*</span></label>
+					</div>
+					<div class="col-xs-10 col-md-10">
+						<input type="hidden" id="topLimitUnit" name="topLimitUnit"
+							   value="${serviceDef.topLimitUnit}"/>
+						<div id="topLimitUnitDiv" style="width: 25%; display: inline-block"></div>
+						<div id="topLimitUnitListDiv" style="width: 10%; display:none"></div>
+						<span class="Validform_checktip Validform_span" style="float: none"></span>
+					</div>
+					<div class="col-xs-2 col-md-2 control-label">
+						<label class="control-label"><span class="required"></span></label>
+					</div>
+					<div class="col-xs-10 col-md-10">
+						<input type="text" style="width: 25%" class="form-control ue-form Validform_input"
+							   id="topLimitCount"
+							   name="topLimitCount" value="${serviceDef.topLimitCount}" placeholder="API限流次数"
+							   datatype="/^[1-9]\d{0,8}$/" errormsg="请输入正确的数字(1~9位正整数)" nullmsg="必填"/>
+						<span class="Validform_checktip Validform_span">次</span>
+					</div>
+
 				</div>
 			<div class="form-group">
 				<label class="col-xs-2 col-md-2 control-label">服务描述<span class="required">*</span></label>
@@ -493,6 +540,8 @@
 	    $(function() {
           reNavBar();
 	      register.loadServiceGroupList("${serviceDef.apiGroup}");//初始化分组
+			register.encryptionTypeList("${serviceDef.encryptionType}");//初始化分组
+			register.loadTopLimitUnitList("${serviceDef.topLimitUnit}");//初始化分组
 	    $("#saveForm").uValidform({
 	        datatype: {
 	          "verifyExample": verifyExample
@@ -510,7 +559,8 @@
 	      });
             var step_0= $("#step_0").uValidform({
                 datatype: {
-                    "checkname":checkname,
+					"checkname": checkname,
+					"checknum": checknum,
 //                    "verifyVersion" : verifyVersion,
                     "verifyGroup": verifyGroup,
                     "verifyDescritpion": verifyDescritpion
@@ -535,8 +585,8 @@
             $("#nextStep").click(function(){
                 if(_step==0&&!step_0.check()){
                     return
-                };
-                if(_step==1&&!step_1.check()){
+				}
+				if (_step == 1 && !step_1.check()) {
                     return
 				}
 				if(_step==2&&!step_2.check()){
@@ -642,6 +692,16 @@
             }
             return true;
 		}
+
+		function checknum(gets, obj, curform, datatye) {
+			var patt = /^[1-9]\d{0,14}((?!\.+$)\.\d{0,2})?$|^0\.(?!0+$)\d{1,2}$/;
+			if (!patt.test(gets)) {
+				obj.attr("errormsg", "所填数值必须是正数，且整数部分取值范围1~15位，小数部分最多小数点后2位");
+				return false;
+			}
+			return true;
+		}
+
         function verifyReqPath(gets, obj, curform, datatye) {
             var context = $("#reqPath").val();
 //            var version = $("#version").val();
@@ -807,7 +867,7 @@
 			fixedValue: "${item.fixedValue}",
             scRequired:"${item.scRequired}",
             scDescription:"${item.scDescription}"
-        }
+		};
         initInputList.push(param);
         </c:forEach>
         var editFlag=false;
@@ -1014,5 +1074,41 @@
 			{{/each}}
 		</select>
 	</script>
+
+	<script id="encryptionTypeList" type="text/html">
+		<select id="encryptionTypeSelect" class="form-control ue-form" onchange="register.loadSubEncryptionTypeList();"
+				datatype="s" nullmsg="必填">
+			<option value="">请选择加密方式</option>
+			{{each data as group}}
+			<option value="{{group.id}}">{{group.name}}</option>
+			{{/each}}
+		</select>
+	</script>
+	<script id="subEncryptionTypeList" type="text/html">
+		<select id="subEncryptionTypeSelect" class="form-control ue-form" onchange="register.selectEncryptionType();">
+			{{each data as group}}
+			<option value="{{group.id}}">{{group.name}}</option>
+			{{/each}}
+		</select>
+	</script>
+
+
+	<script id="loadTopLimitUnitList" type="text/html">
+		<select id="topLimitUnitSelect" class="form-control ue-form" onchange="register.loadSubTopLimitUnitList();"
+				datatype="s" nullmsg="必填">
+			<option value="">请选择时间粒度</option>
+			{{each data as group}}
+			<option value="{{group.id}}">{{group.name}}</option>
+			{{/each}}
+		</select>
+	</script>
+	<script id="subTopLimitUnitList" type="text/html">
+		<select id="subTopLimitUnitSelect" class="form-control ue-form" onchange="register.selectTopLimitUnitType();">
+			{{each data as group}}
+			<option value="{{group.id}}">{{group.name}}</option>
+			{{/each}}
+		</select>
+	</script>
+
 </body>
 </html>

@@ -106,6 +106,10 @@
             window.location.href = context + "/service/dev/monitor/getInfo/" + id;
         }
 
+        function toDetails() {
+
+        }
+
         function reloadApiList() {
             // 重新请求数据
             $("#myauthList").DataTable().ajax.reload();
