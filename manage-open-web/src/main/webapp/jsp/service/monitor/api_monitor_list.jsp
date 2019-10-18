@@ -106,8 +106,8 @@
             window.location.href = context + "/service/dev/monitor/getInfo/" + id;
         }
 
-        function toDetails() {
-
+        function toDetails(id) {
+            window.location.href = context + "/service/dev/monitor/getDetail/" + id;
         }
 
         function reloadApiList() {
@@ -136,7 +136,11 @@
 
         function renderStatus(data, type, full) {
             if ("200" == full.result) {
-                return "成功";
+                if ("b983cc8ee7814d2d9d4702fa08f230e7" == full.apiServiceId) {
+                    return '<a onclick="toDetails(\'' + full.id + '\')">' + '成功' + '</a>';
+                } else {
+                    return "成功";
+                }
             } else if ("10001" == full.result) {
                 return "API分组错误";
             } else if ("10002" == full.result) {

@@ -4,6 +4,8 @@ import com.alibaba.fastjson.JSONObject;
 import com.inspur.bigdata.manage.open.service.data.ApiServiceMonitor;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 import java.util.Map;
 
@@ -21,6 +23,8 @@ public interface IServiceMonitorService {
 
     ModelAndView getInfoById(String monitorId);
 
+    ModelAndView getDetailById(String monitorId);
+
     Map<String, Object> getApiMonitorList(Map<String, String> parameters);
 
     JSONObject getMonitorInfo();
@@ -28,5 +32,7 @@ public interface IServiceMonitorService {
     JSONObject getTopApiInfo();
 
     JSONObject getTopIpInfo();
+
+    void exportExcelById(String monitorId, HttpServletRequest request, HttpServletResponse response);
 
 }
