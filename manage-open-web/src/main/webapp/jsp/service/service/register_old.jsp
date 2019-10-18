@@ -29,7 +29,7 @@
     <script type="text/javascript" src="<l:asset path='loushang-framework.js'/>"></script>
     <script type="text/javascript" src="<l:asset path='ui.js'/>"></script>
     <script type="text/javascript" src="<l:asset path='ztree.js'/>"></script>
-    <script type="text/javascript" src="<l:asset path='service/register.js'/>"></script>
+    <script type="text/javascript" src="<l:asset path='service/register_old.js'/>"></script>
 
     <title>服务编辑</title>
     <style type="text/css">

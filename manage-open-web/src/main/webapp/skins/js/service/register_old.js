@@ -130,7 +130,7 @@ var register = {
                     // $("input[name='serviceProtocol'][value='"+(data.requestType).toLowerCase()+"']").attr("checked",true);
                     $("#serviceAddr").val(data.requestAddr);
                     $("#returnSample").val(data.returnSample);
-                    $("#serviceHttpMethod").val("get").attr("disabled","disabled");//默认get请求
+                    $("#serviceHttpMethod").val("get").attr("disabled", "disabled");//默认get请求
                     $("#remoteId").val(apiId);
                     //初始化后端参数
                     register.addBackendInputParam(data.inputParam);
@@ -168,18 +168,18 @@ var register = {
     addInputParamList: function () {
         var endList = register.getBackendParamList();
         //判断编辑还是新增
-        if(register.checkNeedLoadEdit(endList)){
+        if (register.checkNeedLoadEdit(endList)) {
             var data = {data: endList};
-            $("#inputtabletbody").html("").append(template('inputitemlist',data));
+            $("#inputtabletbody").html("").append(template('inputitemlist', data));
         }
     },
     //判断是否需要加载
     checkNeedLoadEdit: function (endList) {
         //远程id变化要加载最新的后端数据
-        if(initRemoteId!=$("#remoteId").val()){
+        if (initRemoteId != $("#remoteId").val()) {
             return true;
         }
-        if(endList.length!=initInputList.length){
+        if (endList.length != initInputList.length) {
             return true;
         }
         return editFlag;
@@ -310,12 +310,12 @@ var register = {
             };
             for (var j in endList) {
                 if (backname == endList[j].name) {
-                        param.scName = endList[j].name,
+                    param.scName = endList[j].name,
                         param.scType = endList[j].type,
-                            param.scRequired = Number(endList[j].required),
+                        param.scRequired = Number(endList[j].required),
                         param.scDescription = endList[j].description,
                         param.fixedValue = endList[j].fixedValue,
-                            param.scSeq = Number(endList[j].seq),
+                        param.scSeq = Number(endList[j].seq),
                         param.scParamType = endList[j].paramType
                 }
             }
@@ -336,7 +336,7 @@ var register = {
                     required: $(this).find('select[name=inputRequired] option:selected').val(),
                     description: $(this).find('input[name=inputDescription]').val(),
                     fixedValue: $(this).find('input[name=fixedValue]').val(),
-                    backname:$(this).find('input[name=backname]').val()
+                    backname: $(this).find('input[name=backname]').val()
                 };
                 inputParam.push(param);
             }
@@ -348,10 +348,10 @@ var register = {
         $("#backendinputtable tr:gt(0)").each(function (i, e) {
             var name = $(this).find("input[name=paramName]").val();
             if (name != null && name != '') {
-                if($("#remoteId").val()){//远程接口数据
+                if ($("#remoteId").val()) {//远程接口数据
                     var param = {
                         name: name,
-                        type:$(this).find("input[name=type]").val(),
+                        type: $(this).find("input[name=type]").val(),
                         required: $(this).find("input[name=required]").val(),
                         seq: $(this).find("input[name=seq]").val(),
                         description: $(this).find("input[name=description]").val(),
@@ -359,10 +359,10 @@ var register = {
                         paramType: $(this).find('select[name=paramType] option:selected').val()
                     };
                     endParam.push(param);
-                }else{//手动添加
+                } else {//手动添加
                     var param = {
                         name: name,
-                        type:$(this).find('select[name=type] option:selected').val(),
+                        type: $(this).find('select[name=type] option:selected').val(),
                         required: $(this).find('select[name=required] option:selected').val(),
                         seq: $(this).find("input[name=seq]").val(),
                         description: $(this).find("input[name=description]").val(),
@@ -375,14 +375,14 @@ var register = {
         });
         return endParam;
     },
-    getOutputParamList: function(openServiceId) {
+    getOutputParamList: function (openServiceId) {
         var outputParam = [];
-        $("#outtable tr:gt(0)").each(function(i, e) {
+        $("#outtable tr:gt(0)").each(function (i, e) {
             var name = $(this).find("input[name=name]").val();
-            if(name != null && name != '') {
+            if (name != null && name != '') {
                 var param = {
                     id: $(this).find("input[name=id]").val(),
-                    openServiceId:openServiceId,
+                    openServiceId: openServiceId,
                     name: $(this).find("input[name=name]").val(),
                     description: $(this).find("input[name=description]").val(),
                     type: $(this).find('select[name=type] option:selected').val(),
@@ -453,19 +453,4 @@ function sticky(msg, style, position) {
         position: place,
         style: type
     });
-}
-
-function chooseProtocol(msg, style, position) {
-    var scProtocol = $("input[name='scProtocol']:checked").val();//请求协议
-    if('http' == scProtocol){
-    	$("#httpMethodDiv").show();
-    	$("#scFrameDiv").hide();
-    	$("#sc_ws_functionDiv").hide();
-    	$("#sc_ws_namespaceDiv").hide();
-    }else{
-    	$("#httpMethodDiv").hide();
-    	$("#scFrameDiv").show();
-    	$("#sc_ws_functionDiv").show();
-    	$("#sc_ws_namespaceDiv").show();
-    }
 }
