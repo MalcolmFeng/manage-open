@@ -5,6 +5,7 @@ import com.inspur.bigdata.manage.common.utils.PropertiesUtil;
 import com.inspur.bigdata.manage.open.service.data.*;
 import com.inspur.bigdata.manage.open.service.service.*;
 import com.inspur.bigdata.manage.open.service.util.OpenServiceConstants;
+import com.inspur.bigdata.manage.open.service.util.POIUtil;
 import com.inspur.bigdata.manage.utils.HttpUtil;
 import com.inspur.bigdata.manage.utils.OpenDataConstants;
 import com.inspur.bigdata.manage.utils.StringUtil;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import com.alibaba.druid.support.logging.Log;
 import com.alibaba.druid.support.logging.LogFactory;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
 import org.loushang.framework.util.HttpRequestUtils;
@@ -25,8 +27,10 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
 
+import javax.persistence.Transient;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.*;
 
@@ -67,6 +71,31 @@ public class ServiceDefController {
 
     @Autowired
     AppManageController appManageController;
+
+    /**
+     * 批量导入API服务
+     * @return
+     */
+    @PostMapping(value = "/import")
+    public Map<String, Object> importAPI(@RequestParam("excelFile") MultipartFile excelFile, HttpServletRequest request) throws IOException {
+        List<String[]> excelData = POIUtil.readExcelFile(excelFile, 1);
+
+        for (String[] arr : excelData) {
+            System.out.println(arr);
+
+            ServiceDef serviceDef = new ServiceDef();
+            List<ServiceInput> inputList = new ArrayList<>();
+            List<ServiceOutput> outputList = new ArrayList<>();
+
+            serviceDef.setInputList(inputList);
+            serviceDef.setOutputList(outputList);
+
+//            Map<String, Object> result = importAPI(serviceDef);
+        }
+
+
+        return null;
+    }
 
     @RequestMapping(value = "/doApply")
     @ResponseBody
@@ -654,6 +683,26 @@ public class ServiceDefController {
             map.put("message", "数据分组不存在");
             return map;
         }
+        if (!StringUtil.isEmpty(serviceDef.getId())) {
+            return update(serviceDef);
+        }
+        serviceDef.setId(UUIDGenerator.getUUID());
+        serviceDef.setProvider(OpenServiceConstants.getUserId());
+        serviceDef.setAuditStatus(OpenServiceConstants.api_create);
+        serviceDef.setCreateTime(OpenServiceConstants.sf.format(new Date()));
+        try {
+            serviceDefService.addServiceDef(serviceDef);
+            map.put("result", true);
+        } catch (Exception e) {
+            e.printStackTrace();
+            map.put("result", false);
+            map.put("message", e.getMessage());
+        }
+        return map;
+    }
+
+    public Map<String, Object> importAPI(ServiceDef serviceDef){
+        Map<String, Object> map = new HashMap<>();
         if (!StringUtil.isEmpty(serviceDef.getId())) {
             return update(serviceDef);
         }
