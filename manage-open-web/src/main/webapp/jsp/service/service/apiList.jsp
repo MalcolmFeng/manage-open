@@ -133,22 +133,16 @@
                             </thead>
                             <tbody class="t-body" id="inputParamBody">
                             <tr>
-                                <td>_app_timestamp</td>
+                                <td>X-Ca-Key</td>
                                 <td>String</td>
-                                <td>否</td>
-                                <td>请求时间戳</td>
+                                <td>是</td>
+                                <td>APP KEY</td>
                             </tr>
                             <tr>
-                                <td>_app_signature</td>
+                                <td>X-Ca-Signature</td>
                                 <td>String</td>
                                 <td>是</td>
                                 <td>请求签名</td>
-                            </tr>
-                            <tr>
-                                <td>_access_token</td>
-                                <td>String</td>
-                                <td>是</td>
-                                <td>用户授权令牌</td>
                             </tr>
                             </tbody>
                         </table>

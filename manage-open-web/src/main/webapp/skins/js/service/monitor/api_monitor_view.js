@@ -145,7 +145,7 @@ function initTopApiCountEcharts() {
     var option = {
         title: {
             text: '热门API TOP5七日榜',
-            subtext: ''
+            subtext: '最近7天成功调用最多的API前5名'
         },
         tooltip: {
             trigger: 'axis',
@@ -193,7 +193,7 @@ function updateTopApiCountEcharts() {
     topApiChart.setOption({
         backgroundColor: '#fff',
         title: {
-            text: '热门API TOP5'
+            text: '热门API TOP5七日榜'
         },
         xAxis: {
             data: dayList
