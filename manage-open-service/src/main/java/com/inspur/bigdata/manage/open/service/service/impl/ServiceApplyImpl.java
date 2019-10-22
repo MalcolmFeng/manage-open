@@ -51,6 +51,12 @@ public class ServiceApplyImpl implements IServiceApplyService{
     }
 
     @Override
+    public List<Map<String,Object>> getByBatchId(String id)
+    {
+        return serviceApplyMapper.getByBatchId(id);
+    }
+
+    @Override
     public void updateServiceApply(ServiceApply serviceApply){
         serviceApplyMapper.update(serviceApply);
     }

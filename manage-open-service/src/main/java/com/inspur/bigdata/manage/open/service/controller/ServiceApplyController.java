@@ -17,10 +17,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by songlili on 2019/2/13.
@@ -149,6 +146,20 @@ public class ServiceApplyController {
         }
         return result;
     }
+
+    // 批量授权
+    @RequestMapping("/pass/batch/{id}")
+    @ResponseBody
+    public List<Map<String, Object>> authPassBatchApply(@PathVariable("id") String id) {
+        List<Map<String, Object>> resultList = new ArrayList();
+        List<Map<String,Object>> serviceApply = serviceApplyService.getByBatchId(id);
+        for (Map<String,Object> temp : serviceApply){
+            Map<String, Object> result = authPassApply( (String)temp.get("id"));
+            resultList.add(result);
+        }
+        return resultList;
+    }
+
     //驳回操作
     @RequestMapping("/reject/{id}")
     @ResponseBody

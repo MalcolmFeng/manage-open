@@ -29,4 +29,5 @@ public interface ServiceApplyMapper extends EntityMapper<ServiceApply> {
 
     void deleteApplyById(String id);
 
+    List<Map<String,Object>> getByBatchId(String id);
 }

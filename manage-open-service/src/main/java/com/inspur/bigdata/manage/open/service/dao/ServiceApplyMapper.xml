@@ -182,4 +182,8 @@
         delete from  api_service_apply where id=#{id}
     </delete>
 
+    <select id="getByBatchId" resultType="map" parameterType="map">
+        select id from api_service_apply where BATCH_APPLY_ID = #{id}
+    </select>
+
 </mapper>
