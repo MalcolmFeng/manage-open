@@ -882,22 +882,22 @@ public class ServiceExecuteController {
         if ( StringUtil.isNotEmpty(encryptType) && !StringUtils.equals(encryptType,"") ) {
             switch (encryptType) {
                 case ENCRYPT_MODE_NO:
-                    after_value = param;
+                    after_value = after_value;
                     break;
                 case ENCRYPT_MODE_KEY_BASE64:
-                    after_value = encryptBASE64String(param);
+                    after_value = encryptBASE64String(after_value);
                     break;
                 case ENCRYPT_MODE_KEY_REST:
-                    after_value = encryptRESTString(encryptUrl,name,param);
+                    after_value = encryptRESTString(encryptUrl,name,after_value);
                     break;
                 case ENCRYPT_MODE_KEY_SM3:
-                    throw new Exception("暂不支持国密SM3加密，param = [" + param + "]");
+                    throw new Exception("暂不支持国密SM3加密，param = [" + after_value + "]");
                 case ENCRYPT_MODE_KEY_MD5:
-                    throw new Exception("暂不支持MD5加密，param = [" + param + "]");
+                    throw new Exception("暂不支持MD5加密，param = [" + after_value + "]");
                 case ENCRYPT_MODE_KEY_SHA_1:
-                    throw new Exception("暂不支持SHA-1加密，param = [" + param + "]");
+                    throw new Exception("暂不支持SHA-1加密，param = [" + after_value + "]");
                 default:
-                    throw new Exception("暂不支持对所选加密方式，param = [" + param + "],encryptionType = [" + decryptType + "]");
+                    throw new Exception("暂不支持对所选加密方式，param = [" + after_value + "],encryptionType = [" + encryptType + "]");
             }
         }
         return after_value;
