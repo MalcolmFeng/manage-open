@@ -312,11 +312,16 @@ var register = {
                 if (backname == endList[j].name) {
                         param.scName = endList[j].name,
                         param.scType = endList[j].type,
-                            param.scRequired = Number(endList[j].required),
+                        param.scRequired = Number(endList[j].required),
                         param.scDescription = endList[j].description,
                         param.fixedValue = endList[j].fixedValue,
-                            param.scSeq = Number(endList[j].seq),
-                        param.scParamType = endList[j].paramType
+                        param.scSeq = Number(endList[j].seq),
+                        param.scParamType = endList[j].paramType,
+
+                        param.decryptType = endList[j].decryptType,
+                        param.encryptType = endList[j].encryptType,
+                        param.decryptUrl = endList[j].decryptUrl,
+                        param.encryptUrl = endList[j].encryptUrl
                 }
             }
             inputParam.push(param);
@@ -336,7 +341,12 @@ var register = {
                     required: $(this).find('select[name=inputRequired] option:selected').val(),
                     description: $(this).find('input[name=inputDescription]').val(),
                     fixedValue: $(this).find('input[name=fixedValue]').val(),
-                    backname:$(this).find('input[name=backname]').val()
+                    backname:$(this).find('input[name=backname]').val(),
+
+                    decryptType: $(this).find('select[name=decryptType] option:selected').val(),
+                    encryptType: $(this).find('select[name=encryptType] option:selected').val(),
+                    decryptUrl: $(this).find('input[name=decryptUrl]').val(),
+                    encryptUrl: $(this).find('input[name=encryptUrl]').val()
                 };
                 inputParam.push(param);
             }
@@ -356,7 +366,12 @@ var register = {
                         seq: $(this).find("input[name=seq]").val(),
                         description: $(this).find("input[name=description]").val(),
                         fixedValue: $(this).find('input[name=fixedValue]').val(),
-                        paramType: $(this).find('select[name=paramType] option:selected').val()
+                        paramType: $(this).find('select[name=paramType] option:selected').val(),
+
+                        decryptType: $(this).find('select[name=decryptType] option:selected').val(),
+                        encryptType: $(this).find('select[name=encryptType] option:selected').val(),
+                        decryptUrl: $(this).find('input[name=decryptUrl]').val(),
+                        encryptUrl: $(this).find('input[name=encryptUrl]').val()
                     };
                     endParam.push(param);
                 }else{//手动添加
@@ -367,7 +382,12 @@ var register = {
                         seq: $(this).find("input[name=seq]").val(),
                         description: $(this).find("input[name=description]").val(),
                         fixedValue: $(this).find('input[name=fixedValue]').val(),
-                        paramType: $(this).find('select[name=paramType] option:selected').val()
+                        paramType: $(this).find('select[name=paramType] option:selected').val(),
+
+                        decryptType: $(this).find('select[name=decryptType] option:selected').val(),
+                        encryptType: $(this).find('select[name=encryptType] option:selected').val(),
+                        decryptUrl: $(this).find('input[name=decryptUrl]').val(),
+                        encryptUrl: $(this).find('input[name=encryptUrl]').val()
                     };
                     endParam.push(param);
                 }

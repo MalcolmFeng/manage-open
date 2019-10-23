@@ -82,15 +82,19 @@ public class ServiceDefController {
 
         for (String[] arr : excelData) {
             System.out.println(arr);
-
             ServiceDef serviceDef = new ServiceDef();
+//            serviceDef.setName();
+//            serviceDef.setDescription();
+//            serviceDef.setAuditStatus();
+//            serviceDef.setAuthType();
+
             List<ServiceInput> inputList = new ArrayList<>();
             List<ServiceOutput> outputList = new ArrayList<>();
 
             serviceDef.setInputList(inputList);
             serviceDef.setOutputList(outputList);
 
-//            Map<String, Object> result = importAPI(serviceDef);
+            Map<String, Object> result = importAPI(serviceDef);
         }
 
 

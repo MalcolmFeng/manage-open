@@ -271,16 +271,20 @@
 				<hr class="fenge"/>
 				<div class="form-group">
 					<div class="col-xs-12 col-md-12 param-list">
-						<table id="backendinputtable">
+						<table id="backendinputtable" style="width: 100%;margin-right: 10px;">
 							<tr>
-								<th style="width: 12%;">后端参数名称</th>
-								<th style="width: 12%;">后端参数类型</th>
-								<th style="width: 12%;">后端参数位置</th>
+								<th style="width: 8%;">后端参数名称</th>
+								<th style="width: 8%;">后端参数类型</th>
+								<th style="width: 8%;">后端参数位置</th>
 								<th style="width: 8%;">是否必填</th>
-								<th style="width: 12%;">固定值</th>
+								<th style="width: 5%;">固定值</th>
 								<th style="width: 5%;">排序</th>
-								<th>后端参数描述</th>
-								<th style="width: 12%;">操作</th>
+								<th style="width: 12%;">后端参数描述</th>
+								<th style="width: 8%;">解密方式</th>
+								<th style="width: 11%;">解密接口地址</th>
+								<th style="width: 8%;">加密方式</th>
+								<th style="width: 11%;">加密接口地址</th>
+								<th style="width: 6%;">操作</th>
 							</tr>
 							<tbody id="backendinputtbody">
 							<c:forEach items="${serviceDef.inputList}" var="inparam">
@@ -325,9 +329,33 @@
 										<td>
 											<input type="text" name="description" value="${inparam.scDescription}" onchange="changeEditFlag()" />
 										</td>
-										<td><a onclick="register.forColumnDel(this)">删除</a></td>
+										<%-- 解密方式--%>
+										<td>
+											<select name="decryptType" onchange="changeEditFlag()">
+												<option value="" <c:if test="${inparam.decryptType ==''}"> selected="selected" </c:if>>不加密</option>
+												<option value="BASE64" <c:if test="${inparam.decryptType =='BASE64'}"> selected="selected" </c:if>>BASE64</option>
+												<option value="REST" <c:if test="${inparam.decryptType =='REST'}"> selected="selected" </c:if>>REST</option>
+											</select>
+										</td>
+										<td>
+											<input type="text" name="decryptUrl" value="${inparam.decryptUrl}" onchange="changeEditFlag()" />
+										</td>
+										<%-- 加密方式--%>
+										<td>
+											<select name="encryptType" onchange="changeEditFlag()">
+												<option value="" <c:if test="${inparam.encryptType ==''}"> selected="selected" </c:if>>不加密</option>
+												<option value="BASE64" <c:if test="${inparam.encryptType =='BASE64'}"> selected="selected" </c:if>>BASE64</option>
+												<option value="REST" <c:if test="${inparam.encryptType =='REST'}"> selected="selected" </c:if>>REST</option>
+											</select>
+										</td>
+										<%-- 加密接口地址--%>
+										<td>
+											<input type="text" name="encryptUrl" value="${inparam.encryptUrl}" onchange="changeEditFlag()" />
+										</td>
+										<td>
+											<a onclick="register.forColumnDel(this)">删除</a>
+										</td>
 									</tr>
-
                             </c:forEach>
 							</tbody>
 						</table>
@@ -480,7 +508,7 @@
 			  <div class="col-xs-12 col-md-12" style="text-align: center">
 				  <input id="prevStep" style="display: none;" type="button" class="btn ue-btn-primary" value="上一步">&emsp;
 				  <input id="nextStep" type="button" class="btn ue-btn-primary" value="下一步">&emsp;
-				  <input id="_submit"type="submit" style="display: none;" class="btn ue-btn-primary" value="保存">&emsp;
+				  <input id="_submit" type="submit" style="display: none;" class="btn ue-btn-primary" value="保存">&emsp;
 				  <input id="goback" type="button" class="btn ue-btn" value="返回">
 			  </div>
 		  </div>
@@ -816,20 +844,25 @@
 
         var initInputList=[];
         <c:forEach items="${serviceDef.inputList}" var="item">
-        var param={
-            name:"${item.name}",
-            type:"${item.type}",
-            required:"${item.required}",
-            description:"${item.description}",
-            scName:"${item.scName}",
-            scType:"${item.scType}",
-            scParamType:"${item.scParamType}",
-            scSeq:"${item.scSeq}",
-			fixedValue: "${item.fixedValue}",
-            scRequired:"${item.scRequired}",
-            scDescription:"${item.scDescription}"
-		};
-        initInputList.push(param);
+			var param={
+				name:"${item.name}",
+				type:"${item.type}",
+				required:"${item.required}",
+				description:"${item.description}",
+				scName:"${item.scName}",
+				scType:"${item.scType}",
+				scParamType:"${item.scParamType}",
+				scSeq:"${item.scSeq}",
+				fixedValue: "${item.fixedValue}",
+				scRequired:"${item.scRequired}",
+				scDescription:"${item.scDescription}",
+
+				decryptType:"${item.decryptType}",
+				decryptUrl:"${item.decryptUrl}",
+				encryptType:"${item.encryptType}",
+				encryptUrl:"${item.encryptUrl}"
+			};
+			initInputList.push(param);
         </c:forEach>
         var editFlag=false;
         function changeEditFlag(){
@@ -971,16 +1004,16 @@
 			</td>
 			<td>
 				<select name="type" onchange="changeEditFlag()">
-				<option value="string" selected="selected">String</option>
-				<option value="int">Int</option>
-				<option value="long">Long</option>
-				<option value="double">Double</option>
-				<option value="float">Float</option>
-				<option value="boolean">Boolean</option>
-				<option value="application/json">application/json</option>
-				<option value="text/xml">text/xml</option>
-				<option value="file">file</option>
-			</select>
+					<option value="string" selected="selected">String</option>
+					<option value="int">Int</option>
+					<option value="long">Long</option>
+					<option value="double">Double</option>
+					<option value="float">Float</option>
+					<option value="boolean">Boolean</option>
+					<option value="application/json">application/json</option>
+					<option value="text/xml">text/xml</option>
+					<option value="file">file</option>
+				</select>
 			</td>
 			<td>
 				<select name="paramType" onchange="changeEditFlag()">
@@ -1003,6 +1036,30 @@
 			<td>
 				<input type="text" name="description" value="" onchange="changeEditFlag()" />
 			</td>
+			<%-- 解密方式--%>
+			<td>
+				<select name="decryptType" onchange="changeEditFlag()">
+					<option value=""  selected="selected" >不加密</option>
+					<option value="BASE64">BASE64</option>
+					<option value="REST">REST</option>
+				</select>
+			</td>
+			<td>
+				<input type="text" name="decryptUrl" value="" onchange="changeEditFlag()" />
+			</td>
+			<%-- 加密方式--%>
+			<td>
+				<select name="encryptType" onchange="changeEditFlag()">
+					<option value="" selected="selected">不加密</option>
+					<option value="BASE64">BASE64</option>
+					<option value="REST">REST</option>
+				</select>
+			</td>
+			<%-- 加密接口地址--%>
+			<td>
+				<input type="text" name="encryptUrl" value="" onchange="changeEditFlag()" />
+			</td>
+
 			<td><a onclick="register.forColumnDel(this)">删除</a></td>
 		</tr>
 	</script>

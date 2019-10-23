@@ -1,11 +1,15 @@
 package com.inspur.bigdata.manage.utils;
 
 import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.http.HttpResponse;
+import org.apache.http.util.EntityUtils;
 import sun.misc.BASE64Decoder;
 import sun.misc.BASE64Encoder;
 
 import java.io.IOException;
 import java.security.MessageDigest;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * 加密工具类
@@ -78,6 +82,41 @@ public class EncryptionUtil {
         BASE64Decoder decoder = new BASE64Decoder();
         return new String(decoder.decodeBuffer(key));
     }
+
+    /**
+     * 通过REST接口进行解密
+     *
+     * @return
+     * @throws Exception
+     */
+    public static String decryptRESTString(String url,String name,String value) throws Exception {
+        return crypt(url, name, value);
+    }
+    /**
+     * 通过REST接口进行加密
+     *
+     * @return
+     * @throws Exception
+     */
+    public static String encryptRESTString(String url,String name,String value) throws Exception {
+        return crypt(url, name, value);
+    }
+
+    private static String crypt(String url, String name, String value) {
+        try {
+            Map<String, Object> params = new HashMap<>();
+            params.put(name, value);
+            HttpResponse response = HttpUtils.doGet(url, params);
+            if (response.getStatusLine().getStatusCode() == 200) {
+                String entity = EntityUtils.toString(response.getEntity(), "UTF-8");
+                return entity;
+            }
+        } catch (Exception e) {
+            System.out.println(e.toString());
+        }
+        return null;
+    }
+
 
     /**
      * BASE64加密,入参出参为String

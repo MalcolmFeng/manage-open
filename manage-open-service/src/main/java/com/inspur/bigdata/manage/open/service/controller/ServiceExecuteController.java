@@ -742,7 +742,7 @@ public class ServiceExecuteController {
             if (OpenDataConstants.is_null_no == serviceInput.getRequired() && StringUtils.isBlank(serviceInput.getValue()) && !serviceInput.getScType().equals("text/xml") && !serviceInput.getScType().equals("application/json")) {
                 throw new Exception("请传入必填参数" + serviceInput.getName());
             }
-            String decryptedParam = decryptedParam(serviceInput.getValue(), serviceDef.getEncryptionType());
+            String decryptedParam = decryptedParam(serviceInput, serviceDef.getEncryptionType());
             serviceInputParam.put(serviceInput.getScName(), decryptedParam);
             checkData(serviceInput.getScType(), decryptedParam, serviceInput.getScName());//判断参数类型是否正确
             String paramType = serviceInput.getScParamType();
@@ -797,15 +797,17 @@ public class ServiceExecuteController {
     }
 
     /**
-     * 解密参数
+     * 解密参数 接口级
      *
-     * @param param
      * @param encryptionType
      * @return
      * @throws Exception
      */
-    private static String decryptedParam(String param, String encryptionType) throws Exception {
+    private static String decryptedParam(ServiceInput serviceInput, String encryptionType) throws Exception {
         String decryptedParamStr = "";
+        String param = serviceInput.getValue();
+        String url = serviceInput.getValue();
+        String name = serviceInput.getName();
         if (StringUtil.isNotEmpty(encryptionType) && StringUtil.isNotEmpty(ENCRYPTION_MAP.get(encryptionType))) {
             switch (encryptionType) {
                 case ENCRYPT_MODE_NO:
@@ -813,6 +815,9 @@ public class ServiceExecuteController {
                     break;
                 case ENCRYPT_MODE_KEY_BASE64:
                     decryptedParamStr = decryptBASE64String(param);
+                    break;
+                case ENCRYPT_MODE_KEY_REST:
+                    decryptedParamStr = decryptRESTString(url,name,param);
                     break;
                 case ENCRYPT_MODE_KEY_SM3:
                     throw new Exception("暂不支持国密SM3解密，param = [" + param + "]");
@@ -826,7 +831,72 @@ public class ServiceExecuteController {
         } else {
             throw new Exception("传入加密方式不正确，请检查后重试，param = [" + param + "],encryptionType = [" + encryptionType + "]");
         }
-        return decryptedParamStr;
+        // 赋值后进行参数级加解密
+        serviceInput.setValue(decryptedParamStr);
+        return decryptedParam_paramLevel(serviceInput);
+    }
+
+    /**
+     * 解密参数 参数级
+     *
+     * @return
+     * @throws Exception
+     */
+    private static String decryptedParam_paramLevel(ServiceInput serviceInput) throws Exception {
+        String after_value = "";
+        String param = serviceInput.getValue();
+        String name = serviceInput.getName();
+
+        String decryptType = serviceInput.getDecryptType();
+        String encryptType = serviceInput.getEncryptType();
+        String decryptUrl = serviceInput.getDecryptUrl();
+        String encryptUrl = serviceInput.getEncryptUrl();
+
+        // 执行解密
+        if ( StringUtil.isNotEmpty(decryptType) || StringUtils.equals(decryptType,"")) {
+            switch (encryptType) {
+                case ENCRYPT_MODE_NO:
+                    after_value = param;
+                    break;
+                case ENCRYPT_MODE_KEY_BASE64:
+                    after_value = decryptBASE64String(param);
+                    break;
+                case ENCRYPT_MODE_KEY_REST:
+                    after_value = decryptRESTString(decryptUrl,name,param);
+                    break;
+                case ENCRYPT_MODE_KEY_SM3:
+                    throw new Exception("暂不支持国密SM3解密，param = [" + param + "]");
+                case ENCRYPT_MODE_KEY_MD5:
+                    throw new Exception("暂不支持MD5解密，param = [" + param + "]");
+                case ENCRYPT_MODE_KEY_SHA_1:
+                    throw new Exception("暂不支持SHA-1解密，param = [" + param + "]");
+                default:
+                    throw new Exception("暂不支持对所选加密方式解密，param = [" + param + "],encryptionType = [" + decryptType + "]");
+            }
+        }
+        // 执行加密
+        if ( StringUtil.isNotEmpty(encryptType) && !StringUtils.equals(encryptType,"") ) {
+            switch (encryptType) {
+                case ENCRYPT_MODE_NO:
+                    after_value = param;
+                    break;
+                case ENCRYPT_MODE_KEY_BASE64:
+                    after_value = encryptBASE64String(param);
+                    break;
+                case ENCRYPT_MODE_KEY_REST:
+                    after_value = encryptRESTString(encryptUrl,name,param);
+                    break;
+                case ENCRYPT_MODE_KEY_SM3:
+                    throw new Exception("暂不支持国密SM3加密，param = [" + param + "]");
+                case ENCRYPT_MODE_KEY_MD5:
+                    throw new Exception("暂不支持MD5加密，param = [" + param + "]");
+                case ENCRYPT_MODE_KEY_SHA_1:
+                    throw new Exception("暂不支持SHA-1加密，param = [" + param + "]");
+                default:
+                    throw new Exception("暂不支持对所选加密方式，param = [" + param + "],encryptionType = [" + decryptType + "]");
+            }
+        }
+        return after_value;
     }
 
     /**

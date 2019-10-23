@@ -62,6 +62,32 @@ public class ServiceInput implements Serializable, Comparable<ServiceInput> {
     @Column(name = "fixed_value")
     private String fixedValue;
 
+    /**
+     * 加密方式
+     */
+    @Column(name = "encrypt_type")
+    private String encryptType;
+
+    /**
+     * 解密方式
+     */
+    @Column(name = "decrypt_type")
+    private String decryptType;
+
+    /**
+     * 解密方式
+     */
+    @Column(name = "decrypt_url")
+    private String decryptUrl;
+
+    /**
+     * 解密方式
+     */
+    @Column(name = "encrypt_url")
+    private String encryptUrl;
+
+
+
 
     @Transient
     private String value;
@@ -185,5 +211,37 @@ public class ServiceInput implements Serializable, Comparable<ServiceInput> {
 
     public void setFixedValue(String fixedValue) {
         this.fixedValue = fixedValue;
+    }
+
+    public String getEncryptType() {
+        return encryptType;
+    }
+
+    public void setEncryptType(String encryptType) {
+        this.encryptType = encryptType;
+    }
+
+    public String getDecryptType() {
+        return decryptType;
+    }
+
+    public void setDecryptType(String decryptType) {
+        this.decryptType = decryptType;
+    }
+
+    public String getDecryptUrl() {
+        return decryptUrl;
+    }
+
+    public void setDecryptUrl(String decryptUrl) {
+        this.decryptUrl = decryptUrl;
+    }
+
+    public String getEncryptUrl() {
+        return encryptUrl;
+    }
+
+    public void setEncryptUrl(String encryptUrl) {
+        this.encryptUrl = encryptUrl;
     }
 }

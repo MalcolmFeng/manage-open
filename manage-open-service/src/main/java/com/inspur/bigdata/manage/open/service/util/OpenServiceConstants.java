@@ -141,6 +141,8 @@ public class OpenServiceConstants {
     public final static String ENCRYPT_MODE_KEY_SHA_384 = "SHA-384";
     public final static String ENCRYPT_MODE_KEY_SHA_512 = "SHA-512";
     public final static String ENCRYPT_MODE_KEY_SM3 = "SM3";
+    public final static String ENCRYPT_MODE_KEY_REST = "REST";
+
 
     public static final Map<String, String> ENCRYPTION_MAP;
 
