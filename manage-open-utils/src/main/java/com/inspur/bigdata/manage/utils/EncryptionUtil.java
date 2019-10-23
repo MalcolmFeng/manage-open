@@ -105,7 +105,8 @@ public class EncryptionUtil {
     private static String crypt(String url, String name, String value) {
         try {
             Map<String, Object> params = new HashMap<>();
-            params.put(name, value);
+//            params.put(name, value);
+            params.put("content", value);
             HttpResponse response = HttpUtils.doGet(url, params);
             if (response.getStatusLine().getStatusCode() == 200) {
                 String entity = EntityUtils.toString(response.getEntity(), "UTF-8");
