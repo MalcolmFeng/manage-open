@@ -853,7 +853,7 @@ public class ServiceExecuteController {
         String encryptUrl = serviceInput.getEncryptUrl();
 
         // 执行解密
-        if ( StringUtil.isNotEmpty(decryptType) || StringUtils.equals(decryptType,"")) {
+        if ( StringUtil.isNotEmpty(decryptType) && !StringUtils.equals(decryptType,"")) {
             switch (encryptType) {
                 case ENCRYPT_MODE_NO:
                     after_value = param;
@@ -959,7 +959,7 @@ public class ServiceExecuteController {
             str = EntityUtils.toString(entity, "utf-8");
             EntityUtils.consume(entity);
         } catch (Exception e) {
-            str = "API网关POST method failed to access URL！";
+            str = "API网关GET method failed to access URL！";
             log.error("API网关GET method failed to access URL，URL：" + url, e);
         }
         return str;
