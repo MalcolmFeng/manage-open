@@ -284,43 +284,6 @@
 							</tr>
 							<tbody id="backendinputtbody">
 							<c:forEach items="${serviceDef.inputList}" var="inparam">
-								<c:if test="${serviceDef.remoteId !=null}">
-									<tr>
-										<td>
-											<input type="hidden" name="id" value="" />
-											<input type="text" name="paramName"  readonly value="${inparam.scName}" />
-										</td>
-										<td>
-											<input type="hidden" name="type" value="${inparam.scType}" />
-												${inparam.type}
-										</td>
-										<td>
-											<select name="paramType">
-												<option value="path" <c:if test="${inparam.scParamType =='path'}"> selected="selected" </c:if>>Parameter Path</option>
-												<option value="head" <c:if test="${inparam.scParamType =='head'}"> selected="selected" </c:if>>Head</option>
-												<option value="query" <c:if test="${inparam.scParamType =='query'}"> selected="selected" </c:if>>Query</option>
-												<option value="body" <c:if test="${inparam.scParamType =='body'}"> selected="selected" </c:if>>Body</option>
-											</select>
-										</td>
-										<td>
-											<input type="hidden" name="required" value="${inparam.scRequired}" />
-											<c:if test="${inparam.scRequired =='1'}">是</c:if>
-											<c:if test="${inparam.scRequired =='0'}">否</c:if>
-										</td>
-										<td>
-											<input type="text" name="fixedValue" value="${inparam.fixedValue}" onchange="changeEditFlag()">
-										</td>
-										<td>
-											<input type="hidden" name="seq" readonly value="${inparam.scSeq}" />
-										</td>
-										<td>
-											<input type="text" name="description" readonly value="${inparam.scDescription}" />
-										</td>
-										<td>
-										</td>
-									</tr>
-								</c:if>
-								<c:if test="${serviceDef.remoteId ==null}">
 									<tr>
 										<td>
 											<input type="hidden" name="id" value="" />
@@ -364,13 +327,11 @@
 										</td>
 										<td><a onclick="register.forColumnDel(this)">删除</a></td>
 									</tr>
-								</c:if>
-							</c:forEach>
+
+                            </c:forEach>
 							</tbody>
 						</table>
-						<c:if test="${serviceDef.remoteId ==null}">
 						<div id="addBackend" class="pull-right addrow"><a onclick="register.addbackendInputParamTr()">增加一行</a></div>
-						</c:if>
 					</div>
 					<%--<div class="col-xs-2 col-md-2">--%>
 						<%--<input type="hidden" value="*" datatype="verifyParam"  errormsg="前后端参数问题"/>--%>
