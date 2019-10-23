@@ -17,6 +17,7 @@ public interface IServiceApplyService {
     String insert(ServiceApply serviceApply);
 
     ServiceApply getById(String id);
+    List<Map<String,Object>> getByBatchId(String id);
 
     void updateServiceApply(ServiceApply serviceApply);
 
