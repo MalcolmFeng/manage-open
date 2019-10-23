@@ -332,7 +332,7 @@
 										<%-- 解密方式--%>
 										<td>
 											<select name="decryptType" onchange="changeEditFlag()">
-												<option value="" <c:if test="${inparam.decryptType ==''}"> selected="selected" </c:if>>不加密</option>
+												<option value="0" <c:if test="${inparam.decryptType ==''}"> selected="selected" </c:if>>不加密</option>
 												<option value="BASE64" <c:if test="${inparam.decryptType =='BASE64'}"> selected="selected" </c:if>>BASE64</option>
 												<option value="REST" <c:if test="${inparam.decryptType =='REST'}"> selected="selected" </c:if>>REST</option>
 											</select>
@@ -343,7 +343,7 @@
 										<%-- 加密方式--%>
 										<td>
 											<select name="encryptType" onchange="changeEditFlag()">
-												<option value="" <c:if test="${inparam.encryptType ==''}"> selected="selected" </c:if>>不加密</option>
+												<option value="0" <c:if test="${inparam.encryptType ==''}"> selected="selected" </c:if>>不加密</option>
 												<option value="BASE64" <c:if test="${inparam.encryptType =='BASE64'}"> selected="selected" </c:if>>BASE64</option>
 												<option value="REST" <c:if test="${inparam.encryptType =='REST'}"> selected="selected" </c:if>>REST</option>
 											</select>
@@ -1039,7 +1039,7 @@
 			<%-- 解密方式--%>
 			<td>
 				<select name="decryptType" onchange="changeEditFlag()">
-					<option value=""  selected="selected" >不加密</option>
+					<option value="0"  selected="selected" >不加密</option>
 					<option value="BASE64">BASE64</option>
 					<option value="REST">REST</option>
 				</select>
@@ -1050,7 +1050,7 @@
 			<%-- 加密方式--%>
 			<td>
 				<select name="encryptType" onchange="changeEditFlag()">
-					<option value="" selected="selected">不加密</option>
+					<option value="0" selected="selected">不加密</option>
 					<option value="BASE64">BASE64</option>
 					<option value="REST">REST</option>
 				</select>

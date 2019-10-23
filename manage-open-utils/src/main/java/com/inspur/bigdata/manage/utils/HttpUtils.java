@@ -214,6 +214,39 @@ public class HttpUtils {
 		return httpStr;
 	}
 
+
+	/**
+	 * 发送 SSL POST 请求（HTTPS），K-V形式
+	 * @param apiUrl API接口URL
+	 * @param params 参数map
+	 * @return
+	 */
+	public static HttpResponse doGetSSL(String apiUrl, Map<String, Object> params) {
+		CloseableHttpClient httpclient = HttpClients.custom().setSSLSocketFactory(createSSLConnSocketFactory()).setConnectionManager(connMgr).setDefaultRequestConfig(requestConfig).build();
+
+		StringBuffer param = new StringBuffer();
+		int i = 0;
+		for (String key : params.keySet()) {
+			if (i == 0)
+				param.append("?");
+			else
+				param.append("&");
+			param.append(key).append("=").append(params.get(key));
+			i++;
+		}
+		apiUrl += param;
+		String result = null;
+		HttpResponse response = null;
+		try {
+			HttpGet httpGet = new HttpGet(apiUrl);
+			response = httpclient.execute(httpGet);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+		return response;
+
+	}
+
 	/**
 	 * 发送 SSL POST 请求（HTTPS），JSON形式
 	 * @param apiUrl API接口URL

@@ -742,8 +742,11 @@ public class ServiceExecuteController {
             if (OpenDataConstants.is_null_no == serviceInput.getRequired() && StringUtils.isBlank(serviceInput.getValue()) && !serviceInput.getScType().equals("text/xml") && !serviceInput.getScType().equals("application/json")) {
                 throw new Exception("请传入必填参数" + serviceInput.getName());
             }
+
+            // 执行加解密，接口级别和参数级别
             String decryptedParam = decryptedParam(serviceInput, serviceDef.getEncryptionType());
             serviceInputParam.put(serviceInput.getScName(), decryptedParam);
+
             checkData(serviceInput.getScType(), decryptedParam, serviceInput.getScName());//判断参数类型是否正确
             String paramType = serviceInput.getScParamType();
             if (paramType.equalsIgnoreCase(OpenServiceConstants.SC_PARAMTYPE_PATH)) {
@@ -780,6 +783,7 @@ public class ServiceExecuteController {
         apiServiceMonitor.setServiceInput(serviceInputParam.toString());
         apiServiceMonitor.setServiceInputHeader(JSONObject.fromObject(header).toString());
         apiServiceMonitor.setServiceMethod(method);
+        System.out.println("请其头为:" + JSONObject.fromObject(header).toString());
         switch (method) {
             case "GET":
                 result = execGet(httpurl.toString(), timeout, header);
@@ -854,7 +858,7 @@ public class ServiceExecuteController {
 
         // 执行解密
         if ( StringUtil.isNotEmpty(decryptType) && !StringUtils.equals(decryptType,"")) {
-            switch (encryptType) {
+            switch (decryptType) {
                 case ENCRYPT_MODE_NO:
                     after_value = param;
                     break;
@@ -871,7 +875,7 @@ public class ServiceExecuteController {
                 case ENCRYPT_MODE_KEY_SHA_1:
                     throw new Exception("暂不支持SHA-1解密，param = [" + param + "]");
                 default:
-                    throw new Exception("暂不支持对所选加密方式解密，param = [" + param + "],encryptionType = [" + decryptType + "]");
+                    throw new Exception("暂不支持对所选解密方式，param = [" + param + "],encryptionType = [" + decryptType + "]");
             }
         }
         // 执行加密
@@ -950,6 +954,7 @@ public class ServiceExecuteController {
         httpGet.setConfig(requestConfig);
         if (StringUtil.isNotEmpty(headers)) {
             for (String key : headers.keySet()) {
+                System.out.println("赋值head："+key+"  "+headers.get(key));
                 httpGet.addHeader(key, headers.get(key));
             }
         }
