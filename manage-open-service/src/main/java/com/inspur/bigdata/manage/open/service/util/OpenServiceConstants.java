@@ -78,6 +78,9 @@ public class OpenServiceConstants {
     //未知错误
     public final static String ASM_ERROR_UNKNOWN = "99999";
 
+    public final static String ASM_ERROR_IP_REFUSE = "20201";
+    public final static String ASM_ERROR_QPS_LIMIT = "20302";
+
 
     public static boolean isSuperAdmin(String realm) {
         return masert_realm.equals(realm);

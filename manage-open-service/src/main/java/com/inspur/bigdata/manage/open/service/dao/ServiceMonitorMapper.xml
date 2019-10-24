@@ -356,4 +356,18 @@
         <if test="null != pageSize and '' != pageSize">LIMIT 0,${pageSize}</if>
     </select>
 
+    <select id="queryNotSuccessNearby" parameterType="map" resultType="map">
+        SELECT
+        caller_ip,COUNT(id) as count
+        FROM
+        api_service_monitor
+        WHERE
+        1=1
+        <if test="null != result and '' != result">
+            and result != #{result}
+        </if>
+        and create_time between #{startTime} and #{endTime}
+        group by caller_ip
+    </select>
+
 </mapper>

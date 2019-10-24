@@ -3,6 +3,7 @@ package com.inspur.bigdata.manage.open.service.controller;
 import com.alibaba.druid.support.logging.Log;
 import com.alibaba.druid.support.logging.LogFactory;
 import com.alibaba.fastjson.JSON;
+import com.google.common.util.concurrent.RateLimiter;
 import com.inspur.bigdata.manage.open.service.data.*;
 import com.inspur.bigdata.manage.open.service.pay.data.PayAccountCapital;
 import com.inspur.bigdata.manage.open.service.pay.service.IPayService;
@@ -14,6 +15,7 @@ import com.inspur.bigdata.manage.open.service.util.signconstants.Constants;
 import com.inspur.bigdata.manage.utils.OpenDataConstants;
 import com.inspur.bigdata.manage.utils.SM3;
 import com.inspur.bigdata.manage.utils.StringUtil;
+import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
 import net.sf.json.JSONObject;
 import org.apache.axis2.client.Options;
 import org.apache.axis2.rpc.client.RPCServiceClient;
@@ -52,6 +54,7 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.math.BigDecimal;
 import java.net.URLDecoder;
@@ -107,6 +110,14 @@ public class ServiceExecuteController {
     private IPayService payService;
     @Autowired
     private IServiceMonitorService monitorService;
+    @Autowired
+    private IServiceIpListService serviceIpListService;
+
+    // 默认限流器大小
+    public static Double default_limitCount = 60.0;
+
+    // 每次路由的地址，创建的限流器
+    public static Map<String, RateLimiter> map = new ConcurrentHashMap();
 
     private static final int Ncpu = getNcpu();
 
@@ -247,28 +258,53 @@ public class ServiceExecuteController {
     @RequestMapping("/do/{apiContext}/{reqPath}")
     @ResponseBody
     public void execute(@PathVariable("apiContext") String apiContext, @PathVariable("reqPath") String reqPath,
-                        HttpServletRequest request, HttpServletResponse response) {
-        PrintWriter writer = null;
+                        HttpServletRequest request, HttpServletResponse response) throws IOException {
+        PrintWriter writer = response.getWriter();
         boolean success = true;
         long startTime = 0;
+        String responseTime = null;
         String requestUserId = null;
         BigDecimal servicePrice = null;
         String instream = null;
-        /**获取请求者IP*/
-        String requestIp = ApiServiceMonitorUtil.getClientIp(request);
-        String requestTime = DateUtil.getCurrentTime2();
-        String responseTime = null;
-        ApiServiceMonitor apiServiceMonitor = new ApiServiceMonitor();
-        apiServiceMonitor.setCallerIp(requestIp);
-        apiServiceMonitor.setRequestTime(requestTime);
-        apiServiceMonitor.setOpenServiceInput(JSONObject.fromObject(request.getParameterMap()).toString());
-        apiServiceMonitor.setOpenServiceMethod(request.getMethod());
-        apiServiceMonitor.setOpenServiceRequestURL(request.getRequestURL().toString());
         String context_path = "/" + apiContext + "/" + reqPath;
+        ApiServiceMonitor apiServiceMonitor = new ApiServiceMonitor();
         try {
+            /**获取请求者IP*/
+            String requestIp = ApiServiceMonitorUtil.getClientIp(request);
+            String requestTime = DateUtil.getCurrentTime2();
+
+            apiServiceMonitor.setCallerIp(requestIp);
+            apiServiceMonitor.setRequestTime(requestTime);
+            apiServiceMonitor.setOpenServiceInput(JSONObject.fromObject(request.getParameterMap()).toString());
+            apiServiceMonitor.setOpenServiceMethod(request.getMethod());
+            apiServiceMonitor.setOpenServiceRequestURL(request.getRequestURL().toString());
+
+            //  ---------------- IP黑名单 start----------------
+            log.info("开始查询数据库黑名单和白名单");
+            Map<String,Object> ipParams = new HashMap<>();
+            ipParams.put("ipV4",requestIp);
+            ipParams.put("active","true");
+            ipParams.put("type","white");
+            List<IpList> ips_white = serviceIpListService.getIpList(ipParams);  // 查白名单
+
+            ipParams.put("type","black");
+            List<IpList> ips_black = serviceIpListService.getIpList(ipParams); // 查黑名单
+
+            // 存在于黑名单但不存在于白名单，拒绝访问
+            if (ips_black.size()>0 && ips_white.size() ==0){
+                success = false;
+                writer.print("IP地址被禁用");
+                writer.flush();
+                apiServiceMonitor.setNotes("IP地址被禁用");
+                apiServiceMonitor.setResult(ASM_ERROR_IP_REFUSE);
+                return;
+            }
+            //  ---------------- IP黑名单 end ----------------
+
+
+            // ---------------- 查询APP start ----------------
             response.setCharacterEncoding("utf-8");
             response.addHeader("Content-Type", OpenServiceConstants.content_type_html);
-            writer = response.getWriter();
             //组装头部并获取 appkey、appSecret 和请求签名signature
             Enumeration<String> headNames = request.getHeaderNames();
             Map<String, String> headers = new HashMap<>();
@@ -300,41 +336,22 @@ public class ServiceExecuteController {
             requestUserId = appList.get(0).getUserId();
             apiServiceMonitor.setCallerAppId(appId);
             apiServiceMonitor.setCallerUserId(requestUserId);
-            /**
-             * 前台传入X-Ca-Key=appKey,X-Ca-Signature=appSecret 验证身份
-             */
+            // ---------------- 查询APP end ----------------
 
-            //生成签名验证是否一致
-//            Map<String,String[]> pmap=request.getParameterMap();
-//            Iterator<String> iterator= pmap.keySet().iterator();
-//            Map<String,String> reqmap=new HashMap<>();
-//            while (iterator.hasNext()) {
-//                String key = iterator.next();
-//                reqmap.put(key,pmap.get(key)[0]);
-//            }
-//            String pre_sign= SignUtil.sign(appSecret,
-//                    request.getMethod().toUpperCase(),
-//                    context_path,
-//                    headers,
-//                    reqmap,
-//                    null,
-//                    new ArrayList<String>());
-            if (!appSecret.equals(signature)) {//判断签名正确性
+
+            // ---------------- 判断签名正确性 start ----------------
+            if (!appSecret.equals(signature)) {
                 success = false;
-//                headers.remove(SystemHeader.X_CA_SIGNATURE_HEADERS);
-//                String signurl=SignUtil.buildStringToSign(request.getMethod().toUpperCase(),
-//                        context_path,
-//                        headers,
-//                        reqmap,
-//                        null,
-//                        new ArrayList<String>());
                 writer.print("验证签名不正确！");
                 writer.flush();
                 apiServiceMonitor.setNotes("验证签名不正确");
                 apiServiceMonitor.setResult(ASM_ERROR_SIGNATURE);
                 return;
             }
-            //通过context,reqPath关联查询apiService
+            // ---------------- 判断签名正确性 end ----------------
+
+
+            // ---------------- 通过context,reqPath关联查询API是否存在和状态 start ----------------
             ServiceDef serviceDef = checkApiService(apiContext, reqPath, apiServiceMonitor);
             if (serviceDef == null) {
                 success = false;
@@ -353,8 +370,10 @@ public class ServiceExecuteController {
                 apiServiceMonitor.setResult(ASM_ERROR_SERVICE_NO_PASS);
                 return;
             }
+            // ----------------通过context,reqPath关联查询API是否存在和状态 end ----------------
 
-            //TODO 通过serviceId和appId查询授权记录，无授权直接返回
+
+            // ---------------- 通过serviceId和appId查询API授权状态 start ----------------
             Map applymap = new HashMap();
             applymap.put("apiServiceId", apiServiceId);
             applymap.put("appId", appId);
@@ -368,7 +387,10 @@ public class ServiceExecuteController {
                 apiServiceMonitor.setResult(ASM_ERROR_SERVICE_UNAUTHORIZE_APP);
                 return;
             }
+            // ---------------- 通过serviceId和appId查询授权记录 end ----------------
 
+
+            // ---------------- 余额判断 start ----------------
             servicePrice = serviceDef.getPrice();
             if (servicePrice.compareTo(new BigDecimal(0.00)) > 0) {
                 //如果调用的API服务售价大于0 需要判断调用者账号下的余额
@@ -395,6 +417,10 @@ public class ServiceExecuteController {
                     }
                 }
             }
+            // ---------------- 余额判断 end ----------------
+
+
+            // ---------------- 入参初始化 start ----------------
             List<ServiceInput> listServiceInput = serviceInputService.listByServiceId(apiServiceId);
             try {
                 //读取request数据流
@@ -413,20 +439,40 @@ public class ServiceExecuteController {
                 apiServiceMonitor.setResult(ASM_ERROR_PARAMETER);
                 return;
             }
-            startTime = System.currentTimeMillis();
+            // ---------------- 入参初始化 end ----------------
 
+
+            //  ---------------- qps limit start ----------------
+            String key = apiContext+"/"+reqPath;
+            // 如果是首次请求
+            if (map.get(key) == null){
+                log.info("apiService: "+ JSON.toJSONString(serviceDef));
+                map.putIfAbsent(key, RateLimiter.create( serviceDef != null ? serviceDef.getLimitCount() : default_limitCount ));
+            }
+            // 进行限流
+            RateLimiter rateLimiter = map.get(key);
+            if (!rateLimiter.tryAcquire()) {
+                success = false;
+                writer.print("请求过于频繁");
+                writer.flush();
+                apiServiceMonitor.setNotes("请求过于频繁");
+                apiServiceMonitor.setResult(ASM_ERROR_QPS_LIMIT);
+                return;
+            }
+            //  ---------------- qps limit end ----------------
+
+
+            // ---------------- 执行转发请求 start ----------------
+            startTime = System.currentTimeMillis();
             String result_str = "";
-            Cookie[] cookies = request.getCookies();
             if (serviceDef.getScProtocol().equals("webService")) {
                 String type = serviceDef.getScFrame();
                 if ("Axiom".equals(type)) {
-
                     result_str = executeAxis2(serviceDef, listServiceInput);
                 } else if ("RPC".equals(type)) {
                     result_str = executeRPC(serviceDef, listServiceInput);
                 }
             } else {
-//                result_str = doRequest(serviceDef, listServiceInput, cookies);
                 result_str = doRequest(instream, serviceDef, listServiceInput, apiServiceMonitor);
             }
             response.addHeader("Content-Type", OpenServiceConstants.getContentType(serviceDef.getContentType()));
@@ -452,7 +498,6 @@ public class ServiceExecuteController {
             apiServiceMonitor.setResult(ASM_ERROR_UNKNOWN);
         } finally {
             IOUtils.closeQuietly(writer);
-//            responseTime = OpenServiceConstants.sf.format(new Date());
             responseTime = DateUtil.getCurrentTime2();
             long serviceTime = System.currentTimeMillis() - startTime;
             if (log.isDebugEnabled()) {
@@ -470,8 +515,6 @@ public class ServiceExecuteController {
             }
             apiServiceMonitor.setResponseTime(responseTime);
             apiServiceMonitor.setCreateTime(DateUtil.getCurrentTime2());
-//            monitorService.insert(apiServiceMonitor);
-//            ApiServiceMonitorUtil.insert(monitorService, apiServiceMonitor);
             ApiServiceMonitorUtil.insertByThreadPool(monitorService, apiServiceMonitor, monitorExecutorService);
         }
     }
@@ -1064,73 +1107,5 @@ public class ServiceExecuteController {
         sc.init(null, new TrustManager[]{trustManager}, null);
         return sc;
     }
-
-    public static void main(String[] args) throws Exception {
-//        RPCServiceClient serviceClient = new RPCServiceClient();
-//
-//        EndpointReference targetEPR = new EndpointReference("http://222.74.69.242:8090/ws/service/hisForHzfwhMessage");
-//        Options options = serviceClient.getOptions();
-//
-//        options.setTo(targetEPR);
-//
-//        options.setAction("http://itf.bussiness.jythis.com/interfaceAPC");
-//        QName qname = new QName("http://itf.bussiness.jythis.com", "interfaceAPC");
-//
-//        Object[] parameters = new Object[]{"<req> \n" +
-//                "<methodCode>getDoctorInfo001</methodCode> \n" +
-//                "<methodParam> \n" +
-//                "<hospitalId>747554124</hospitalId> \n" +
-//                "<signature>80C428E098CE42258084F9C502AEA206</signature> \n" +
-//                "<nonceStr>D3332E9938464648847CA0F450E9294A</nonceStr> \n" +
-//                "<openId>Udffsdfsdfdsf81</openId> \n" +
-//                "<deptId>8000001</deptId> \n" +
-//                "<doctorId/> \n" +
-//                "</methodParam> \n" +
-//                "</req>"};
-//
-//            OMElement element = serviceClient.invokeBlocking(qname, parameters);
-//
-//        List result = getResults(element);
-//
-//        String str = JSON.toJSON(result).toString();
-//        System.out.println("result" + str);
-
-
-        // axis2 服务端
-//        String url = "http://222.74.69.242:8090/founderWebs/services/ICalculateService";
-//        // 使用RPC方式调用WebService
-//        RPCServiceClient serviceClient = new RPCServiceClient();
-//        EndpointReference targetEPR = new EndpointReference(url);
-//        Options options = serviceClient.getOptions();
-//
-//        options.setTo(targetEPR);
-//
-////        options.setAction("urn:FounderRequestData");
-//
-//        QName qname = new QName("http://services.founder.com", "FounderRequestData");
-//
-//
-//        Object[] parameters = new Object[] { "?","?","?","<![CDATA[<Request> <ServiceName>getDeptInfo001</ServiceName> <hospitalId>747554124</hospitalId> <signature>80C428E098CE42258084F9C502AEA206</signature> <nonceStr>D3332E9938464648847CA0F450E9294A</nonceStr> <openId>Udffsdfsdfdsf81</openId> <deptId>1001011</deptId> </Request>]]>" };
-//        OMElement element = serviceClient.invokeBlocking(qname, parameters);
-//        List result = getResults(element);
-//        String str = JSON.toJSON(result).toString();
-//        System.out.println("result" + str);
-
-        String str = "<ns1:out xmlns:ns1=\"http://itf.bussiness.jythis.com\">&lt;?xml version=\"1.0\" encoding=\"utf-8\"?>&lt;res>&#xd;\n" +
-                "&lt;returnCode>0&lt;/returnCode>&#xd;\n" +
-                "&lt;returnMsg>成功&lt;/returnMsg>&#xd;\n" +
-                "&lt;returnData>&lt;doctorInfo>&lt;doctorId>00001&lt;/doctorId>&lt;octorName>崔其福&lt;/octorName>&lt;branchId/>&lt;branchName/>&lt;deptClassId/>&lt;deptClassName/>&lt;deptId>8000001&lt;/deptId>&lt;deptName>崔其福院长办公室&lt;/deptName>&lt;doctorTitle>主任医师&lt;/doctorTitle>&lt;doctorRemark/>&lt;doctorGender>未知&lt;/doctorGender>&lt;betterFor/>&lt;urlPic/>&lt;visitTimeInfo/>&lt;doctorDesc/>&lt;/doctorInfo>&lt;/returnData>&#xd;\n" +
-                "&lt;/res>&#xd;\n" +
-                "</ns1:out>";
-        String xml = str.replace("&lt;","<").replace("&#xd","").replace(";","").replace("</ns1:out>","");;
-
-        Pattern pat = Pattern.compile("<ns1:out.*?>");
-        Matcher mat = pat.matcher(xml);
-        String result = mat.replaceAll("");
-        System.out.println(result);
-
-
-    }
-
 
 }

@@ -6,10 +6,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.inspur.bigdata.manage.open.service.data.IpList;
 import com.inspur.bigdata.manage.open.service.data.ServiceApply;
 import com.inspur.bigdata.manage.open.service.data.ServiceDef;
-import com.inspur.bigdata.manage.open.service.service.IAppManage;
-import com.inspur.bigdata.manage.open.service.service.IServiceApplyService;
-import com.inspur.bigdata.manage.open.service.service.IServiceDefService;
-import com.inspur.bigdata.manage.open.service.service.IServiceIpListService;
+import com.inspur.bigdata.manage.open.service.service.*;
 import com.inspur.bigdata.manage.open.service.util.OpenServiceConstants;
 import com.inspur.bigdata.manage.utils.StringUtil;
 import org.apache.commons.lang.StringUtils;
@@ -21,12 +18,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static com.inspur.bigdata.manage.open.service.util.OpenServiceConstants.getUserId;
 import static org.loushang.framework.util.DateUtil.getCurrentTime2;
@@ -47,6 +42,9 @@ public class ServiceIpListController {
 
     @Autowired
     private IAppManage appManage;
+
+    @Autowired
+    private IServiceMonitorService monitorService;
 
     /**
      * 我的申请列表页
@@ -159,6 +157,60 @@ public class ServiceIpListController {
             result = true;
         }
         return result;
+    }
+
+    /**
+     * 定时统计 监控表，将近十分钟频繁调用失败的ip拉黑
+     */
+    @PostConstruct
+    public void ipBlackAutoHandler(){
+
+        // 十分钟执行一次
+        new Timer().scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                try{
+                    System.out.println("开始执行：ipBlackAutoHandler");
+                    Calendar beforeTime = Calendar.getInstance();
+                    beforeTime.add(Calendar.MINUTE, -10);// 5分钟之前的时间
+                    Date beforeD = beforeTime.getTime();
+                    String startTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(beforeD);
+                    String endTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
+
+                    Map<String, Object> paramsMap = new HashMap<>();
+                    paramsMap.put("result","200");
+                    paramsMap.put("startTime", startTime);
+                    paramsMap.put("endTime", endTime);
+                    List<Map<String,Object>> ipList = monitorService.queryNotSuccessNearby(paramsMap);
+
+                    for (Map<String,Object> item : ipList){
+                        String ipString = (String)item.get("caller_ip");
+                        Long count = (Long) item.get("count");
+                        if (count>100) {
+                            System.out.println("拉黑："+ipString+", 近5min调用失败次数为："+count+" 次");
+                            // 拉黑
+                            IpList ip = new IpList();
+                            ip.setActive("true");
+                            ip.setId(UUID.randomUUID().toString());
+                            ip.setCreateTime(endTime);
+                            ip.setProvider("system");
+                            ip.setIpV4(ipString);
+                            ip.setIpV6(ipString);
+                            ip.setType("black");
+                            try{
+                                serviceIpListService.addIpList(ip);
+                            }catch (Exception e){
+                                System.out.println(e.toString());
+                            }
+                        }
+                    }
+                }catch (Exception e){
+                    System.out.println("执行ipBlackAutoHandler异常："+e.toString());
+                }
+            }
+        },0,10 * 60 *1000);
+
+
     }
 }
 

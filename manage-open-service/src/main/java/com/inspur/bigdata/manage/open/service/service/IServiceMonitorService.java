@@ -35,4 +35,5 @@ public interface IServiceMonitorService {
 
     void exportExcelById(String monitorId, HttpServletRequest request, HttpServletResponse response);
 
+    List<Map<String, Object>> queryNotSuccessNearby(Map<String, Object> paramsMap);
 }

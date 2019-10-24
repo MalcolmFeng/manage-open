@@ -313,6 +313,11 @@ public class ServiceMonitorImpl implements IServiceMonitorService {
 
     }
 
+    @Override
+    public List<Map<String, Object>> queryNotSuccessNearby(Map<String, Object> paramsMap) {
+        return serviceMonitorMapper.queryNotSuccessNearby(paramsMap);
+    }
+
     public Date getFewDays(Date date, int dayNum) {
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(date);

@@ -56,4 +56,6 @@ public interface ServiceMonitorMapper extends EntityMapper<ApiServiceMonitor> {
     List<Map<String, String>> getTopApiCount(Map<String, Object> map);
 
     List<Map<String, String>> getTopIpCount(Map<String, Object> map);
+
+    List<Map<String, Object>> queryNotSuccessNearby(Map<String, Object> paramsMap);
 }
