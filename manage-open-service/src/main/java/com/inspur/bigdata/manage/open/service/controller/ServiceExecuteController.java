@@ -226,7 +226,20 @@ public class ServiceExecuteController {
                 return map;
             }
             //后台请求
-            String result_str = doRequest("", serviceDef, listServiceInput, new ApiServiceMonitor());
+
+            String result_str = "";
+            if (serviceDef.getScProtocol().equals("webService")) {
+                String type = serviceDef.getScFrame();
+                if ("Axiom".equals(type)) {
+                    result_str = executeAxis2(serviceDef, listServiceInput);
+                } else if ("RPC".equals(type)) {
+                    result_str = executeRPC(serviceDef, listServiceInput);
+                }
+            } else {
+                result_str = doRequest("", serviceDef, listServiceInput, new ApiServiceMonitor());
+            }
+
+//            String result_str = doRequest("", serviceDef, listServiceInput, new ApiServiceMonitor());
             ///发送请求
             map.put("result", true);
             map.put("header", "Content-Type:" + OpenServiceConstants.getContentType(serviceDef.getContentType()));
