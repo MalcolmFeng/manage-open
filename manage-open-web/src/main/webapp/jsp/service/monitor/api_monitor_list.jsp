@@ -159,6 +159,10 @@
                 return "输入参数异常";
             } else if ("99999" == full.result) {
                 return "未知错误";
+            } else if ("20202" == full.result) {
+                return "IP地址没有访问权限";
+            } else if ("20302" == full.result) {
+                return "请求过于频繁";
             } else {
                 return "未知系统错误";
             }
