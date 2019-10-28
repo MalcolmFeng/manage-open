@@ -1,5 +1,6 @@
 package com.inspur.bigdata.manage.open.service.controller;
 
+import com.alibaba.druid.util.StringUtils;
 import com.alibaba.fastjson.JSON;
 import com.inspur.bigdata.manage.common.utils.PropertiesUtil;
 import com.inspur.bigdata.manage.open.service.data.*;
@@ -77,28 +78,95 @@ public class ServiceDefController {
      * @return
      */
     @PostMapping(value = "/import")
+    @ResponseBody
     public Map<String, Object> importAPI(@RequestParam("excelFile") MultipartFile excelFile, HttpServletRequest request) throws IOException {
-        List<String[]> excelData = POIUtil.readExcelFile(excelFile, 1);
+        List<String[]> excelData = POIUtil.readExcelFile(excelFile, 0);
 
+        // 初始化参数
+        ServiceDef serviceDef = new ServiceDef();
+        List<ServiceInput> inputList = new ArrayList<>();
+        List<ServiceOutput> outputList = new ArrayList<>();
+        serviceDef.setInputList(inputList);
+        serviceDef.setOutputList(outputList);
+
+        // 开始遍历
+        int id_count = 0;
         for (String[] arr : excelData) {
             System.out.println(arr);
-            ServiceDef serviceDef = new ServiceDef();
-//            serviceDef.setName();
-//            serviceDef.setDescription();
-//            serviceDef.setAuditStatus();
-//            serviceDef.setAuthType();
-
-            List<ServiceInput> inputList = new ArrayList<>();
-            List<ServiceOutput> outputList = new ArrayList<>();
-
-            serviceDef.setInputList(inputList);
-            serviceDef.setOutputList(outputList);
-
-            Map<String, Object> result = importAPI(serviceDef);
+            if (StringUtils.equals(arr[0],"") && StringUtils.equals(arr[1],"") && StringUtils.equals(arr[2],"")){
+                continue;
+            }
+            if (StringUtils.equals(arr[0],"id")){
+                id_count++;
+                continue;
+            }
+            if (id_count == 1){ // 解析serviceDef
+                try{
+                    serviceDef.setName(arr[1]);
+                    serviceDef.setDescription(arr[2]);
+                    serviceDef.setAuditStatus("0");
+                    serviceDef.setAuthType("0");
+                    serviceDef.setProvider(arr[3]);
+                    serviceDef.setProtocol(arr[4]);
+                    serviceDef.setReqPath(arr[5]);
+                    serviceDef.setHttpMethod(arr[6]);
+                    serviceDef.setScProtocol(arr[7]);
+                    serviceDef.setScHttpMethod(arr[8]);
+                    serviceDef.setScAddr(arr[9]);
+                    serviceDef.setSc_ws_function(arr[10]);
+                    serviceDef.setScFrame(arr[11]);
+                    serviceDef.setNameSpace(arr[12]);
+                    serviceDef.setContentType(arr[13]);
+                    serviceDef.setReturnSample(arr[14]);
+                    serviceDef.setApiGroup(arr[15]);
+                    serviceDef.setPrice(new BigDecimal(Double.parseDouble(arr[16])));
+                    serviceDef.setPriceType(arr[17]);
+                    serviceDef.setLimitCount(Double.parseDouble(arr[18]));
+                    serviceDef.setEncryptionType(arr[19]);
+                    serviceDef.setTopLimitCount(Integer.parseInt(arr[20]));
+                    serviceDef.setTopLimitUnit(arr[21]);
+                }catch (Exception e){
+                    System.out.println("赋值serviceDef异常：" + e.toString());
+                }
+            }else if(id_count == 2){ // 解析 Input
+                try{
+                    ServiceInput serviceInput = new ServiceInput();
+                    serviceInput.setType(arr[1]);
+                    serviceInput.setRequired(Integer.parseInt(arr[2]));
+                    serviceInput.setDescription(arr[3]);
+                    serviceInput.setScName(arr[4]);
+                    serviceInput.setName(arr[4]);
+                    serviceInput.setScType(arr[5]);
+                    serviceInput.setScRequired(Integer.parseInt(arr[6]));
+                    serviceInput.setScDescription(arr[7]);
+                    serviceInput.setScSeq(Integer.parseInt(arr[8]));
+                    serviceInput.setScParamType(arr[9]);
+                    serviceInput.setFixedValue(arr[10]);
+                    serviceInput.setEncryptType(arr[11]);
+                    serviceInput.setDecryptType(arr[12]);
+                    serviceInput.setEncryptUrl(arr[13]);
+                    serviceInput.setDecryptUrl(arr[14]);
+                    inputList.add(serviceInput);
+                }catch (Exception e){
+                    System.out.println("赋值serviceInput异常："+e.toString());
+                }
+            }else if(id_count == 3){ // 解析 Output
+                try{
+                    ServiceOutput serviceOutput = new ServiceOutput();
+                    serviceOutput.setName(arr[1]);
+                    serviceOutput.setType(arr[2]);
+                    serviceOutput.setDescription(arr[3]);
+                    serviceOutput.setSeq(Integer.parseInt(arr[4]));
+                    outputList.add(serviceOutput);
+                }catch (Exception e){
+                    System.out.println("赋值serviceOutput异常："+e.toString());
+                }
+            }
         }
 
-
-        return null;
+        Map<String, Object> result = importAPI(serviceDef);
+        System.out.println(JSON.toJSONString(result));
+        return result;
     }
 
     @RequestMapping(value = "/doApply")
@@ -711,8 +779,6 @@ public class ServiceDefController {
             return update(serviceDef);
         }
         serviceDef.setId(UUIDGenerator.getUUID());
-        serviceDef.setProvider(OpenServiceConstants.getUserId());
-        serviceDef.setAuditStatus(OpenServiceConstants.api_create);
         serviceDef.setCreateTime(OpenServiceConstants.sf.format(new Date()));
         try {
             serviceDefService.addServiceDef(serviceDef);

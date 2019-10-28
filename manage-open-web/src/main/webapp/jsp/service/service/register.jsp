@@ -45,6 +45,17 @@
 		<form class="form-horizontal" id="saveForm" name="saveForm" onsubmit="return false;">
 			<div id="step_0" class="_step">
 		    <h3 class="text-left htext">基本信息</h3>
+			<div style="display: flex;flex-direction: row">
+				<div>
+					<label style="line-height: 25px;margin-left: 30px;">批量导入: </label>
+				</div>
+				<div style="margin-left: 20px;">
+					<input type="file" name="FileUpload" id="FileUpload" value="" style="width: 200px;">
+				</div>
+				<div>
+					<button style="cursor: pointer;" onclick="postData();">提交</button>
+				</div>
+			</div>
 		    <hr class="fenge"/>
 			<div class="form-group">
 				<input type="hidden" id="groupId" name="groupId" value="${serviceDef.apiGroup }"/>
@@ -1127,6 +1138,38 @@
 			{{/each}}
 		</select>
 	</script>
+
+<script>
+	function postData(){
+
+		var fileObj = document.getElementById("FileUpload").files[0]; // js 获取文件对象
+		if (typeof (fileObj) == "undefined" || fileObj.size <= 0) {
+			alert("请选择图片");
+			return;
+		}
+		var formFile = new FormData();
+		formFile.append("action", "xxxxxxx");
+		formFile.append("excelFile", fileObj); //加入文件对象
+		var data = formFile;
+		$.ajax({
+			url: context + "/service/open/api/import",
+			data: data,
+			type: "Post",
+			dataType: "json",
+			cache: false,//上传文件无需缓存
+			processData: false,//用于对data参数进行序列化处理 这里必须false
+			contentType: false, //必须
+			success: function (result) {
+				if (result.result){
+					alert("批量导入完成!");
+				}else{
+					alert("批量导入异常，请联系管理员");
+				}
+
+			},
+		})
+	}
+</script>
 
 </body>
 </html>
