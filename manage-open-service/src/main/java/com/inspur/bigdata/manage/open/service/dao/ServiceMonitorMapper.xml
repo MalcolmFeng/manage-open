@@ -368,7 +368,6 @@
         </if>
         and create_time between #{startTime} and #{endTime}
         group by caller_ip
-        ORDER BY totalCount DESC
     </select>
 
 </mapper>
