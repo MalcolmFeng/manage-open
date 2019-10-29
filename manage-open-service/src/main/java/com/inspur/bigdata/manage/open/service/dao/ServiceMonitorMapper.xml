@@ -309,7 +309,8 @@
         ,SUM(result=#{result}) AS totalSuccessCount
         FROM api_service_monitor
         WHERE request_time>=#{days}
-        GROUP BY SUBSTRING(request_time,1,10)
+        GROUP BY day
+        ORDER BY day asc
 	</select>
 
     <select id="getTopApiCount" parameterType="map" resultMap="countMap">
@@ -328,7 +329,7 @@
                 AND result = '200'
             </otherwise>
         </choose>
-        GROUP BY api_service_id
+        GROUP BY api_service_id,api_service_name
         ORDER BY totalCount DESC
         <if test="null != pageSize and '' != pageSize">LIMIT 0,${pageSize}</if>
 
@@ -339,7 +340,6 @@
 
         SELECT
         caller_ip
-        ,caller_user_id
         ,COUNT(caller_ip) AS totalCount
         FROM api_service_monitor
         WHERE request_time >=#{days}
@@ -351,7 +351,7 @@
                 AND result = '200'
             </otherwise>
         </choose>
-        GROUP BY api_service_id
+        GROUP BY caller_ip
         ORDER BY totalCount DESC
         <if test="null != pageSize and '' != pageSize">LIMIT 0,${pageSize}</if>
     </select>
