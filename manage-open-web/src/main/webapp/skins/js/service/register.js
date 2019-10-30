@@ -248,6 +248,7 @@ var register = {
     getServiceInfo: function () {
         var serviceInfo = {};
 
+        serviceInfo.apiType = $('input[name=apiType]:checked').val();//授权方式
         serviceInfo.id = $("#id").val();
         serviceInfo.remoteId = $("#remoteId").val();
         serviceInfo.name = $("#name").val();

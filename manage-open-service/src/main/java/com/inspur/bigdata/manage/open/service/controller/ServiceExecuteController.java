@@ -324,6 +324,12 @@ public class ServiceExecuteController {
             String appkey = null;
             String appSecret = null;
             String signature = null;
+
+            // 1.先获取参数中的密钥（page转发时）
+            appkey = request.getParameter("xCaKey");
+            signature = request.getParameter("xCaSignature");
+
+            // 2.api服务时获取请求头中的密钥
             while (headNames.hasMoreElements()) {
                 String headName = headNames.nextElement();
                 headers.put(headName, request.getHeader(headName));
@@ -478,21 +484,26 @@ public class ServiceExecuteController {
             // ---------------- 执行转发请求 start ----------------
             startTime = System.currentTimeMillis();
             String result_str = "";
-            if (serviceDef.getScProtocol().equals("webService")) {
-                String type = serviceDef.getScFrame();
-                if ("Axiom".equals(type)) {
-                    result_str = executeAxis2(serviceDef, listServiceInput);
-                } else if ("RPC".equals(type)) {
-                    result_str = executeRPC(serviceDef, listServiceInput);
+            if (serviceDef.getApiType()!=null && serviceDef.getApiType().equals("page")){
+                response.sendRedirect(serviceDef.getScAddr());
+            }else{
+                if (serviceDef.getScProtocol().equals("webService")) {
+                    String type = serviceDef.getScFrame();
+                    if ("Axiom".equals(type)) {
+                        result_str = executeAxis2(serviceDef, listServiceInput);
+                    } else if ("RPC".equals(type)) {
+                        result_str = executeRPC(serviceDef, listServiceInput);
+                    }
+                } else {
+                    result_str = doRequest(instream, serviceDef, listServiceInput, apiServiceMonitor);
                 }
-            } else {
-                result_str = doRequest(instream, serviceDef, listServiceInput, apiServiceMonitor);
+                response.addHeader("Content-Type", OpenServiceConstants.getContentType(serviceDef.getContentType()));
+                writer.print(result_str);
+                writer.flush();
+                apiServiceMonitor.setOpenServiceOutput(result_str);
+                apiServiceMonitor.setResult(ASM_SUCCESS);
             }
-            response.addHeader("Content-Type", OpenServiceConstants.getContentType(serviceDef.getContentType()));
-            writer.print(result_str);
-            writer.flush();
-            apiServiceMonitor.setOpenServiceOutput(result_str);
-            apiServiceMonitor.setResult(ASM_SUCCESS);
+
         } catch (Throwable e) {
             response.addHeader("Content-Type", OpenServiceConstants.content_type_html);
             success = false;

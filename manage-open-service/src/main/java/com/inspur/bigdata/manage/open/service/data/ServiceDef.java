@@ -167,6 +167,12 @@ public class ServiceDef implements Serializable {
     @Column(name = "top_limit_unit")
     private String topLimitUnit;
 
+    /**
+     * api类型
+     */
+    @Column(name = "api_type")
+    private String apiType;
+
     // 新增加的三个 支持webservice
     @Column(name = "SC_FRAME")
     private String scFrame;
@@ -459,5 +465,13 @@ public class ServiceDef implements Serializable {
 
     public void setSc_ws_function(String sc_ws_function) {
         this.sc_ws_function = sc_ws_function;
+    }
+
+    public String getApiType() {
+        return apiType;
+    }
+
+    public void setApiType(String apiType) {
+        this.apiType = apiType;
     }
 }

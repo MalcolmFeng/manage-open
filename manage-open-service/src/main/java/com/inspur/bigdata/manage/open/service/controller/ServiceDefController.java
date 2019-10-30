@@ -10,6 +10,8 @@ import com.inspur.bigdata.manage.open.service.util.POIUtil;
 import com.inspur.bigdata.manage.utils.HttpUtil;
 import com.inspur.bigdata.manage.utils.OpenDataConstants;
 import com.inspur.bigdata.manage.utils.StringUtil;
+import freemarker.template.Configuration;
+import freemarker.template.Template;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.loushang.framework.mybatis.PageUtil;
@@ -31,8 +33,9 @@ import org.springframework.beans.BeanWrapperImpl;
 import javax.persistence.Transient;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
+import java.io.*;
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 import static com.inspur.bigdata.manage.open.service.util.OpenServiceConstants.*;
@@ -72,6 +75,85 @@ public class ServiceDefController {
 
     @Autowired
     AppManageController appManageController;
+
+
+    @PostMapping(value = "/generateAPIDocByAPP")
+    @ResponseBody
+    public void generateAPIDocByAPP(@RequestParam("appId") String appId,HttpServletRequest request,HttpServletResponse response) throws Exception{
+
+        AppInstance instance = appManage.getById(appId);
+        String X_CA_KEY = instance.getAppKey();
+        String X_CA_SIGNATURE = instance.getAppSecret();
+        String authStatus = instance.getAuth_status();
+        String appName = instance.getAppName();
+        String description = instance.getAppDescription();
+
+        // 查询所有授权记录
+        List<ServiceApply> lists = serviceApplyService.getAuthorizedApiListById(appId);
+        for (ServiceApply list:lists){
+            Map<String, String> map = new HashMap<String, String>();
+            String service_id = list.getApi_service_id();
+
+            // 查询API
+            ServiceDef serviceDef = serviceDefService.getServiceDef(service_id);
+            DevGroup devGroup = devGroupService.getById(serviceDef.getApiGroup());
+        }
+
+        //构造数据
+        Map<String, Object> dataMap = new HashMap<String,Object>();
+        List list = new ArrayList();
+
+        dataMap.put("userList", list);
+
+        Configuration configuration = new Configuration();
+        configuration.setDefaultEncoding("utf-8");
+        configuration.setDirectoryForTemplateLoading(new File("C:/"));
+        File outFile = new File("D:/api.doc");
+        Template t =  configuration.getTemplate("api.ftl","utf-8");
+        Writer out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outFile), "utf-8"),10240);
+        t.process(dataMap, out);
+        out.close();
+    }
+
+    @RequestMapping(value = "/generateAPIDocByAPIIds")
+    @ResponseBody
+    public void generateAPIDocByAPIIds(HttpServletRequest request, HttpServletResponse response) throws Exception{
+
+        com.alibaba.fastjson.JSONArray jsonArray = new com.alibaba.fastjson.JSONArray();
+        jsonArray.add("0fe97e025e6b4845b1dc992245722b24");
+        jsonArray.add("2a8e95269fb14b06afb098652b9fabe4");
+        jsonArray.add("48e26f73ad4f4c93b3f2c311ea779813");
+
+        // 查询API
+        List<ServiceDef> list = new ArrayList<>();
+        for (int i = 0; i < jsonArray.size(); i++) {
+            ServiceDef serviceDef = serviceDefService.getServiceDef(jsonArray.getString(i));
+            DevGroup devGroup = devGroupService.getById(serviceDef.getApiGroup());
+
+            List<ServiceInput> inputList = serviceInputService.listByServiceId(serviceDef.getId());
+            List<ServiceOutput> outputList = serviceOutputService.selectByApiId(serviceDef.getId());
+            serviceDef.setInputList(inputList);
+            serviceDef.setOutputList(outputList);
+            list.add(serviceDef);
+        }
+
+        //构造数据
+        Map<String, Object> dataMap = new HashMap<String,Object>();
+        dataMap.put("apiList", list);
+        dataMap.put("datetime",new SimpleDateFormat("yyyy-MM-dd").format(new Date()));
+        dataMap.put("version","V1.0");
+        dataMap.put("auth","system");
+
+
+        Configuration configuration = new Configuration();
+        configuration.setDefaultEncoding("utf-8");
+        configuration.setDirectoryForTemplateLoading(new File("C:/"));
+        File outFile = new File("D:/api.docx");
+        Template t =  configuration.getTemplate("api.ftl","utf-8");
+        Writer out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outFile), "utf-8"),10240);
+        t.process(dataMap, out);
+        out.close();
+    }
 
     /**
      * 批量导入API服务
@@ -169,6 +251,11 @@ public class ServiceDefController {
         return result;
     }
 
+    /**
+     * 批量申请api （省平台开放平台的定制化功能）
+     * @param ids
+     * @return
+     */
     @RequestMapping(value = "/doApply")
     @ResponseBody
     public com.alibaba.fastjson.JSONObject doApply(String[] ids){
@@ -500,7 +587,7 @@ public class ServiceDefController {
     @ResponseBody
     public boolean doRelease(@RequestParam Map<String, String> parameters) {
         ServiceDef serviceDef = serviceDefService.getServiceDef(parameters.get("id"));
-        if (serviceDef.getProvider().equals(OpenServiceConstants.getUserId())) {
+//        if (serviceDef.getProvider().equals(OpenServiceConstants.getUserId())) {
             serviceDef.setId(parameters.get("id"));
 
             if (parameters.get("subgroupId") == null) {
@@ -519,10 +606,10 @@ public class ServiceDefController {
                 return false;
             }
             return true;
-        } else {
-            log.error("api发布者和提供者不一致！");
-            return false;
-        }
+//        } else {
+//            log.error("api发布者和提供者不一致！");
+//            return false;
+//        }
 
     }
 

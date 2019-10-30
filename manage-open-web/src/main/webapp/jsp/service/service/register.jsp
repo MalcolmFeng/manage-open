@@ -79,6 +79,16 @@
 				    <span class="Validform_checktip Validform_span">3-20个字符(中英文、数字。中文算一个字符)</span>
     			</div>
 		    </div>
+
+			<div class="form-group">
+				<div class="col-xs-2 col-md-2 control-label">
+					<label class="control-label">服务类型<span class="required">*</span></label>
+				</div>
+				<div class="col-xs-10 col-md-10 text-left radio" style="margin-top: 5px;">
+					<label><input type="radio" name="apiType" value="interface" <c:if test="${serviceDef.apiType eq 'interface' }"> checked="checked"</c:if>/>接口&emsp;</label>
+					<label><input type="radio" name="apiType" value="page" <c:if test="${serviceDef.apiType eq 'page' }"> checked="checked"</c:if>/>页面&emsp;</label>
+				</div>
+			</div>
 				<%--<div class="form-group">--%>
 					<%--<div class="col-xs-2 col-md-2 control-label">--%>
 						<%--<label class="control-label">服务版本<span class="required">*</span></label>--%>
