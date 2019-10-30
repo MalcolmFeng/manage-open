@@ -34,6 +34,22 @@
 	<script type="text/javascript" src="<l:asset path='ui.js'/>"></script>
 	<script type="text/javascript" src="<l:asset path='ztree.js'/>"></script>
 
+	<style type="text/css">
+		.btn {
+			color: #3e99ff;
+			padding: 4px 12px;
+			background-color: #fff;
+			border-color: #ddd;
+			border-radius: 0;
+			position: relative;
+			float: right;
+		}
+		.btn:hover{
+			color: #fff;
+			background-color:#3e99ff;
+		}
+
+	</style>
 	<script type="text/javascript">
         var context = "<l:assetcontext/>";
         $(document).ready(function() {
@@ -48,68 +64,92 @@
             grid.init(options); //初始化datatable
         });
 
-        function forPass(applyId) {
-            $.dialog({
-                type: 'confirm',
-                content: '确认同意api申请?',
-                autofocus: true,
-                ok: function() {
-                    $.ajax({
-                        url : context + "/service/open/apply/pass/" + applyId,
-                        success: function(resp){
-                            console.log(resp);
-                            if(resp.result == true) {
-                                $.dialog({
-                                    autofocus: true,
-                                    type: "alert",
-                                    content: "成功!"
-                                });
-                                reloadAuthList();
-                            } else {
-                                $.dialog({
-                                    autofocus: true,
-                                    type: "alert",
-                                    content:"失败!"+resp.message
-                                });
-                            }
-                        }
-                    });
-                },
-                cancel: function(){}
-            });
-        }
-
-        function forReject(applyId) {
-            $.dialog({
-                type: 'confirm',
-                content: '确认驳回申请?',
-                autofocus: true,
-                ok: function() {
-                    $.ajax({
-                        url : context + "/service/open/apply/reject/" + applyId,
-                        success: function(resp){
-                            console.log(resp);
-                            if(resp.result == true) {
-                                $.dialog({
-                                    autofocus: true,
-                                    type: "alert",
-                                    content: "成功!"
-                                });
-                                reloadAuthList();
-                            } else {
-                                $.dialog({
-                                    autofocus: true,
-                                    type: "alert",
-                                    content:"失败!"+resp.message
-                                });
-                            }
-                        }
-                    });
-                },
-                cancel: function(){}
-            });
-        }
-
+        // function forPass(applyId) {
+        //     $.dialog({
+        //         type: 'confirm',
+        //         content: '确认同意api申请?',
+        //         autofocus: true,
+        //         ok: function() {
+        //             $.ajax({
+        //                 url : context + "/service/open/apply/pass/" + applyId,
+        //                 success: function(resp){
+        //                     console.log(resp);
+        //                     if(resp.result == true) {
+        //                         $.dialog({
+        //                             autofocus: true,
+        //                             type: "alert",
+        //                             content: "成功!"
+        //                         });
+        //                         reloadAuthList();
+        //                     } else {
+        //                         $.dialog({
+        //                             autofocus: true,
+        //                             type: "alert",
+        //                             content:"失败!"+resp.message
+        //                         });
+        //                     }
+        //                 }
+        //             });
+        //         },
+        //         cancel: function(){}
+        //     });
+        // }
+		function eachPass(applyId) {
+					$.ajax({
+						url : context + "/service/open/apply/pass/" + applyId,
+						success: function(resp){
+							console.log(resp);
+							if(resp.result == true) {
+								reloadAuthList();
+							} else {
+								sticky("失败!"+resp.message);
+							}
+						}
+					});
+		}
+        // function forReject(applyId) {
+        //     $.dialog({
+        //         type: 'confirm',
+        //         content: '确认驳回申请?',
+        //         autofocus: true,
+        //         ok: function() {
+        //             $.ajax({
+        //                 url : context + "/service/open/apply/reject/" + applyId,
+        //                 success: function(resp){
+        //                     console.log(resp);
+        //                     if(resp.result == true) {
+        //                         $.dialog({
+        //                             autofocus: true,
+        //                             type: "alert",
+        //                             content: "成功!"
+        //                         });
+        //                         reloadAuthList();
+        //                     } else {
+        //                         $.dialog({
+        //                             autofocus: true,
+        //                             type: "alert",
+        //                             content:"失败!"+resp.message
+        //                         });
+        //                     }
+        //                 }
+        //             });
+        //         },
+        //         cancel: function(){}
+        //     });
+        // }
+		function eachReject(applyId) {
+					$.ajax({
+						url : context + "/service/open/apply/reject/" + applyId,
+						success: function(resp){
+							console.log(resp);
+							if(resp.result == true) {
+								reloadAuthList();
+							} else {
+								sticky("失败!"+resp.message);
+							}
+						}
+					});
+				}
         function forView(openDataId) {
             window.location.href = context + "/service/open/data/get/" + openDataId;
         }
@@ -121,14 +161,6 @@
             reloadAuthList();
         }
 
-        /*function forQuery() {
-            var param = {
-                tableName: $("#tableName").val()
-
-            };
-            grid.reload(url, param);
-
-        }*/
 
         function reloadAuthList() {
             // 重新请求数据
@@ -164,19 +196,76 @@
                 html += '</div>';
             } else {
                 html += '<div>';
-                html += '    <a onclick="forPass(\''+data+'\')">同意</a>&nbsp;&nbsp;';
-                html += '    <a class="del" onclick="forReject(\''+ data +'\')">驳回</a>';
+				html += '    <a onclick="passAll(\''+data+'\')" class="btnSingle">同意</a>&nbsp;&nbsp;';
+				// html += '    <a onclick="forPass(\''+data+'\')">同意</a>&nbsp;&nbsp;';
+                html += '    <a class="del" onclick="rejectAll(\''+ data +'\')" class="btnSingle">驳回</a>';
                 html += '</div>';
             }
             return html;
         }
-
         function renderName(data, type, full) {
             var html = '';
             html += '<a onclick="forView(\''+ full.dtDataId +'\')">'+ data + '</a>&emsp;';
             return html;
         }
+		function renderCheckBox(data, type, full){
+			return '<input type="checkbox" value="' + data + '" name="id">';
+		}
+		function passAll(id) {
+			var cs = $("input[type='checkBox']:checked").serialize()
+			var ids = cs.split("&");//获取所选的id数组
+			if (cs.length>0){
+				var flag = window.confirm("确认同意所选的申请吗？");
+				if(!flag){return}
+				for (var i=0;i<ids.length;i++){
+					var a = ids[i].split("=");
+					eachPass(a[1]);
+				}
+			}
+			else if(id.length>0){
+				var flag = window.confirm("确认同意该申请吗？");
+				if(!flag){return}
+				eachPass(id);
+			}
+			else{
+				sticky("请选择至少一个申请");
+			}
 
+		}
+		function rejectAll(id) {
+			var cs = $("input[type='checkBox']:checked").serialize()
+			var ids = cs.split("&");//获取所选的id数组
+			if (cs.length>0){
+				var flag = window.confirm("确认驳回所选的申请吗？");
+				if(!flag){return}
+				for (var i=0;i<ids.length;i++){
+					var a = ids[i].split("=");
+					console.log(a);
+					eachReject(a[1]);
+				}
+			}
+			else if(id.length>0){
+				var flag = window.confirm("确认驳回该申请吗？");
+				if(!flag){return}
+				eachReject(id);
+			}
+			else{
+				sticky("请选择至少一个申请");
+			}
+		}
+		/**更新弹窗提示*/
+		function sticky(msg, style, position) {
+			var type = style ? style : 'success';
+			var place = position ? position : 'top';
+			$.sticky(
+					msg,
+					{
+						autoclose : 2000,
+						position : place,
+						style : type
+					}
+			);
+		}
 	</script>
 </head>
 <body>
@@ -190,14 +279,21 @@
 					<span class="fa fa-search"></span>
 				</div>
 			</div>
+			<input class="btn"type="button" value="驳回所选申请" onclick="rejectAll()">
+			<input class="btn" type="button" value="同意所选申请" onclick="passAll()">
 
 		</form>
+
 	</div>
+
 	<div class="row">
 		<table id="myauthList" class="table table-bordered table-hover">
 			<thead>
 			<tr>
-				<th width="5%" data-field="id" data-render="renderId">序号</th>
+				<th width="30px" data-field="id" data-render="renderCheckBox" >
+					<input type="checkbox" id="selectAll"/>
+				</th>
+<%--				<th width="5%" data-field="id" data-render="renderId">序号</th>--%>
 				<th width="25%" data-field="app_name">应用名称</th>
 				<th width="25%" data-field="api_service_name">服务名称</th>
 				<th width="15%" data-field="applicant">申请人</th>
