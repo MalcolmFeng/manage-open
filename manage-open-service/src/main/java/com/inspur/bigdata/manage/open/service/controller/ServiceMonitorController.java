@@ -20,6 +20,7 @@ import java.util.*;
  * @author zhuzilian
  * @date 2019/08/05
  */
+@CrossOrigin
 @Controller
 @RequestMapping("/dev/monitor")
 public class ServiceMonitorController {

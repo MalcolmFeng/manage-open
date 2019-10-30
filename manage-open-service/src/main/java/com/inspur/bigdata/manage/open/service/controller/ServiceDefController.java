@@ -43,6 +43,7 @@ import static com.inspur.bigdata.manage.open.service.util.OpenServiceConstants.*
 /**
  * Created by songlili on 2019/2/12.
  */
+@CrossOrigin
 @Controller
 @RequestMapping("/open/api")
 public class ServiceDefController {

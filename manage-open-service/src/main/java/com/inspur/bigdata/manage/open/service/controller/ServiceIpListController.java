@@ -26,6 +26,7 @@ import java.util.*;
 import static com.inspur.bigdata.manage.open.service.util.OpenServiceConstants.getUserId;
 import static org.loushang.framework.util.DateUtil.getCurrentTime2;
 
+@CrossOrigin
 @Controller
 @RequestMapping("/open/iplist")
 public class ServiceIpListController {

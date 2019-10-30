@@ -91,6 +91,7 @@ import org.apache.axis2.rpc.client.RPCServiceClient;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
+@CrossOrigin
 @Controller
 @RequestMapping("/api/execute")
 public class ServiceExecuteController {
@@ -485,7 +486,8 @@ public class ServiceExecuteController {
             startTime = System.currentTimeMillis();
             String result_str = "";
             if (serviceDef.getApiType()!=null && serviceDef.getApiType().equals("page")){
-                response.sendRedirect(serviceDef.getScAddr());
+                // 拼接地址和参数，进行重定向
+                response.sendRedirect( httpUrlBuffer(serviceDef, listServiceInput, apiServiceMonitor) );
             }else{
                 if (serviceDef.getScProtocol().equals("webService")) {
                     String type = serviceDef.getScFrame();
@@ -865,6 +867,60 @@ public class ServiceExecuteController {
         //TODO:暂时将返回值全部加密，具体加密解密形式再继续探讨
         result = encryptionResult(result, serviceDef.getEncryptionType());
         return result;
+    }
+
+
+    private String httpUrlBuffer(ServiceDef serviceDef, List<ServiceInput> listServiceInput, ApiServiceMonitor apiServiceMonitor) throws Exception {
+
+        String addr = serviceDef.getScAddr();
+        addr = addr.endsWith("/") ? addr.substring(0, addr.length() - 1) : addr;
+        StringBuilder httpurl = new StringBuilder();
+        httpurl.append(addr);
+
+        //组装后端参数param
+        Map<String, String> header = new HashMap<>();
+        JSONObject serviceInputParam = new JSONObject();
+        header.put(Constants.HTTP_HEADER_ACCEPT, "*/*");
+        Collections.sort(listServiceInput);//根据scSeq排序
+
+        boolean firstQueryParam = true;
+        for (ServiceInput serviceInput : listServiceInput) {
+            serviceInputParam.put(serviceInput.getScName(), serviceInput.getValue());
+            //判断必填属性
+            if (OpenDataConstants.is_null_no == serviceInput.getRequired() && StringUtils.isBlank(serviceInput.getValue()) && !serviceInput.getScType().equals("text/xml") && !serviceInput.getScType().equals("application/json")) {
+                throw new Exception("请传入必填参数" + serviceInput.getName());
+            }
+
+            // 执行加解密，接口级别和参数级别
+            String decryptedParam = decryptedParam(serviceInput, serviceDef.getEncryptionType());
+            serviceInputParam.put(serviceInput.getScName(), decryptedParam);
+
+            checkData(serviceInput.getScType(), decryptedParam, serviceInput.getScName());//判断参数类型是否正确
+            String paramType = serviceInput.getScParamType();
+
+            if (paramType.equalsIgnoreCase(OpenServiceConstants.SC_PARAMTYPE_QUERY)) {
+//                if (StringUtils.equals(serviceInput.getScName(),"xCaKey") || StringUtils.equals(serviceInput.getScName(),"xCaSignature") ){
+//                    continue;
+//                }
+                if (firstQueryParam) {
+                    if (StringUtils.isNotBlank(decryptedParam)) {
+                        httpurl.append("?").append(serviceInput.getScName()).append("=").append(URLEncoder.encode(decryptedParam));
+                        firstQueryParam = false;
+                    }
+                } else {
+                    if (StringUtils.isNotBlank(decryptedParam)) {
+                        httpurl.append("&").append(serviceInput.getScName()).append("=").append(URLEncoder.encode(decryptedParam));
+                    }
+                }
+            }
+        }
+
+        apiServiceMonitor.setServiceInput(serviceInputParam.toString());
+        apiServiceMonitor.setServiceInputHeader(JSONObject.fromObject(header).toString());
+        apiServiceMonitor.setServiceMethod(serviceDef.getScHttpMethod().toUpperCase());
+
+        System.out.println("请其头为:" + JSONObject.fromObject(header).toString());
+        return httpurl.toString();
     }
 
     /**

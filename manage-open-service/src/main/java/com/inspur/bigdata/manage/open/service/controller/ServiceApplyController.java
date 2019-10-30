@@ -22,6 +22,7 @@ import java.util.*;
 /**
  * Created by songlili on 2019/2/13.
  */
+@CrossOrigin
 @Controller
 @RequestMapping("/open/apply")
 public class ServiceApplyController {

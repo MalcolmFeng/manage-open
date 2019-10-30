@@ -20,6 +20,7 @@ import java.util.Map;
 /**
  * Created by songlili on 2019/2/21.
  */
+@CrossOrigin
 @Controller
 @RequestMapping("/dev/group")
 public class DevGroupController {

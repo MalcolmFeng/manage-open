@@ -6,6 +6,7 @@ import com.inspur.bigdata.manage.open.service.util.OpenServiceConstants;
 import com.inspur.bigdata.manage.utils.OpenDataConstants;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
@@ -17,6 +18,7 @@ import java.util.Map;
 /**
  * Created by songlili on 2019/3/12.
  */
+@CrossOrigin
 @Controller
 @RequestMapping("/open/portal")
 public class PortalController {
