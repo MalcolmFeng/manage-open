@@ -77,59 +77,23 @@ public class ServiceDefController {
     @Autowired
     AppManageController appManageController;
 
-
-    @PostMapping(value = "/generateAPIDocByAPP")
-    @ResponseBody
-    public void generateAPIDocByAPP(@RequestParam("appId") String appId,HttpServletRequest request,HttpServletResponse response) throws Exception{
-
-        AppInstance instance = appManage.getById(appId);
-        String X_CA_KEY = instance.getAppKey();
-        String X_CA_SIGNATURE = instance.getAppSecret();
-        String authStatus = instance.getAuth_status();
-        String appName = instance.getAppName();
-        String description = instance.getAppDescription();
-
-        // 查询所有授权记录
-        List<ServiceApply> lists = serviceApplyService.getAuthorizedApiListById(appId);
-        for (ServiceApply list:lists){
-            Map<String, String> map = new HashMap<String, String>();
-            String service_id = list.getApi_service_id();
-
-            // 查询API
-            ServiceDef serviceDef = serviceDefService.getServiceDef(service_id);
-            DevGroup devGroup = devGroupService.getById(serviceDef.getApiGroup());
-        }
-
-        //构造数据
-        Map<String, Object> dataMap = new HashMap<String,Object>();
-        List list = new ArrayList();
-
-        dataMap.put("userList", list);
-
-        Configuration configuration = new Configuration();
-        configuration.setDefaultEncoding("utf-8");
-        configuration.setDirectoryForTemplateLoading(new File("C:/"));
-        File outFile = new File("D:/api.doc");
-        Template t =  configuration.getTemplate("api.ftl","utf-8");
-        Writer out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outFile), "utf-8"),10240);
-        t.process(dataMap, out);
-        out.close();
-    }
-
+    /**
+     * 自动批量生成API文档
+     * @param ids
+     * @param request
+     * @param response
+     * @throws Exception
+     */
     @RequestMapping(value = "/generateAPIDocByAPIIds")
     @ResponseBody
-    public void generateAPIDocByAPIIds(HttpServletRequest request, HttpServletResponse response) throws Exception{
+    public void generateAPIDocByAPIIds(@RequestBody List<String> ids,HttpServletRequest request, HttpServletResponse response) throws Exception{
 
-        com.alibaba.fastjson.JSONArray jsonArray = new com.alibaba.fastjson.JSONArray();
-        jsonArray.add("0fe97e025e6b4845b1dc992245722b24");
-        jsonArray.add("2a8e95269fb14b06afb098652b9fabe4");
-        jsonArray.add("48e26f73ad4f4c93b3f2c311ea779813");
+        com.alibaba.fastjson.JSONArray jsonArray = JSON.parseArray(JSON.toJSONString(ids));
 
         // 查询API
         List<ServiceDef> list = new ArrayList<>();
         for (int i = 0; i < jsonArray.size(); i++) {
             ServiceDef serviceDef = serviceDefService.getServiceDef(jsonArray.getString(i));
-            DevGroup devGroup = devGroupService.getById(serviceDef.getApiGroup());
 
             List<ServiceInput> inputList = serviceInputService.listByServiceId(serviceDef.getId());
             List<ServiceOutput> outputList = serviceOutputService.selectByApiId(serviceDef.getId());
@@ -145,13 +109,25 @@ public class ServiceDefController {
         dataMap.put("version","V1.0");
         dataMap.put("auth","system");
 
+        // 生成文件到本地
+//        Configuration configuration = new Configuration();
+//        configuration.setDefaultEncoding("utf-8");
+//        configuration.setDirectoryForTemplateLoading(new File("C:/"));
+//        File outFile = new File("D:/test.doc");
+//        Template t =  configuration.getTemplate("c.ftl","utf-8");
+//        Writer out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outFile), "utf-8"),10240);
+//        t.process(dataMap, out);
+//        out.close();
 
+        // 生成下载文件
         Configuration configuration = new Configuration();
         configuration.setDefaultEncoding("utf-8");
         configuration.setDirectoryForTemplateLoading(new File("C:/"));
-        File outFile = new File("D:/api.docx");
-        Template t =  configuration.getTemplate("api.ftl","utf-8");
-        Writer out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outFile), "utf-8"),10240);
+        response.setContentType("application/msword");
+        response.setHeader("Content-Disposition", "attachment;filename=\"" + new String("c.doc".getBytes("GBK"), "iso8859-1") + "\"");
+        response.setCharacterEncoding("utf-8");//此句非常关键,不然word文档全是乱码
+        PrintWriter out = response.getWriter();
+        Template t =  configuration.getTemplate("c.ftl","utf-8");//以utf-8的编码读取ftl文件
         t.process(dataMap, out);
         out.close();
     }
