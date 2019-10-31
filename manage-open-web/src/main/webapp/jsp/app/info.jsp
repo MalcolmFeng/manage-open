@@ -305,19 +305,20 @@
 <script type="text/javascript" src="<l:asset path='form.js'/>"></script>
 <script type="text/javascript" src="<l:asset path='datatables.js'/>"></script>
 <script type="text/javascript" src="<l:asset path='loushang-framework.js'/>"></script>
-<script type="text/javascript" src="<l:asset path='jquery.form.js'/>"></script>
+<%--<script type="text/javascript" src="<l:asset path='jquery.form.js'/>"></script>--%>
 <script type="text/javascript" src="<l:asset path='ui.js'/>"></script>
 
 <script type="text/javascript">
     var context = "<l:assetcontext/>";
     var appid="${app.appId}";
-    var url = context + "/service/service/app/list/getAuthorizedApi/" +appid;
+    var url = context + "/service/service/app/list/getAuthorizedApi/" ;
     $(function () {
 
         var options = {
             ordering: false
         };
         grid = new L.FlexGrid("AuthorizedApi", url);
+        grid.setParameter("appId", appid);
         grid.init(options); //初始化datatable
 
         // 返回
@@ -394,11 +395,11 @@
         return rowId;
     }
 
-  /*  function renderName(data, type, full) {
-        var html = '';
-        html += '<a onclick="forView(\''+ full.appId +'\')">'+ data + '</a>&emsp;';
-        return html;
-    }*/
+   // function renderName(data, type, full) {
+   //      var html = '';
+   //      html += '<a onclick="forView(\''+ full.appId +'\')">'+ data + '</a>&emsp;';
+   //      return html;
+   //  }
 
     function renderoptions(data, type, full) {
         var html = "<div>";
