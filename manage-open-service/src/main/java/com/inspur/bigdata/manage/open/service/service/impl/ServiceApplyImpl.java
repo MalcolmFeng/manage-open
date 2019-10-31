@@ -71,8 +71,8 @@ public class ServiceApplyImpl implements IServiceApplyService{
         return serviceApplyMapper.getListById(param);
     }
 
-    public  List<ServiceApply> getAuthorizedApiListById(String id){
-        return serviceApplyMapper.getAuthorizedApiListById(id);
+    public  List<ServiceApply> getAuthorizedApiListById(Map<String, Object> param){
+        return serviceApplyMapper.getAuthorizedApiListById(param);
     }
 
     public List<ServiceApply> getList(Map<String, Object> param){
