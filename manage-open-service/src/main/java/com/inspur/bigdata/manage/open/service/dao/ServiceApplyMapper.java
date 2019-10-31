@@ -20,7 +20,7 @@ public interface ServiceApplyMapper extends EntityMapper<ServiceApply> {
     List<ServiceApply> getByServiceId(String apiServiceId);
     List<ServiceApply> getListById(Map<String, Object> parameters);
     ServiceApply getById(String id);
-    List<ServiceApply> getAuthorizedApiListById(String id);
+    List<ServiceApply> getAuthorizedApiListById(Map<String, Object> param);
     List<ServiceApply> getList(Map<String, Object> param);
     List<ServiceApply> isApplyAuthToUser(Map<String, Object> map);
     int updateById(ServiceApply serviceApply);
