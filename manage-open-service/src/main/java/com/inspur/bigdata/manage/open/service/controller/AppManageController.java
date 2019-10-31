@@ -25,7 +25,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@CrossOrigin
 @Controller
 @RequestMapping("/service/app")
 public class AppManageController {
@@ -207,13 +206,23 @@ public class AppManageController {
         }
     }
     //获取已授权Api列表
-    @RequestMapping("/list/getAuthorizedApi/{id}")
+    @RequestMapping("/list/getAuthorizedApi")
     @ResponseBody
-    public Map<String, Object> getAuthorizedApi(@PathVariable("id") String appId)
+    public Map<String, Object> getAuthorizedApi(@RequestBody Map<String, Object> parameters)
     {
+        Map<String, Object> param = new HashMap<String, Object>();
+        param.put("limit",parameters.get("limit"));
+        param.put("start",parameters.get("start"));
+        if(parameters.get("appId")==null||parameters.get("appId").toString().length()==0)
+        {
+            param.put("appId","");
+        }else{
+            param.put("appId",parameters.get("appId"));
+        }
         Map<String, Object> result = new HashMap<String, Object>();
         List<Map<String, String>> apiList = new ArrayList<Map<String, String>>();
-        List<ServiceApply> lists = serviceApplyService.getAuthorizedApiListById(appId);
+        List<ServiceApply> lists = serviceApplyService.getAuthorizedApiListById(param);
+        int total = PageUtil.getTotalCount();
         for (ServiceApply list:lists){
             Map<String, String> map = new HashMap<String, String>();
             try{
@@ -240,7 +249,8 @@ public class AppManageController {
             apiList.add(map);
         }
         result.put("data", apiList);
-        result.put("total", lists.size());
+//        result.put("total", lists.size());
+        result.put("total", total);
 
         return result;
     }
