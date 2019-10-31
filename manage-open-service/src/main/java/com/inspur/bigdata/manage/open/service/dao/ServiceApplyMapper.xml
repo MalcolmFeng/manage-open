@@ -115,9 +115,14 @@
             and APPLICANT = #{APPLICANT}
         </if>
     </select>
-    <select id="getAuthorizedApiListById" resultMap="serviceResult" parameterType="string">
-        select b.name as name,b.audit_status as audit_status,a.* from api_service_apply a,api_service_def b where a.API_SERVICE_ID=b.ID and
-        a.APP_ID = #{_parameter} and a.AUTH_STATUS='1'
+    <select id="getAuthorizedApiListById" resultMap="serviceResult" parameterType="map">
+        select b.name as name,b.audit_status as audit_status,a.* from api_service_apply a,api_service_def b
+         where a.API_SERVICE_ID=b.ID
+
+        <if test="appId!=null and appId!='' ">
+            and a.APP_ID = #{appId}
+        </if>
+        and a.AUTH_STATUS='1'
     </select>
 
     <update id="updateById" parameterType="com.inspur.bigdata.manage.open.service.data.ServiceApply">
