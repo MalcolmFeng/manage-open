@@ -22,7 +22,7 @@ public interface IServiceApplyService {
     void updateServiceApply(ServiceApply serviceApply);
 
     List<ServiceApply> getByServiceId(String apiServiceId);
-    List<ServiceApply> getAuthorizedApiListById(String id);
+    List<ServiceApply> getAuthorizedApiListById(Map<String, Object> param);
 
     List<ServiceApply> getListById(Map<String, Object> param);
 
