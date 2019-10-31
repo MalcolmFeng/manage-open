@@ -232,12 +232,12 @@ public class ServiceExecuteController {
             if (serviceDef.getScProtocol().equals("webService")) {
                 String type = serviceDef.getScFrame();
                 if ("Axiom".equals(type)) {
-                    result_str = executeAxis2(serviceDef, listServiceInput);
+                    result_str = executeAxis2(success, serviceDef, listServiceInput);
                 } else if ("RPC".equals(type)) {
-                    result_str = executeRPC(serviceDef, listServiceInput);
+                    result_str = executeRPC(success, serviceDef, listServiceInput);
                 }
             } else {
-                result_str = doRequest("", serviceDef, listServiceInput, new ApiServiceMonitor());
+                result_str = doRequest(success,"", serviceDef, listServiceInput, new ApiServiceMonitor());
             }
 
 //            String result_str = doRequest("", serviceDef, listServiceInput, new ApiServiceMonitor());
@@ -261,11 +261,6 @@ public class ServiceExecuteController {
             if (log.isDebugEnabled()) {
                 log.debug("调用api执行的时间" + (System.currentTimeMillis() - startTime) + "毫秒");
             }
-            if (success) {
-                // TODO 服务调用成功，查询之前调用此服务失败的记录，将之前的失败的etime
-                // (end_time)修改为当前时间，表示服务已经修正可用
-                // 首先根据service_id获取表monitor_item中有关服务的记录，有则处理
-            }
         }
     }
 
@@ -274,7 +269,7 @@ public class ServiceExecuteController {
     public void execute(@PathVariable("apiContext") String apiContext, @PathVariable("reqPath") String reqPath,
                         HttpServletRequest request, HttpServletResponse response) throws IOException {
         PrintWriter writer = response.getWriter();
-        boolean success = true;
+        boolean success = false;
         long startTime = 0;
         String responseTime = null;
         String requestUserId = null;
@@ -306,7 +301,6 @@ public class ServiceExecuteController {
 
             // 存在于黑名单但不存在于白名单，拒绝访问
             if (ips_black.size()>0 && ips_white.size() ==0){
-                success = false;
                 writer.print("IP地址被禁用");
                 writer.flush();
                 apiServiceMonitor.setNotes("IP地址被禁用");
@@ -344,7 +338,7 @@ public class ServiceExecuteController {
             apiServiceMonitor.setOpenServiceInputHeader(JSONObject.fromObject(headers).toString());
             List<AppInstance> appList = appManage.getAppByAppKey(appkey);
             if (appList == null || appList.size() != 1) {
-                success = false;
+
                 writer.print("查询授权应用异常");
                 writer.flush();
                 apiServiceMonitor.setNotes("查询授权应用异常");
@@ -361,7 +355,6 @@ public class ServiceExecuteController {
 
             // ---------------- 判断签名正确性 start ----------------
             if (!appSecret.equals(signature)) {
-                success = false;
                 writer.print("验证签名不正确！");
                 writer.flush();
                 apiServiceMonitor.setNotes("验证签名不正确");
@@ -374,7 +367,6 @@ public class ServiceExecuteController {
             // ---------------- 通过context,reqPath关联查询API是否存在和状态 start ----------------
             ServiceDef serviceDef = checkApiService(apiContext, reqPath, apiServiceMonitor);
             if (serviceDef == null) {
-                success = false;
                 writer.print("API服务不存在");
                 writer.flush();
                 return;
@@ -383,7 +375,6 @@ public class ServiceExecuteController {
             apiServiceMonitor.setApiServiceId(apiServiceId);
             apiServiceMonitor.setApiServiceName(serviceDef.getName());
             if (!OpenServiceConstants.api_audit_pass.equals(serviceDef.getAuditStatus())) {
-                success = false;
                 writer.print("API服务当前状态不可用");
                 writer.flush();
                 apiServiceMonitor.setNotes("API服务当前状态不可用");
@@ -400,7 +391,6 @@ public class ServiceExecuteController {
             applymap.put("authStatus", OpenServiceConstants.auth_status_pass);
             List<ServiceApply> alist = serviceApplyService.getList(applymap);
             if (alist == null || alist.size() == 0) {
-                success = false;
                 writer.print("API未授权应用");
                 writer.flush();
                 apiServiceMonitor.setNotes("API未授权应用");
@@ -418,7 +408,6 @@ public class ServiceExecuteController {
                     PayAccountCapital payAccountCapital = payService.getPayAccountByUserId(requestUserId);
                     BigDecimal balance = new BigDecimal(payAccountCapital.getAccountBalance());
                     if (balance.compareTo(new BigDecimal(0.00)) <= 0) {
-                        success = false;
                         writer.print("账户余额不足，请及时充值！");
                         writer.flush();
                         apiServiceMonitor.setNotes("账户余额不足，请及时充值");
@@ -427,7 +416,6 @@ public class ServiceExecuteController {
                     } else {
                         BigDecimal bigDecimal = balance.subtract(serviceDef.getPrice());
                         if (bigDecimal.compareTo(new BigDecimal(0.00)) <= 0) {
-                            success = false;
                             writer.print("账户余额不足调用，请及时充值！");
                             writer.flush();
                             apiServiceMonitor.setNotes("账户余额不足调用，请及时充值");
@@ -451,7 +439,6 @@ public class ServiceExecuteController {
                 }
                 initInputList(request, listServiceInput);
             } catch (Exception e) {
-                success = false;
                 e.printStackTrace();
                 writer.print("输入参数异常:" + e.getMessage());
                 writer.flush();
@@ -472,7 +459,6 @@ public class ServiceExecuteController {
             // 进行限流
             RateLimiter rateLimiter = map.get(key);
             if (!rateLimiter.tryAcquire()) {
-                success = false;
                 writer.print("请求过于频繁");
                 writer.flush();
                 apiServiceMonitor.setNotes("请求过于频繁");
@@ -487,17 +473,24 @@ public class ServiceExecuteController {
             String result_str = "";
             if (serviceDef.getApiType()!=null && serviceDef.getApiType().equals("page")){
                 // 拼接地址和参数，进行重定向
-                response.sendRedirect( httpUrlBuffer(serviceDef, listServiceInput, apiServiceMonitor) );
+                String urlTarget = "";
+                try{
+                    urlTarget = httpUrlBuffer(serviceDef, listServiceInput, apiServiceMonitor);
+                    success = true;
+                    response.sendRedirect( urlTarget );
+                }catch (Exception e){
+                    log.error(e.getMessage());
+                }
             }else{
                 if (serviceDef.getScProtocol().equals("webService")) {
                     String type = serviceDef.getScFrame();
                     if ("Axiom".equals(type)) {
-                        result_str = executeAxis2(serviceDef, listServiceInput);
+                        result_str = executeAxis2(success,serviceDef, listServiceInput);
                     } else if ("RPC".equals(type)) {
-                        result_str = executeRPC(serviceDef, listServiceInput);
+                        result_str = executeRPC(success,serviceDef, listServiceInput);
                     }
                 } else {
-                    result_str = doRequest(instream, serviceDef, listServiceInput, apiServiceMonitor);
+                    result_str = doRequest(success,instream, serviceDef, listServiceInput, apiServiceMonitor);
                 }
                 response.addHeader("Content-Type", OpenServiceConstants.getContentType(serviceDef.getContentType()));
                 writer.print(result_str);
@@ -529,13 +522,13 @@ public class ServiceExecuteController {
             if (log.isDebugEnabled()) {
                 log.debug("调用api执行的时间" + (serviceTime) + "毫秒");
             }
+            // 扣款
             if (success) {
-                // TODO 服务调用成功，查询之前调用此服务失败的记录，将之前的失败的etime
-                // (end_time)修改为当前时间，表示服务已经修正可用
-                // 首先根据service_id获取表monitor_item中有关服务的记录，有则处理
                 if (requestUserId != null && servicePrice != null) {
-                    //成功调用时扣费
-                    payService.subPayAccountByUserId(requestUserId, servicePrice + "");
+                    // 成功调用、且api价格不为0时扣费
+                    if (servicePrice.compareTo(new BigDecimal(0.00)) > 0) {
+                        payService.subPayAccountByUserId(requestUserId, servicePrice + "");
+                    }
                 }
                 apiServiceMonitor.setServiceTotalTime((int) serviceTime);
             }
@@ -633,7 +626,7 @@ public class ServiceExecuteController {
     }
 
 
-    private String executeRPC(ServiceDef ws, List<ServiceInput> serviceInputList) throws AxisFault {
+    private String executeRPC(boolean success,ServiceDef ws, List<ServiceInput> serviceInputList) throws AxisFault {
         RPCServiceClient serviceClient = new RPCServiceClient();
 
         System.out.println("***************************:  " + ws.getScAddr());
@@ -725,7 +718,7 @@ public class ServiceExecuteController {
         return JSON.toJSONString(list);
     }
 
-    private String executeAxis2(ServiceDef ws, List<ServiceInput> listServiceInput) throws AxisFault {
+    private String executeAxis2(boolean success,ServiceDef ws, List<ServiceInput> listServiceInput) throws AxisFault {
         try {
             String[] params = new String[listServiceInput.size()];
             int i = 0;
@@ -766,6 +759,7 @@ public class ServiceExecuteController {
             OMElement result = sender.sendReceive(getPricePayload);
             String response = result.getFirstElement().getText();
             System.out.println("Current price of WSO: " + response);
+            success = true;
             return response;
         } catch (AxisFault e) {
             log.error("axis2执行异常", e);
@@ -791,7 +785,7 @@ public class ServiceExecuteController {
     }
 
 
-    private String doRequest(String instream, ServiceDef serviceDef, List<ServiceInput> listServiceInput, ApiServiceMonitor apiServiceMonitor) throws Exception {
+    private String doRequest(boolean success,String instream, ServiceDef serviceDef, List<ServiceInput> listServiceInput, ApiServiceMonitor apiServiceMonitor) throws Exception {
         String scType = null;
         String addr = serviceDef.getScAddr();
         addr = addr.endsWith("/") ? addr.substring(0, addr.length() - 1) : addr;
@@ -855,10 +849,10 @@ public class ServiceExecuteController {
         System.out.println("请其头为:" + JSONObject.fromObject(header).toString());
         switch (method) {
             case "GET":
-                result = execGet(httpurl.toString(), timeout, header);
+                result = execGet(success,httpurl.toString(), timeout, header);
                 break;
             case "POST":
-                result = execPost(instream, scType, httpurl.toString(), timeout, header, bodys);
+                result = execPost(success,instream, scType, httpurl.toString(), timeout, header, bodys);
                 break;
             default:
                 result = "{error:404}";
@@ -1070,7 +1064,7 @@ public class ServiceExecuteController {
      * @param headers
      * @return
      */
-    public static String execGet(String url, int timeout, Map<String, String> headers) {
+    public static String execGet(boolean success,String url, int timeout, Map<String, String> headers) {
         String str = "{error:404}";
         HttpGet httpGet = new HttpGet(url);
         RequestConfig requestConfig = RequestConfig.custom().setSocketTimeout(timeout).setConnectTimeout(timeout).build();//设置请求和传输超时时间
@@ -1083,6 +1077,9 @@ public class ServiceExecuteController {
         }
         try (final CloseableHttpClient httpclient = createCloseableHttpClient(url);
              final CloseableHttpResponse response = httpclient.execute(httpGet)) {
+            if (response.getStatusLine().getStatusCode() == 200){
+                success = true;
+            }
             HttpEntity entity = response.getEntity();
             str = EntityUtils.toString(entity, "utf-8");
             EntityUtils.consume(entity);
@@ -1103,7 +1100,7 @@ public class ServiceExecuteController {
      * @return
      */
 
-    public static String execPost(String instream, String scType, String url, int timeout, Map<String, String> headers, Map<String, String> parameters) {
+    public static String execPost(boolean success,String instream, String scType, String url, int timeout, Map<String, String> headers, Map<String, String> parameters) {
         String str = "{error:404}";
         HttpPost httpPost = new HttpPost(url);
         HttpGet httpGet = new HttpGet(url);
@@ -1141,6 +1138,9 @@ public class ServiceExecuteController {
         }
         try (final CloseableHttpClient httpclient = createCloseableHttpClient(url);
              final CloseableHttpResponse response = httpclient.execute(httpPost)) {
+            if (response.getStatusLine().getStatusCode() == 200){
+                success = true;
+            }
             HttpEntity entity = response.getEntity();
             str = EntityUtils.toString(entity, "UTF-8");
             EntityUtils.consume(entity);
