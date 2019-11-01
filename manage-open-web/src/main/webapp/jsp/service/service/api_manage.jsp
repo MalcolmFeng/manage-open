@@ -143,19 +143,22 @@
 					var a = ids[i].split("=");
 					id.push(a[1]);
 				}
-				$.ajax({
-					url : context + "/service/open/api/generateAPIDocByAPIIds" ,
-					type:"POST",
-					data: JSON.stringify(id),
-					success: function(resp){
-						console.log(resp);
-						if(resp.result == true) {
-							reloadAuditList();
-						} else {
-							sticky("失败!"+resp.message);
-						}
-					}
-				});
+
+				window.open(context + "/service/open/api/generateAPIDocByAPIIds?ids="+ JSON.stringify(id));
+				// $.ajax({
+				// 	url : context + "/service/open/api/generateAPIDocByAPIIds" ,
+				// 	type:"POST",
+				// 	// contentType: 'application/json;charset=UTF-8',
+				// 	data: JSON.stringify(),
+				// 	success: function(resp){
+				// 		console.log(resp);
+				// 		if(resp.result == true) {
+				// 			reloadAuditList();
+				// 		} else {
+				// 			sticky("失败!"+resp.message);
+				// 		}
+				// 	}
+				// });
 			}
 			else{
 				sticky("请选择至少一个申请");

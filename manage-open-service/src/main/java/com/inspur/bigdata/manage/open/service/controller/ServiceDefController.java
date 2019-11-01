@@ -79,16 +79,15 @@ public class ServiceDefController {
 
     /**
      * 自动批量生成API文档
-     * @param ids
      * @param request
      * @param response
      * @throws Exception
      */
     @RequestMapping(value = "/generateAPIDocByAPIIds")
     @ResponseBody
-    public void generateAPIDocByAPIIds(@RequestBody List<String> ids,HttpServletRequest request, HttpServletResponse response) throws Exception{
-
-        com.alibaba.fastjson.JSONArray jsonArray = JSON.parseArray(JSON.toJSONString(ids));
+    public void generateAPIDocByAPIIds(HttpServletRequest request, HttpServletResponse response) throws Exception{
+        String ids = request.getParameter("ids");
+        com.alibaba.fastjson.JSONArray jsonArray = JSON.parseArray(ids);
 
         // 查询API
         List<ServiceDef> list = new ArrayList<>();
@@ -100,6 +99,52 @@ public class ServiceDefController {
             serviceDef.setInputList(inputList);
             serviceDef.setOutputList(outputList);
             list.add(serviceDef);
+            // 为null时赋值空字符串，避免生成的doc打不开
+
+            if (serviceDef.getName() == null){
+                serviceDef.setName("");
+            }
+            if (serviceDef.getApiGroup() == null){
+                serviceDef.setApiGroup("");
+            }
+            if (serviceDef.getReqPath() == null){
+                serviceDef.setReqPath("");
+            }
+            if (serviceDef.getProtocol() == null){
+                serviceDef.setProtocol("");
+            }
+            if (serviceDef.getDescription() == null){
+                serviceDef.setDescription("");
+            }
+            if (serviceDef.getContentType() == null){
+                serviceDef.setContentType("");
+            }
+            if (serviceDef.getReturnSample() == null){
+                serviceDef.setReturnSample("");
+            }
+
+            for (ServiceInput input: inputList) {
+                if (input.getName() == null){
+                    input.setName("");
+                }
+                if (input.getType() == null){
+                    input.setType("");
+                }
+                if (input.getDescription() == null){
+                    input.setDescription("");
+                }
+            }
+            for (ServiceOutput output: outputList) {
+                if (output.getName() == null){
+                    output.setName("");
+                }
+                if (output.getType() == null){
+                    output.setType("");
+                }
+                if (output.getDescription() == null){
+                    output.setDescription("");
+                }
+            }
         }
 
         //构造数据
@@ -131,6 +176,8 @@ public class ServiceDefController {
         t.process(dataMap, out);
         out.close();
     }
+
+
 
     /**
      * 批量导入API服务
