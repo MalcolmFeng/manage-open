@@ -33,7 +33,22 @@
 	<script type="text/javascript" src="<l:asset path='loushang-framework.js'/>"></script>
 	<script type="text/javascript" src="<l:asset path='ui.js'/>"></script>
 	<script type="text/javascript" src="<l:asset path='ztree.js'/>"></script>
+	<style type="text/css">
+		.btn {
+			color: #3e99ff;
+			padding: 4px 12px;
+			background-color: #fff;
+			border-color: #ddd;
+			border-radius: 0;
+			position: relative;
+			float: right;
+		}
+		.btn:hover{
+			color: #fff;
+			background-color:#3e99ff;
+		}
 
+	</style>
 	<script type="text/javascript">
         var context = "<l:assetcontext/>";
         $(document).ready(function() {
@@ -114,7 +129,38 @@
         function forView(id) {
             window.location.href = context + "/service/open/api/getInfo/" + id;
         }
-
+		function renderCheckBox(data, type, full){
+			return '<input type="checkbox" value="' + data + '" name="id">';
+		}
+		function exportDoc() {
+			var cs = $("input[type='checkBox']:checked").serialize()
+			var ids = cs.split("&");//获取所选的id数组
+			var id = new Array()
+			if (cs.length>0){
+				var flag = window.confirm("确认导出所选的API文档吗？");
+				if(!flag){return}
+				for (var i=0;i<ids.length;i++){
+					var a = ids[i].split("=");
+					id.push(a[1]);
+				}
+				$.ajax({
+					url : context + "/service/open/api/generateAPIDocByAPIIds" ,
+					type:"POST",
+					data: JSON.stringify(id),
+					success: function(resp){
+						console.log(resp);
+						if(resp.result == true) {
+							reloadAuditList();
+						} else {
+							sticky("失败!"+resp.message);
+						}
+					}
+				});
+			}
+			else{
+				sticky("请选择至少一个申请");
+			}
+		}
 	</script>
 </head>
 <body>
@@ -128,13 +174,17 @@
 					<span class="fa fa-search"></span>
 				</div>
 			</div>
+			<input class="btn"type="button" value="批量导出API文档" onclick="exportDoc()">
 		</form>
 	</div>
 	<div class="row">
 		<table id="myauthList" class="table table-bordered table-hover">
 			<thead>
 			<tr>
-				<th width="5%" data-field="id" data-render="renderId">序号</th>
+				<th width="30px" data-field="id" data-render="renderCheckBox" >
+					<input type="checkbox" id="selectAll"/>
+				</th>
+<%--				<th width="5%" data-field="id" data-render="renderId">序号</th>--%>
 				<th width="25%" data-field="name" data-render="renderName">服务名称</th>
 				<th width="20%" data-field="provider">服务发布人</th>
 				<th width="20%" data-field="description">服务描述</th>
