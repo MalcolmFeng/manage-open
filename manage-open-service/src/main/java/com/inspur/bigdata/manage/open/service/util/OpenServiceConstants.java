@@ -38,6 +38,7 @@ public class OpenServiceConstants {
     public final static String SC_TYPE_APPLICATION_JSON = "application/json";
     public final static String SC_TYPE_TEXT_XML = "text/xml";
     public final static String SC_TYPE_APPLICATION_XWWWFORMURLENCODED = "application/x-www-form-urlencoded";
+    public final static String SC_TYPE_FILE = "file";
 
     /*
     ApiServiceMonitor表，api监控审计用到的错误代码等常量

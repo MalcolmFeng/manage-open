@@ -35,30 +35,34 @@ import org.apache.http.conn.socket.PlainConnectionSocketFactory;
 import org.apache.http.conn.ssl.NoopHostnameVerifier;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.entity.StringEntity;
+import org.apache.http.entity.mime.MultipartEntityBuilder;
+import org.apache.http.entity.mime.content.FileBody;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
-import org.apache.tools.ant.taskdefs.EchoXML;
+
 import org.loushang.framework.util.DateUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
-import javax.servlet.http.Cookie;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.PrintWriter;
+
+import java.io.*;
 import java.math.BigDecimal;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.nio.charset.Charset;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
@@ -75,21 +79,16 @@ import static com.inspur.bigdata.manage.utils.EncryptionUtil.*;
 
 
 import javax.xml.namespace.QName;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 
-import net.sf.json.JSONObject;
 import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMFactory;
 import org.apache.axiom.om.OMNamespace;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.EndpointReference;
-import org.apache.axis2.client.Options;
+
 import org.apache.axis2.client.ServiceClient;
-import org.apache.axis2.rpc.client.RPCServiceClient;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
+
 
 @CrossOrigin
 @Controller
@@ -437,9 +436,9 @@ public class ServiceExecuteController {
                     instream = HttpUtil.getRequestIn(request);
                     apiServiceMonitor.setOpenServiceInput(instream);
                 }
-                initInputList(request, listServiceInput);
+                // 给入参赋值
+                initInputList(request, serviceDef, listServiceInput);
             } catch (Exception e) {
-                e.printStackTrace();
                 writer.print("输入参数异常:" + e.getMessage());
                 writer.flush();
                 apiServiceMonitor.setNotes("输入参数异常:" + e.getMessage());
@@ -490,7 +489,7 @@ public class ServiceExecuteController {
                         result_str = executeRPC(success,serviceDef, listServiceInput);
                     }
                 } else {
-                    result_str = doRequest(success,instream, serviceDef, listServiceInput, apiServiceMonitor);
+                    result_str = doRequest(success, instream, serviceDef, listServiceInput, apiServiceMonitor);
                 }
                 response.addHeader("Content-Type", OpenServiceConstants.getContentType(serviceDef.getContentType()));
                 writer.print(result_str);
@@ -562,31 +561,65 @@ public class ServiceExecuteController {
     /**
      * 验证输入参数并赋值
      */
-    public void initInputList(HttpServletRequest request, List<ServiceInput> listServiceInput) throws Exception {
-        Map<String, String[]> requestmap = request.getParameterMap();
+    public void initInputList(HttpServletRequest request, ServiceDef serviceDef, List<ServiceInput> listServiceInput) throws Exception {
         for (ServiceInput serviceInput : listServiceInput) {
-            if (StringUtils.isNotEmpty(serviceInput.getFixedValue())) {
-                //有设置固定值
-                serviceInput.setValue(serviceInput.getFixedValue());
+            String paramName = serviceInput.getName();
+            String paramType = serviceInput.getType();
+            String postionType = serviceInput.getScParamType();
+            String fixedValue = serviceInput.getFixedValue();
+            int required = serviceInput.getRequired();
+
+            // 如果是body参数，不做处理（已经赋值到instream）
+            if (StringUtils.equals(postionType, OpenServiceConstants.SC_PARAMTYPE_BODY)){
                 continue;
             }
-            if (serviceInput.getScParamType().equals(OpenServiceConstants.SC_PARAMTYPE_HEAD)) {
-                serviceInput.setValue(request.getHeader(serviceInput.getScName()));
-            }
-            if (requestmap != null) {
-                for (Object key : requestmap.keySet()) {//循环请求所有参数
-                    if (serviceInput.getName().equals(String.valueOf(key))) {
-                        String value = String.valueOf(requestmap.get(key)[0]);
-                        checkData(serviceInput.getType(), value, (String) key);
+
+            // 判断是文件类型还是基本类型
+            if (StringUtils.equals(paramType, OpenServiceConstants.SC_TYPE_FILE)){
+                MultipartHttpServletRequest multipartRequest = (MultipartHttpServletRequest) request;
+                MultipartFile files = multipartRequest.getFile((String)paramName);
+                serviceInput.setValue(files);
+            }else{
+                // 有设置固定值
+                if (StringUtils.isNotEmpty(fixedValue)) {
+                    // 先进行赋值。 （如果依然传了，进行覆盖）
+                    serviceInput.setValue(fixedValue);
+                }
+
+                // 先从请求头中获取（适配可能出现的老方式）
+                if (StringUtils.equals(postionType, OpenServiceConstants.SC_PARAMTYPE_HEAD)) {
+                    String value = request.getHeader(paramName);
+                    if (value != null) { // 防止null将固定值覆盖
                         serviceInput.setValue(value);
-                        break;
                     }
                 }
+
+                // 从参数中获取
+                String value = request.getParameter(paramName);
+                if (value != null){ // 防止null将固定值覆盖
+                    serviceInput.setValue(value);
+                }
+
+                // 校验 (参数类型和必填性)
+                checkData(paramType, (String)serviceInput.getValue(), paramName,required);
             }
         }
     }
 
-    private void checkData(String type, String value, String key) throws Exception {
+    private void checkData(String type, String value, String key,Integer required) throws Exception {
+        // 如果是必填参数，校验是否为空
+        if (required == 1){
+            if (value == null){
+                throw new Exception("请输入必填参数[" + key + "]");
+            }
+        }
+        if (type.toLowerCase().equals("application/json")) {
+            try {
+                JSON.parseObject(value);
+            } catch (Exception e) {
+                throw new Exception("applicaiton/json数据格式错误[" + key + "=" + value + "]");
+            }
+        }
         if (type.toLowerCase().equals("int")) {
             try {
                 Integer.parseInt(value);
@@ -723,7 +756,6 @@ public class ServiceExecuteController {
             String[] params = new String[listServiceInput.size()];
             int i = 0;
             for (ServiceInput serviceInput : listServiceInput) {
-                checkData(serviceInput.getScType(), serviceInput.getValue(), serviceInput.getScName());
                 String paramType = serviceInput.getScParamType();
                 if (paramType.equalsIgnoreCase("body")) {
                     System.out.println(serviceInput.getScType() + ":" + serviceInput.getValue());
@@ -734,7 +766,7 @@ public class ServiceExecuteController {
             String[] paramValues = new String[listServiceInput.size()];
             int j = 0;
             for (ServiceInput item : listServiceInput) {
-                paramValues[j++] = item.getValue();
+                paramValues[j++] = (String)item.getValue();
             }
 
 //            String[] paramValues = new String[param.size()];
@@ -787,78 +819,75 @@ public class ServiceExecuteController {
 
     private String doRequest(boolean success,String instream, ServiceDef serviceDef, List<ServiceInput> listServiceInput, ApiServiceMonitor apiServiceMonitor) throws Exception {
         String scType = null;
+        String contentType = serviceDef.getContentType();
+
+        // 地址拼接
         String addr = serviceDef.getScAddr();
         addr = addr.endsWith("/") ? addr.substring(0, addr.length() - 1) : addr;
         StringBuilder httpurl = new StringBuilder();
         httpurl.append(addr);
-        //组装后端参数param
-        Map<String, String> header = new HashMap<>();
-        Map<String, String> bodys = new HashMap<String, String>();
+
+        // monitor记录所有入参
         JSONObject serviceInputParam = new JSONObject();
-        header.put(Constants.HTTP_HEADER_ACCEPT, "*/*");
+
         Collections.sort(listServiceInput);//根据scSeq排序
 
-        boolean firstQueryParam = true;
+        //组装后端参数
+        Map<String, String> headerMap = new HashMap<>();
+        headerMap.put(Constants.HTTP_HEADER_ACCEPT, "*/*");
+
+        Map<String,Object> paramsMap = new HashMap<>();
+        Map<String,Object> paramsTypeMap = new HashMap<>();
+
         for (ServiceInput serviceInput : listServiceInput) {
-            serviceInputParam.put(serviceInput.getScName(), serviceInput.getValue());
-            //判断必填属性
-            if (OpenDataConstants.is_null_no == serviceInput.getRequired() && StringUtils.isBlank(serviceInput.getValue()) && !serviceInput.getScType().equals("text/xml") && !serviceInput.getScType().equals("application/json")) {
-                throw new Exception("请传入必填参数" + serviceInput.getName());
+            String paramsType = serviceInput.getType();
+            String paramsName = serviceInput.getName();
+            String paramPositionType = serviceInput.getScParamType();
+
+            // 入参解密
+            Object decryptedParam = decryptedParam(serviceInput, serviceDef.getEncryptionType());
+            if (decryptedParam!=null){
+                serviceInputParam.put(paramsName, decryptedParam.toString());
             }
 
-            // 执行加解密，接口级别和参数级别
-            String decryptedParam = decryptedParam(serviceInput, serviceDef.getEncryptionType());
-            serviceInputParam.put(serviceInput.getScName(), decryptedParam);
-
-            checkData(serviceInput.getScType(), decryptedParam, serviceInput.getScName());//判断参数类型是否正确
-            String paramType = serviceInput.getScParamType();
-            if (paramType.equalsIgnoreCase(OpenServiceConstants.SC_PARAMTYPE_PATH)) {
+            // 根据参数位置 来进行处理
+            if (paramPositionType.equalsIgnoreCase(OpenServiceConstants.SC_PARAMTYPE_PATH)) {
                 httpurl.append("/").append(decryptedParam);
-            } else if (paramType.equalsIgnoreCase(OpenServiceConstants.SC_PARAMTYPE_BODY)) {
-                if (!serviceInput.getScType().equals(OpenServiceConstants.SC_TYPE_APPLICATION_JSON) && !serviceInput.getScType().equals(OpenServiceConstants.SC_TYPE_TEXT_XML)) {
-                    if (StringUtils.isNotBlank(decryptedParam)) {
-                        bodys.put(serviceInput.getScName(), decryptedParam);
-                    }
-                } else {
-                    if (StringUtils.isEmpty(instream) && StringUtils.isNotBlank(decryptedParam)) {
-                        instream = decryptedParam;
-                    }
-                    scType = serviceInput.getScType();
+            } else if (paramPositionType.equalsIgnoreCase(OpenServiceConstants.SC_PARAMTYPE_QUERY)) {
+                Object object = serviceInput.getValue();
+                if (object != null){
+                    paramsMap.put(paramsName,object);
                 }
-            } else if (paramType.equalsIgnoreCase(OpenServiceConstants.SC_PARAMTYPE_QUERY)) {
-                if (firstQueryParam) {
-                    if (StringUtils.isNotBlank(decryptedParam)) {
-                        httpurl.append("?").append(serviceInput.getScName()).append("=").append(URLEncoder.encode(decryptedParam));
-                        firstQueryParam = false;
-                    }
-                } else {
-                    if (StringUtils.isNotBlank(decryptedParam)) {
-                        httpurl.append("&").append(serviceInput.getScName()).append("=").append(URLEncoder.encode(decryptedParam));
-                    }
+            } else if (paramPositionType.equalsIgnoreCase(OpenServiceConstants.SC_PARAMTYPE_HEAD)) {
+                headerMap.put(paramsName, (String)decryptedParam);
+            } else if (paramPositionType.equalsIgnoreCase(OpenServiceConstants.SC_PARAMTYPE_BODY)) {
+                if (StringUtils.isEmpty(instream) && decryptedParam != null) {
+                    instream = (String)decryptedParam;
                 }
-            } else if (paramType.equalsIgnoreCase(OpenServiceConstants.SC_PARAMTYPE_HEAD)) {
-                header.put(serviceInput.getScName(), decryptedParam);
+                scType = serviceInput.getScType();
             }
+            paramsTypeMap.put(paramsName,paramsType);
         }
+
         int timeout = 30000;
         String method = serviceDef.getScHttpMethod().toUpperCase();
         String result = null;
         apiServiceMonitor.setServiceInput(serviceInputParam.toString());
-        apiServiceMonitor.setServiceInputHeader(JSONObject.fromObject(header).toString());
+        apiServiceMonitor.setServiceInputHeader(JSONObject.fromObject(headerMap).toString());
         apiServiceMonitor.setServiceMethod(method);
-        System.out.println("请其头为:" + JSONObject.fromObject(header).toString());
+        System.out.println("请其头为:" + JSONObject.fromObject(headerMap).toString());
         switch (method) {
             case "GET":
-                result = execGet(success,httpurl.toString(), timeout, header);
+                result = execGet(success, httpurl.toString(), timeout, headerMap,paramsMap);
                 break;
             case "POST":
-                result = execPost(success,instream, scType, httpurl.toString(), timeout, header, bodys);
+                result = execPost(success, instream, scType, httpurl.toString(), timeout, headerMap, paramsMap, paramsTypeMap);
                 break;
             default:
                 result = "{error:404}";
         }
         apiServiceMonitor.setServiceOutput(result);
-        //TODO:暂时将返回值全部加密，具体加密解密形式再继续探讨
+
         result = encryptionResult(result, serviceDef.getEncryptionType());
         return result;
     }
@@ -881,15 +910,15 @@ public class ServiceExecuteController {
         for (ServiceInput serviceInput : listServiceInput) {
             serviceInputParam.put(serviceInput.getScName(), serviceInput.getValue());
             //判断必填属性
-            if (OpenDataConstants.is_null_no == serviceInput.getRequired() && StringUtils.isBlank(serviceInput.getValue()) && !serviceInput.getScType().equals("text/xml") && !serviceInput.getScType().equals("application/json")) {
+            if (OpenDataConstants.is_null_no == serviceInput.getRequired() && serviceInput.getValue()!=null && !serviceInput.getScType().equals("text/xml") && !serviceInput.getScType().equals("application/json")) {
                 throw new Exception("请传入必填参数" + serviceInput.getName());
             }
 
             // 执行加解密，接口级别和参数级别
-            String decryptedParam = decryptedParam(serviceInput, serviceDef.getEncryptionType());
+            Object decryptedParam = decryptedParam(serviceInput, serviceDef.getEncryptionType());
             serviceInputParam.put(serviceInput.getScName(), decryptedParam);
 
-            checkData(serviceInput.getScType(), decryptedParam, serviceInput.getScName());//判断参数类型是否正确
+            checkData(serviceInput.getScType(), (String)decryptedParam, serviceInput.getScName(),serviceInput.getRequired());//判断参数类型是否正确
             String paramType = serviceInput.getScParamType();
 
             if (paramType.equalsIgnoreCase(OpenServiceConstants.SC_PARAMTYPE_QUERY)) {
@@ -897,13 +926,13 @@ public class ServiceExecuteController {
 //                    continue;
 //                }
                 if (firstQueryParam) {
-                    if (StringUtils.isNotBlank(decryptedParam)) {
-                        httpurl.append("?").append(serviceInput.getScName()).append("=").append(URLEncoder.encode(decryptedParam));
+                    if (decryptedParam != null) {
+                        httpurl.append("?").append(serviceInput.getScName()).append("=").append(URLEncoder.encode((String)decryptedParam));
                         firstQueryParam = false;
                     }
                 } else {
-                    if (StringUtils.isNotBlank(decryptedParam)) {
-                        httpurl.append("&").append(serviceInput.getScName()).append("=").append(URLEncoder.encode(decryptedParam));
+                    if (decryptedParam != null) {
+                        httpurl.append("&").append(serviceInput.getScName()).append("=").append(URLEncoder.encode((String)decryptedParam));
                     }
                 }
             }
@@ -924,10 +953,13 @@ public class ServiceExecuteController {
      * @return
      * @throws Exception
      */
-    private static String decryptedParam(ServiceInput serviceInput, String encryptionType) throws Exception {
+    private static Object decryptedParam(ServiceInput serviceInput, String encryptionType) throws Exception {
+        if (serviceInput.getType().equals(SC_TYPE_FILE)){
+            return serviceInput.getValue();
+        }
         String decryptedParamStr = "";
-        String param = serviceInput.getValue();
-        String url = serviceInput.getValue();
+        String param = (String)serviceInput.getValue();
+        String url = serviceInput.getDecryptUrl();
         String name = serviceInput.getName();
         if (StringUtil.isNotEmpty(encryptionType) && StringUtil.isNotEmpty(ENCRYPTION_MAP.get(encryptionType))) {
             switch (encryptionType) {
@@ -965,7 +997,7 @@ public class ServiceExecuteController {
      */
     private static String decryptedParam_paramLevel(ServiceInput serviceInput) throws Exception {
         String after_value = "";
-        String param = serviceInput.getValue();
+        String param = (String)serviceInput.getValue();
         String name = serviceInput.getName();
 
         String decryptType = serviceInput.getDecryptType();
@@ -1064,9 +1096,23 @@ public class ServiceExecuteController {
      * @param headers
      * @return
      */
-    public static String execGet(boolean success,String url, int timeout, Map<String, String> headers) {
-        String str = "{error:404}";
-        HttpGet httpGet = new HttpGet(url);
+    public static String execGet(boolean success,String url, int timeout, Map<String, String> headers, Map<String,Object> paramsMap) {
+
+        StringBuffer urlAppend = new StringBuffer();
+        boolean firstQueryParam = true;
+        for (Map.Entry<String,Object> temp : paramsMap.entrySet()){
+            String key = temp.getKey();
+            Object value = temp.getValue();
+            if (firstQueryParam) {
+                    urlAppend.append("?").append(key).append("=").append(URLEncoder.encode((String)value));
+                    firstQueryParam = false;
+            } else {
+                urlAppend.append("&").append(key).append("=").append(URLEncoder.encode((String)value));
+            }
+        }
+        HttpGet httpGet = new HttpGet(url + urlAppend.toString());
+
+        // 设置请求头
         RequestConfig requestConfig = RequestConfig.custom().setSocketTimeout(timeout).setConnectTimeout(timeout).build();//设置请求和传输超时时间
         httpGet.setConfig(requestConfig);
         if (StringUtil.isNotEmpty(headers)) {
@@ -1075,19 +1121,24 @@ public class ServiceExecuteController {
                 httpGet.addHeader(key, headers.get(key));
             }
         }
-        try (final CloseableHttpClient httpclient = createCloseableHttpClient(url);
-             final CloseableHttpResponse response = httpclient.execute(httpGet)) {
+
+        // 执行请求
+        String result;
+        try {
+            CloseableHttpClient httpclient = createCloseableHttpClient(url);
+            CloseableHttpResponse response = httpclient.execute(httpGet);
             if (response.getStatusLine().getStatusCode() == 200){
                 success = true;
             }
             HttpEntity entity = response.getEntity();
-            str = EntityUtils.toString(entity, "utf-8");
+            result = EntityUtils.toString(entity, "utf-8");
             EntityUtils.consume(entity);
+
         } catch (Exception e) {
-            str = "API网关GET method failed to access URL！";
+            result = "API网关GET method failed to access URL！";
             log.error("API网关GET method failed to access URL，URL：" + url, e);
         }
-        return str;
+        return result;
     }
 
     /**
@@ -1095,32 +1146,42 @@ public class ServiceExecuteController {
      *
      * @param url
      * @param timeout
-     * @param headers
-     * @param parameters
      * @return
      */
 
-    public static String execPost(boolean success,String instream, String scType, String url, int timeout, Map<String, String> headers, Map<String, String> parameters) {
-        String str = "{error:404}";
+    public static String execPost(boolean success,String instream, String scType, String url, int timeout, Map<String, String> headersMap, Map<String,Object> paramsMap, Map<String,Object>  paramsType) throws IOException {
+        // 创建请求对象，进行初始化设置
         HttpPost httpPost = new HttpPost(url);
-        HttpGet httpGet = new HttpGet(url);
         RequestConfig requestConfig = RequestConfig.custom().setSocketTimeout(timeout).setConnectTimeout(timeout).build();//设置请求和传输超时时间
-        httpGet.setConfig(requestConfig);
-        if (StringUtil.isNotEmpty(headers)) {
-            for (String key : headers.keySet()) {
-                httpPost.addHeader(key, headers.get(key));
+        httpPost.setConfig(requestConfig);
+
+        // 赋值请求头
+        if (StringUtil.isNotEmpty(headersMap)) {
+            for (String key : headersMap.keySet()) {
+                httpPost.addHeader(key, headersMap.get(key));
             }
         }
-        if (StringUtil.isNotEmpty(parameters)) {
-            List<NameValuePair> nvps = new ArrayList<>();
-            for (String key : parameters.keySet()) {
-                nvps.add(new BasicNameValuePair(key, parameters.get(key)));
-            }
 
-            try {
-                httpPost.setEntity(new UrlEncodedFormEntity(nvps, "utf-8"));
-            } catch (Exception e) {
+        // 如果参数不为空
+        if (paramsMap.size()>0) {
+            // 复杂Entity构造器
+            MultipartEntityBuilder entityBuilder = MultipartEntityBuilder.create();
+
+            // 遍历Query参数，赋值到 entityBuilder
+            for (Map.Entry<String, Object> entry : paramsMap.entrySet()) {
+                //添加普通参数
+                if(paramsType.get(entry.getKey()).equals(SC_TYPE_FILE)){
+                    //添加上传的文件
+                    MultipartFile mulFile = (MultipartFile) entry.getValue();
+                    File file = asFile(mulFile.getInputStream());
+                    entityBuilder.addPart(entry.getKey(),new FileBody(file));
+                }else{
+                    entityBuilder.addTextBody(entry.getKey(), (String)entry.getValue());
+                }
             }
+            HttpEntity httpEntity = entityBuilder.build();
+            httpPost.setEntity(httpEntity);
+
         } else if (StringUtils.isNotEmpty(instream) && (scType.equals(OpenServiceConstants.SC_TYPE_APPLICATION_JSON) || scType.equals(OpenServiceConstants.SC_TYPE_TEXT_XML))) {
             switch (scType) {
                 case OpenServiceConstants.SC_TYPE_APPLICATION_JSON:
@@ -1136,20 +1197,40 @@ public class ServiceExecuteController {
                 e.printStackTrace();
             }
         }
-        try (final CloseableHttpClient httpclient = createCloseableHttpClient(url);
-             final CloseableHttpResponse response = httpclient.execute(httpPost)) {
+        String result;
+        try{
+            final CloseableHttpClient httpclient = createCloseableHttpClient(url);
+
+            // 执行请求
+            final CloseableHttpResponse response = httpclient.execute(httpPost);
+
+            // 请求成功
             if (response.getStatusLine().getStatusCode() == 200){
                 success = true;
             }
+
+            // 响应Entity
             HttpEntity entity = response.getEntity();
-            str = EntityUtils.toString(entity, "UTF-8");
+            result = EntityUtils.toString(entity, "UTF-8");
             EntityUtils.consume(entity);
         } catch (Exception e) {
-            str = "API网关POST method failed to access URL!";
+            result = "API网关POST method failed to access URL!";
             e.printStackTrace();
             log.error("API网关POST method failed to access URL，URL：" + url, e);
         }
-        return str;
+        return result;
+    }
+
+    public static File asFile(InputStream inputStream) throws IOException{
+        File tmp = File.createTempFile("hdsp", ".zip", new File("C:\\"));
+        OutputStream os = new FileOutputStream(tmp);
+        int bytesRead = 0;
+        byte[] buffer = new byte[8192];
+        while ((bytesRead = inputStream.read(buffer, 0, 8192)) != -1) {
+            os.write(buffer, 0, bytesRead);
+        }
+        inputStream.close();
+        return tmp;
     }
 
     public static CloseableHttpClient createCloseableHttpClient(String url) throws Exception {

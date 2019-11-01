@@ -87,10 +87,11 @@ public class ServiceInput implements Serializable, Comparable<ServiceInput> {
     private String encryptUrl;
 
 
-
-
+    /**
+     * 有可能是 string 有可能是 MultipartFile
+     */
     @Transient
-    private String value;
+    private Object value;
 
     public String getId() {
         return id;
@@ -188,11 +189,11 @@ public class ServiceInput implements Serializable, Comparable<ServiceInput> {
         this.scParamType = scParamType;
     }
 
-    public String getValue() {
+    public Object getValue() {
         return value;
     }
 
-    public void setValue(String value) {
+    public void setValue(Object value) {
         this.value = value;
     }
 
