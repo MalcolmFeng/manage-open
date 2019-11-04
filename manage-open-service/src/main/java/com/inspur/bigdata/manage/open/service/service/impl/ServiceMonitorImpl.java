@@ -178,7 +178,13 @@ public class ServiceMonitorImpl implements IServiceMonitorService {
     @Override
     public Map<String, Object> getApiMonitorList(Map<String, String> parameters) {
         Map<String, Object> mpMap = new HashMap<String, Object>();
-//        parameters.put("provider", OpenServiceConstants.getUserId());
+        String userId= OpenDataConstants.getUserId();
+        if(userId.equals("odadmin")){
+            parameters.put("callerUserId", null);
+        }
+        else {
+            parameters.put("callerUserId", userId);
+        }
         List<ApiServiceMonitor> ApiServiceMonitors = serviceMonitorService.query(parameters);
         if (StringUtil.isEmpty(ApiServiceMonitors)) {
             mpMap.put("total", 0);
