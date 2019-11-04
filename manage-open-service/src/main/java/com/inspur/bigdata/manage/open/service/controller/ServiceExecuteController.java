@@ -575,9 +575,8 @@ public class ServiceExecuteController {
             String fixedValue = serviceInput.getFixedValue();
             int required = serviceInput.getRequired();
 
-            // 如果是body参数，不做处理（已经赋值到instream）,如果使用post方式调用webservice接口，将body的K-V值赋到listServiceInput
-            if (StringUtils.equals(postionType, OpenServiceConstants.SC_PARAMTYPE_BODY)
-                    && !StringUtils.equals(serviceDef.getScProtocol(), "webService")) {
+            // 如果是body参数，不做处理（已经赋值到instream）
+            if (StringUtils.equals(postionType, OpenServiceConstants.SC_PARAMTYPE_BODY)) {
                 continue;
             }
 
