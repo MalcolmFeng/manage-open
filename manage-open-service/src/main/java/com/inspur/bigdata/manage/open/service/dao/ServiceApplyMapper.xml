@@ -20,6 +20,7 @@
         <if test="userId!=null and userId!='' ">
             and a.APPLICANT=#{userId}
         </if>
+           order by a.APPLY_TIME desc
     </select>
     <select id="getServiceList" resultMap="serviceResult" parameterType="map">
         select b.`NAME` as name,a.* from api_service_apply a,api_service_def b where a.API_SERVICE_ID=b.ID
