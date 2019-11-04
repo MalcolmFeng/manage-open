@@ -17,6 +17,8 @@ import com.inspur.bigdata.manage.utils.SM3;
 import com.inspur.bigdata.manage.utils.StringUtil;
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
 import net.sf.json.JSONObject;
+import org.apache.axis.client.Call;
+import org.apache.axis.client.Service;
 import org.apache.axis2.client.Options;
 import org.apache.axis2.rpc.client.RPCServiceClient;
 import org.apache.commons.io.IOUtils;
@@ -231,9 +233,10 @@ public class ServiceExecuteController {
             if (serviceDef.getScProtocol().equals("webService")) {
                 String type = serviceDef.getScFrame();
                 if ("Axiom".equals(type)) {
-                    result_str = executeAxis2(success, serviceDef, listServiceInput);
+                    result_str = executeAxis2(success, serviceDef, listServiceInput, new ApiServiceMonitor());
                 } else if ("RPC".equals(type)) {
-                    result_str = executeRPC(success, serviceDef, listServiceInput);
+//                    result_str = executeRPC(success, serviceDef, listServiceInput);
+                    result_str = executeRPCAxis(success, serviceDef, listServiceInput, new ApiServiceMonitor());
                 }
             } else {
                 result_str = doRequest(success,"", serviceDef, listServiceInput, new ApiServiceMonitor());
@@ -434,7 +437,9 @@ public class ServiceExecuteController {
                 String contentType = request.getHeader("Content-Type");
                 if (StringUtils.isNotEmpty(contentType) && !contentType.equals(OpenServiceConstants.SC_TYPE_APPLICATION_XWWWFORMURLENCODED)) {
                     instream = HttpUtil.getRequestIn(request);
-                    apiServiceMonitor.setOpenServiceInput(instream);
+                    if (StringUtil.isNotEmpty(instream)) {
+                        apiServiceMonitor.setOpenServiceInput(instream);
+                    }
                 }
                 // 给入参赋值
                 initInputList(request, serviceDef, listServiceInput);
@@ -484,9 +489,10 @@ public class ServiceExecuteController {
                 if (serviceDef.getScProtocol().equals("webService")) {
                     String type = serviceDef.getScFrame();
                     if ("Axiom".equals(type)) {
-                        result_str = executeAxis2(success,serviceDef, listServiceInput);
+                        result_str = executeAxis2(success, serviceDef, listServiceInput, apiServiceMonitor);
                     } else if ("RPC".equals(type)) {
-                        result_str = executeRPC(success,serviceDef, listServiceInput);
+//                        result_str = executeRPC(success,serviceDef, listServiceInput);
+                        result_str = executeRPCAxis(success, serviceDef, listServiceInput, apiServiceMonitor);
                     }
                 } else {
                     result_str = doRequest(success, instream, serviceDef, listServiceInput, apiServiceMonitor);
@@ -569,15 +575,16 @@ public class ServiceExecuteController {
             String fixedValue = serviceInput.getFixedValue();
             int required = serviceInput.getRequired();
 
-            // 如果是body参数，不做处理（已经赋值到instream）
-            if (StringUtils.equals(postionType, OpenServiceConstants.SC_PARAMTYPE_BODY)){
+            // 如果是body参数，不做处理（已经赋值到instream）,如果使用post方式调用webservice接口，将body的K-V值赋到listServiceInput
+            if (StringUtils.equals(postionType, OpenServiceConstants.SC_PARAMTYPE_BODY)
+                    && !StringUtils.equals(serviceDef.getScProtocol(), "webService")) {
                 continue;
             }
 
             // 判断是文件类型还是基本类型
             if (StringUtils.equals(paramType, OpenServiceConstants.SC_TYPE_FILE)){
                 MultipartHttpServletRequest multipartRequest = (MultipartHttpServletRequest) request;
-                MultipartFile files = multipartRequest.getFile((String)paramName);
+                MultipartFile files = multipartRequest.getFile(paramName);
                 serviceInput.setValue(files);
             }else{
                 // 有设置固定值
@@ -715,6 +722,32 @@ public class ServiceExecuteController {
         return result;
     }
 
+    private String executeRPCAxis(boolean success, ServiceDef ws, List<ServiceInput> serviceInputList, ApiServiceMonitor apiServiceMonitor) throws Exception {
+        // monitor记录所有入参
+        JSONObject serviceInputParam = new JSONObject();
+        Service service = new Service();
+        Call call = (Call) service.createCall();
+        call.setTargetEndpointAddress(ws.getScAddr());
+        call.setOperationName(new QName(ws.getNameSpace(), ws.getSc_ws_function()));
+        Object[] parameters = null;
+        if (serviceInputList != null) {
+            parameters = new Object[serviceInputList.size()];
+            int j = 0;
+            for (ServiceInput item : serviceInputList) {
+                parameters[j++] = item.getValue();
+                call.addParameter(item.getName(), org.apache.axis.Constants.XSD_STRING, javax.xml.rpc.ParameterMode.IN);
+                serviceInputParam.put(item.getName(), item.getValue());
+            }
+            call.setReturnType(org.apache.axis.Constants.XSD_STRING);
+        } else {
+            parameters = new Object[]{null};
+        }
+        apiServiceMonitor.setServiceInput(serviceInputParam.toString());
+        String result = (String) call.invoke(parameters);
+        return result;
+    }
+
+
     public static String getResults(OMElement element) {
         if (element == null) {
             return null;
@@ -751,8 +784,10 @@ public class ServiceExecuteController {
         return JSON.toJSONString(list);
     }
 
-    private String executeAxis2(boolean success,ServiceDef ws, List<ServiceInput> listServiceInput) throws AxisFault {
+    private String executeAxis2(boolean success, ServiceDef ws, List<ServiceInput> listServiceInput, ApiServiceMonitor apiServiceMonitor) throws AxisFault {
         try {
+            // monitor记录所有入参
+            JSONObject serviceInputParam = new JSONObject();
             String[] params = new String[listServiceInput.size()];
             int i = 0;
             for (ServiceInput serviceInput : listServiceInput) {
@@ -767,8 +802,9 @@ public class ServiceExecuteController {
             int j = 0;
             for (ServiceInput item : listServiceInput) {
                 paramValues[j++] = (String)item.getValue();
+                serviceInputParam.put(item.getName(), item.getValue());
             }
-
+            apiServiceMonitor.setServiceInput(serviceInputParam.toString());
 //            String[] paramValues = new String[param.size()];
 //            int j = 0;
 //            for (Map.Entry<String, Object> entry : param.entrySet()) {
