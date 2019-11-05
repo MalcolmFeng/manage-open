@@ -23,6 +23,8 @@ import org.apache.axis2.client.Options;
 import org.apache.axis2.rpc.client.RPCServiceClient;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.http.Header;
+import org.apache.http.HeaderElement;
 import org.apache.http.HttpEntity;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.config.RequestConfig;
@@ -90,6 +92,7 @@ import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.EndpointReference;
 
 import org.apache.axis2.client.ServiceClient;
+import org.w3c.dom.svg.SVGAltGlyphDefElement;
 
 
 @CrossOrigin
@@ -180,7 +183,7 @@ public class ServiceExecuteController {
 
     @RequestMapping("/apitest/{apiServiceId}")
     @ResponseBody
-    public Map<String, Object> apiTest(@PathVariable("apiServiceId") String apiServiceId, HttpServletRequest request) {
+    public Map<String, Object> apiTest(@PathVariable("apiServiceId") String apiServiceId, HttpServletRequest request, HttpServletResponse response) {
         //判断是否有权限测试
         Map<String, Object> map = new HashMap<>();
         String userId = OpenDataConstants.getUserId();
@@ -239,7 +242,7 @@ public class ServiceExecuteController {
                     result_str = executeRPCAxis(success, serviceDef, listServiceInput, new ApiServiceMonitor());
                 }
             } else {
-                result_str = doRequest(success,"", serviceDef, listServiceInput, new ApiServiceMonitor());
+                result_str = doRequest(response, success,"", serviceDef, listServiceInput, new ApiServiceMonitor());
             }
 
 //            String result_str = doRequest("", serviceDef, listServiceInput, new ApiServiceMonitor());
@@ -270,7 +273,7 @@ public class ServiceExecuteController {
     @ResponseBody
     public void execute(@PathVariable("apiContext") String apiContext, @PathVariable("reqPath") String reqPath,
                         HttpServletRequest request, HttpServletResponse response) throws IOException {
-        PrintWriter writer = response.getWriter();
+        PrintWriter writer  = new PrintWriter(response.getOutputStream());
         boolean success = false;
         long startTime = 0;
         String responseTime = null;
@@ -303,6 +306,7 @@ public class ServiceExecuteController {
 
             // 存在于黑名单但不存在于白名单，拒绝访问
             if (ips_black.size()>0 && ips_white.size() ==0){
+                writer = response.getWriter();
                 writer.print("IP地址被禁用");
                 writer.flush();
                 apiServiceMonitor.setNotes("IP地址被禁用");
@@ -340,7 +344,7 @@ public class ServiceExecuteController {
             apiServiceMonitor.setOpenServiceInputHeader(JSONObject.fromObject(headers).toString());
             List<AppInstance> appList = appManage.getAppByAppKey(appkey);
             if (appList == null || appList.size() != 1) {
-
+                writer = response.getWriter();
                 writer.print("查询授权应用异常");
                 writer.flush();
                 apiServiceMonitor.setNotes("查询授权应用异常");
@@ -357,6 +361,7 @@ public class ServiceExecuteController {
 
             // ---------------- 判断签名正确性 start ----------------
             if (!appSecret.equals(signature)) {
+                writer = response.getWriter();
                 writer.print("验证签名不正确！");
                 writer.flush();
                 apiServiceMonitor.setNotes("验证签名不正确");
@@ -369,6 +374,7 @@ public class ServiceExecuteController {
             // ---------------- 通过context,reqPath关联查询API是否存在和状态 start ----------------
             ServiceDef serviceDef = checkApiService(apiContext, reqPath, apiServiceMonitor);
             if (serviceDef == null) {
+                writer = response.getWriter();
                 writer.print("API服务不存在");
                 writer.flush();
                 return;
@@ -377,6 +383,7 @@ public class ServiceExecuteController {
             apiServiceMonitor.setApiServiceId(apiServiceId);
             apiServiceMonitor.setApiServiceName(serviceDef.getName());
             if (!OpenServiceConstants.api_audit_pass.equals(serviceDef.getAuditStatus())) {
+                writer = response.getWriter();
                 writer.print("API服务当前状态不可用");
                 writer.flush();
                 apiServiceMonitor.setNotes("API服务当前状态不可用");
@@ -393,6 +400,7 @@ public class ServiceExecuteController {
             applymap.put("authStatus", OpenServiceConstants.auth_status_pass);
             List<ServiceApply> alist = serviceApplyService.getList(applymap);
             if (alist == null || alist.size() == 0) {
+                writer = response.getWriter();
                 writer.print("API未授权应用");
                 writer.flush();
                 apiServiceMonitor.setNotes("API未授权应用");
@@ -410,6 +418,7 @@ public class ServiceExecuteController {
                     PayAccountCapital payAccountCapital = payService.getPayAccountByUserId(requestUserId);
                     BigDecimal balance = new BigDecimal(payAccountCapital.getAccountBalance());
                     if (balance.compareTo(new BigDecimal(0.00)) <= 0) {
+                        writer = response.getWriter();
                         writer.print("账户余额不足，请及时充值！");
                         writer.flush();
                         apiServiceMonitor.setNotes("账户余额不足，请及时充值");
@@ -418,6 +427,7 @@ public class ServiceExecuteController {
                     } else {
                         BigDecimal bigDecimal = balance.subtract(serviceDef.getPrice());
                         if (bigDecimal.compareTo(new BigDecimal(0.00)) <= 0) {
+                            writer = response.getWriter();
                             writer.print("账户余额不足调用，请及时充值！");
                             writer.flush();
                             apiServiceMonitor.setNotes("账户余额不足调用，请及时充值");
@@ -444,6 +454,7 @@ public class ServiceExecuteController {
                 // 给入参赋值
                 initInputList(request, serviceDef, listServiceInput);
             } catch (Exception e) {
+                writer = response.getWriter();
                 writer.print("输入参数异常:" + e.getMessage());
                 writer.flush();
                 apiServiceMonitor.setNotes("输入参数异常:" + e.getMessage());
@@ -463,6 +474,7 @@ public class ServiceExecuteController {
             // 进行限流
             RateLimiter rateLimiter = map.get(key);
             if (!rateLimiter.tryAcquire()) {
+                writer = response.getWriter();
                 writer.print("请求过于频繁");
                 writer.flush();
                 apiServiceMonitor.setNotes("请求过于频繁");
@@ -495,13 +507,17 @@ public class ServiceExecuteController {
                         result_str = executeRPCAxis(success, serviceDef, listServiceInput, apiServiceMonitor);
                     }
                 } else {
-                    result_str = doRequest(success, instream, serviceDef, listServiceInput, apiServiceMonitor);
+                    result_str = doRequest(response,success, instream, serviceDef, listServiceInput, apiServiceMonitor);
                 }
                 response.addHeader("Content-Type", OpenServiceConstants.getContentType(serviceDef.getContentType()));
-                writer.print(result_str);
-                writer.flush();
                 apiServiceMonitor.setOpenServiceOutput(result_str);
                 apiServiceMonitor.setResult(ASM_SUCCESS);
+
+                if (!serviceDef.getContentType().equals("binary")){
+                    writer = response.getWriter();
+                    writer.print(result_str);
+                    writer.flush();
+                }
             }
 
         } catch (Throwable e) {
@@ -515,6 +531,7 @@ public class ServiceExecuteController {
             result.put("result", errorResult);
             // 未知错误编码
             result.put("status", ASM_ERROR_UNKNOWN);
+            writer = response.getWriter();
             writer.print(result);
             writer.flush();
             apiServiceMonitor.setOpenServiceOutput(String.valueOf(result));
@@ -852,9 +869,9 @@ public class ServiceExecuteController {
     }
 
 
-    private String doRequest(boolean success,String instream, ServiceDef serviceDef, List<ServiceInput> listServiceInput, ApiServiceMonitor apiServiceMonitor) throws Exception {
+    private String doRequest(HttpServletResponse response,boolean success,String instream, ServiceDef serviceDef, List<ServiceInput> listServiceInput, ApiServiceMonitor apiServiceMonitor) throws Exception {
         String scType = null;
-        String contentType = serviceDef.getContentType();
+        String dataType = serviceDef.getContentType();
 
         // 地址拼接
         String addr = serviceDef.getScAddr();
@@ -913,10 +930,10 @@ public class ServiceExecuteController {
         System.out.println("请其头为:" + JSONObject.fromObject(headerMap).toString());
         switch (method) {
             case "GET":
-                result = execGet(success, httpurl.toString(), timeout, headerMap,paramsMap);
+                result = execGet(dataType,response,success, httpurl.toString(), timeout, headerMap,paramsMap,listServiceInput);
                 break;
             case "POST":
-                result = execPost(success, instream, scType, httpurl.toString(), timeout, headerMap, paramsMap, paramsTypeMap);
+                result = execPost(dataType,response,success, instream, scType, httpurl.toString(), timeout, headerMap, paramsMap, paramsTypeMap,listServiceInput);
                 break;
             default:
                 result = "{error:404}";
@@ -1128,10 +1145,10 @@ public class ServiceExecuteController {
      *
      * @param url
      * @param timeout
-     * @param headers
+     * @param headersMap
      * @return
      */
-    public static String execGet(boolean success,String url, int timeout, Map<String, String> headers, Map<String,Object> paramsMap) {
+    public static String execGet(String dataType,HttpServletResponse responseOut, boolean success,String url, int timeout, Map<String, String> headersMap, Map<String,Object> paramsMap,List<ServiceInput> listServiceInput) {
 
         StringBuffer urlAppend = new StringBuffer();
         boolean firstQueryParam = true;
@@ -1150,15 +1167,15 @@ public class ServiceExecuteController {
         // 设置请求头
         RequestConfig requestConfig = RequestConfig.custom().setSocketTimeout(timeout).setConnectTimeout(timeout).build();//设置请求和传输超时时间
         httpGet.setConfig(requestConfig);
-        if (StringUtil.isNotEmpty(headers)) {
-            for (String key : headers.keySet()) {
-                System.out.println("赋值head："+key+"  "+headers.get(key));
-                httpGet.addHeader(key, headers.get(key));
+        if (StringUtil.isNotEmpty(headersMap)) {
+            for (String key : headersMap.keySet()) {
+                System.out.println("赋值head："+key+"  "+headersMap.get(key));
+                httpGet.addHeader(key, headersMap.get(key));
             }
         }
 
         // 执行请求
-        String result;
+        String result = "";
         try {
             CloseableHttpClient httpclient = createCloseableHttpClient(url);
             CloseableHttpResponse response = httpclient.execute(httpGet);
@@ -1166,7 +1183,12 @@ public class ServiceExecuteController {
                 success = true;
             }
             HttpEntity entity = response.getEntity();
-            result = EntityUtils.toString(entity, "utf-8");
+
+            if (StringUtils.equals(dataType,"binary")){
+                createResponseFile(headersMap,responseOut, response, entity,listServiceInput);
+            }else{
+                result = EntityUtils.toString(entity, "utf-8");
+            }
             EntityUtils.consume(entity);
 
         } catch (Exception e) {
@@ -1174,6 +1196,75 @@ public class ServiceExecuteController {
             log.error("API网关GET method failed to access URL，URL：" + url, e);
         }
         return result;
+    }
+
+    private static void createResponseFile(Map<String,String> headersMap,HttpServletResponse responseOut, CloseableHttpResponse response,HttpEntity entity,List<ServiceInput> listServiceInput) throws Exception {
+        Header contentHead = response.getLastHeader("Content-Disposition");
+        String filename = null;
+        if (contentHead != null){
+            HeaderElement[] elements = contentHead.getElements();
+            for (HeaderElement el : elements) {
+                //遍历，获取filename
+                NameValuePair pair = el.getParameterByName("filename");
+                filename = pair.getValue();
+
+                if (null != filename) {
+                    break;
+                }
+            }
+        }else{
+            filename = UUID.randomUUID().toString();
+            for (ServiceInput serviceInput : listServiceInput) {
+                String paramPositionType = serviceInput.getScParamType();
+                if (paramPositionType.equalsIgnoreCase(OpenServiceConstants.SC_PARAMTYPE_PATH)) {
+                    filename = (String)serviceInput.getValue();
+                    break;
+                }
+            }
+        }
+
+        InputStream inputStream = entity.getContent();
+//        File tmp = File.createTempFile("tmp", filename, new File("C:\\"));
+//        OutputStream os1 = new FileOutputStream(tmp);
+//        int bytesRead = 0;
+//        byte[] buffer1 = new byte[8192];
+//        while ((bytesRead = inputStream.read(buffer1, 0, 8192)) != -1) {
+//            os1.write(buffer1, 0, bytesRead);
+//        }
+//        inputStream.close();
+
+//        if(tmp.exists()) {
+            responseOut.setContentType("application/octet-stream");
+            responseOut.addHeader("Content-Disposition","attachment;filename="+filename);
+            byte[] buffer = new byte[1024];
+            InputStream fis =null;
+            BufferedInputStream bis =null;
+            try {
+                fis = inputStream;
+                bis = new BufferedInputStream(fis);
+                OutputStream os = responseOut.getOutputStream();
+                int i = bis.read(buffer);
+                while ( i!=-1 ) {
+                    os.write(buffer, 0, i);
+                    i=bis.read(buffer);
+                }
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }finally {
+                try {
+                    bis.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                try {
+                    fis.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+//        }
     }
 
     /**
@@ -1184,7 +1275,7 @@ public class ServiceExecuteController {
      * @return
      */
 
-    public static String execPost(boolean success,String instream, String scType, String url, int timeout, Map<String, String> headersMap, Map<String,Object> paramsMap, Map<String,Object>  paramsType) throws IOException {
+    public static String execPost(String dataType, HttpServletResponse responseOut, boolean success,String instream, String scType, String url, int timeout, Map<String, String> headersMap, Map<String,Object> paramsMap, Map<String,Object>  paramsType,List<ServiceInput> serviceInputList) throws IOException {
         // 创建请求对象，进行初始化设置
         HttpPost httpPost = new HttpPost(url);
         RequestConfig requestConfig = RequestConfig.custom().setSocketTimeout(timeout).setConnectTimeout(timeout).build();//设置请求和传输超时时间
@@ -1232,7 +1323,7 @@ public class ServiceExecuteController {
                 e.printStackTrace();
             }
         }
-        String result;
+        String result = "";
         try{
             final CloseableHttpClient httpclient = createCloseableHttpClient(url);
 
@@ -1246,7 +1337,13 @@ public class ServiceExecuteController {
 
             // 响应Entity
             HttpEntity entity = response.getEntity();
-            result = EntityUtils.toString(entity, "UTF-8");
+
+            if (StringUtils.equals(dataType,"binary")){
+                createResponseFile(headersMap, responseOut, response, entity, serviceInputList);
+            }else{
+                result = EntityUtils.toString(entity, "utf-8");
+            }
+
             EntityUtils.consume(entity);
         } catch (Exception e) {
             result = "API网关POST method failed to access URL!";
