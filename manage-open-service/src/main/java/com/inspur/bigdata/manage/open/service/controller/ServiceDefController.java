@@ -167,8 +167,8 @@ public class ServiceDefController {
         // 生成下载文件
         Configuration configuration = new Configuration();
         configuration.setDefaultEncoding("utf-8");
-        configuration.setDirectoryForTemplateLoading(new File("/usr/local/ftl/")); // 生产环境
-//        configuration.setDirectoryForTemplateLoading(new File("C:/")); // 开发环境
+//        configuration.setDirectoryForTemplateLoading(new File("/usr/local/ftl/")); // 生产环境
+        configuration.setDirectoryForTemplateLoading(new File("C:/")); // 开发环境
         response.setContentType("application/msword");
         response.setHeader("Content-Disposition", "attachment;filename=\"" + new String("c.doc".getBytes("GBK"), "iso8859-1") + "\"");
         response.setCharacterEncoding("utf-8");//此句非常关键,不然word文档全是乱码
