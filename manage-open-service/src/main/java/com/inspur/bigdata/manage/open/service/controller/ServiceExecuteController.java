@@ -273,7 +273,7 @@ public class ServiceExecuteController {
     @ResponseBody
     public void execute(@PathVariable("apiContext") String apiContext, @PathVariable("reqPath") String reqPath,
                         HttpServletRequest request, HttpServletResponse response) throws IOException {
-        PrintWriter writer  = new PrintWriter(response.getOutputStream());
+        PrintWriter writer = null;
         boolean success = false;
         long startTime = 0;
         String responseTime = null;
@@ -538,7 +538,9 @@ public class ServiceExecuteController {
             apiServiceMonitor.setNotes(String.valueOf(errorResult));
             apiServiceMonitor.setResult(ASM_ERROR_UNKNOWN);
         } finally {
-            IOUtils.closeQuietly(writer);
+            if (writer!= null){
+                IOUtils.closeQuietly(writer);
+            }
             responseTime = DateUtil.getCurrentTime2();
             long serviceTime = System.currentTimeMillis() - startTime;
             if (log.isDebugEnabled()) {
@@ -593,9 +595,9 @@ public class ServiceExecuteController {
             int required = serviceInput.getRequired();
 
             // 如果是body参数，不做处理（已经赋值到instream）
-            if (StringUtils.equals(postionType, OpenServiceConstants.SC_PARAMTYPE_BODY)) {
-                continue;
-            }
+//            if (StringUtils.equals(postionType, OpenServiceConstants.SC_PARAMTYPE_BODY)) {
+//                continue;
+//            }
 
             // 判断是文件类型还是基本类型
             if (StringUtils.equals(paramType, OpenServiceConstants.SC_TYPE_FILE)){
