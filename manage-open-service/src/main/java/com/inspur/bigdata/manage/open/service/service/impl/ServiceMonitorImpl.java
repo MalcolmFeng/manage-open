@@ -179,11 +179,13 @@ public class ServiceMonitorImpl implements IServiceMonitorService {
     public Map<String, Object> getApiMonitorList(Map<String, String> parameters) {
         Map<String, Object> mpMap = new HashMap<String, Object>();
         String userId= OpenDataConstants.getUserId();
-        if(userId.equals("odadmin")){
-            parameters.put("callerUserId", null);
-        }
-        else {
-            parameters.put("callerUserId", userId);
+        if ( userId != null ){
+            if(userId.equals("odadmin")){
+                parameters.put("callerUserId", null);
+            }
+            else {
+                parameters.put("callerUserId", userId);
+            }
         }
         List<ApiServiceMonitor> ApiServiceMonitors = serviceMonitorService.query(parameters);
         if (StringUtil.isEmpty(ApiServiceMonitors)) {

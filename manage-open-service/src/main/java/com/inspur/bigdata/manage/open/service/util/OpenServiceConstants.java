@@ -96,7 +96,7 @@ public class OpenServiceConstants {
     public static String getUserId() {
         String userId = AuthenticationProvider.getLoginUserId();
         return userId;
-        //return "test2-realm1234";                                                 g
+        //return "test2-realm1234";
     }
 
     public static String api_create = "0";//api创建
