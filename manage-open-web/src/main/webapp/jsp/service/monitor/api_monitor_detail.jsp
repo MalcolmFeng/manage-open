@@ -319,8 +319,18 @@
                 </tr>
                 <tr>
                     <td colspan="3" class="ng-binding"><span class="console-grey ng-binding">上传文件查看：</span><span>
-                    <c:if test="${not empty uploadFile }"><a href="${uploadFile}" target="上传文件下载"
-                                                             title="上传文件下载">点击下载</a></c:if>
+                    <c:if test="${not empty uploadFile }">
+                        <%
+                            String fileAPi = "/manage-open/service/api/execute/do/92fcd23169094b209dc6ab07b8a15036/downloadZipFile?xCaKey=517479&xCaSignature=e0a08fb968942e3fcdbb67417dc26b82&fileName=";
+                            String fileUrl = (String) request.getAttribute("uploadFile");
+                            String[] names = fileUrl.split("/");
+                            if (names != null && names.length > 0) {
+                                out.print("<a href=\"" + fileAPi + names[names.length - 1] + "\" target=\"上传文件下载\" title=\"上传文件下载\">点击下载</a>");
+                            } else {
+                                out.print("暂无文件下载");
+                            }
+                        %>
+                    </c:if>
                     <c:if test="${empty uploadFile }">暂无文件下载</c:if>
                 </span></td>
                 </tr>
