@@ -48,6 +48,7 @@ import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 
 import org.loushang.framework.util.DateUtil;
+import org.loushang.framework.util.UUIDGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -282,6 +283,8 @@ public class ServiceExecuteController {
         String instream = null;
         String context_path = "/" + apiContext + "/" + reqPath;
         ApiServiceMonitor apiServiceMonitor = new ApiServiceMonitor();
+        String logId = UUIDGenerator.getUUID();
+        apiServiceMonitor.setId(logId);
         try {
             /**获取请求者IP*/
             String requestIp = ApiServiceMonitorUtil.getClientIp(request);
@@ -870,7 +873,6 @@ public class ServiceExecuteController {
         return data;
     }
 
-
     private String doRequest(HttpServletResponse response,boolean success,String instream, ServiceDef serviceDef, List<ServiceInput> listServiceInput, ApiServiceMonitor apiServiceMonitor) throws Exception {
         String scType = null;
         String dataType = serviceDef.getContentType();
@@ -892,6 +894,15 @@ public class ServiceExecuteController {
 
         Map<String,Object> paramsMap = new HashMap<>();
         Map<String,Object> paramsTypeMap = new HashMap<>();
+
+        // 核保定制化（将日志id传递给核保获取模型接口）
+        if (httpurl.indexOf("getHealthModel") != -1){
+            String key = "logId";
+            String value = apiServiceMonitor.getId();
+            paramsMap.put(key,value);
+            paramsTypeMap.put(key,"string");
+            serviceInputParam.put(key, value);
+        }
 
         for (ServiceInput serviceInput : listServiceInput) {
             String paramsType = serviceInput.getType();

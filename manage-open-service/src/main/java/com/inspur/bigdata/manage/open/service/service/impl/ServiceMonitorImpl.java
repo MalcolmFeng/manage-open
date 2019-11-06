@@ -60,8 +60,6 @@ public class ServiceMonitorImpl implements IServiceMonitorService {
 
     @Override
     public int insert(ApiServiceMonitor apiServiceMonitor) {
-        String groupId = UUIDGenerator.getUUID();
-        apiServiceMonitor.setId(groupId);
         return serviceMonitorMapper.insert(apiServiceMonitor);
     }
 
