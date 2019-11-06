@@ -136,9 +136,9 @@
 
         function renderStatus(data, type, full) {
             if ("200" == full.result) {
-                if ("b983cc8ee7814d2d9d4702fa08f230e7" == full.apiServiceId) {
+                if("b983cc8ee7814d2d9d4702fa08f230e7" == full.apiServiceId){
                     return '<a onclick="toDetails(\'' + full.id + '\')">' + '成功' + '</a>';
-                } else {
+                }else {
                     return "成功";
                 }
             } else if ("10001" == full.result) {
@@ -159,7 +159,7 @@
                 return "输入参数异常";
             } else if ("99999" == full.result) {
                 return "未知错误";
-            } else if ("20202" == full.result) {
+            }else if ("20202" == full.result) {
                 return "IP地址没有访问权限";
             } else if ("20302" == full.result) {
                 return "请求过于频繁";

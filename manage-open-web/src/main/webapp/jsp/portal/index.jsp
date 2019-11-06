@@ -29,6 +29,26 @@
   <script type="text/javascript" src="<l:asset path='loushang-framework.js'/>"></script>
   <script type="text/javascript" src="<l:asset path='jquery.form.js'/>"></script>
   <script type="text/javascript" src="<l:asset path='ui.js'/>"></script>
+
+ <!-- <script type="text/javascript">
+      var data_url;
+      var data_service;
+      var data_dev;
+      $(function(){
+          var protocal = window.location.protocol;
+          var HostIp = protocal+"//"+window.location.host;
+          data_url='${dataurl}';
+          data_service=HostIp+"/open-platform/jsp/servicedev/console.jsp?realm="+'${realm}';
+          //data_dev=HostIp+"/dev/?realm="+'${realm}';
+          data_dev='http://172.19.221.1/dev/?realm=realm2959';
+
+          document.getElementById("datasource").href=data_url;
+          document.getElementById("dataservice").href=data_service;
+          document.getElementById("datadevelop").href=data_dev;
+
+      });
+
+  </script> -->
   <script type="text/javascript">
       var data_url;
       var data_service;
@@ -37,13 +57,13 @@
           var protocal = window.location.protocol;
           var HostIp = protocal+"//"+window.location.host;
           data_service=HostIp+"/open-platform/jsp/servicedev/console.jsp?realm="+'${realm}';
-          if(protocal.indexOf("172")>0){
+          if(HostIp.indexOf("172")>-1){
             //内网访问
-            data_url="http://172.19.221.54:9181/odmgr";
-            data_dev="http://172.19.221.54/open-platform/?realm="+'${realm}';
+            data_url="http://172.19.221.1:9181/odmgr";
+            data_dev="http://172.19.221.1/dev/?realm="+'${realm}';
           }else{
             data_url='${dataurl}';
-            data_dev=HostIp+"/open-platform/?realm="+'${realm}';
+            data_dev=HostIp+"/dev/?realm="+'${realm}';
           }
           document.getElementById("datasource").href=data_url;
           document.getElementById("dataservice").href=data_service;

@@ -11,7 +11,6 @@ $(function() {
         var openServiceId = $(this).attr("data-id");
         loadAppList(openServiceId);
     });
-
 });
 
 function pageSelectCallback(curPage, pagination) {

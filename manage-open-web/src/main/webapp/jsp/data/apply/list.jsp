@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
     <title>数据申请</title>
-
+    
     <!-- 需要引用的CSS -->
 	<link rel="shortcut icon" href="<%=request.getContextPath()%>/jsp/public/images/favicon.ico" />
 	<link rel="stylesheet" type="text/css" href="<l:asset path='css/bootstrap.css'/>" />
@@ -29,7 +29,7 @@
     <script type="text/javascript" src="<l:asset path='jquery.js'/>" ></script>
     <script type="text/javascript" src="<l:asset path='bootstrap.js'/>" ></script>
 	<script type="text/javascript" src="<l:asset path='form.js'/>" ></script>
-	<script type="text/javascript" src="<l:asset path='arttemplate.js'/>" ></script>
+	<script type="text/javascript" src="<l:asset path='arttemplate.js'/>" ></script>	
 	<script type="text/javascript" src="<l:asset path='datatables.js'/>"></script>
     <script type="text/javascript" src="<l:asset path='loushang-framework.js'/>"></script>
     <script type="text/javascript" src="<l:asset path='ui.js'/>"></script>
@@ -47,15 +47,15 @@
     grid = new L.FlexGrid("myApplyList", url);
     grid.init(options); //初始化datatable
   });
-
+  
   function forEdit(openServiceId) {
     window.location.href = context + "/service/data/apply/edit/" + openServiceId;
   }
-
+  
   function forView(openServiceId) {
     window.location.href = context + "/service/open/data/get/" + openServiceId;
   }
-
+  
   function forQuery() {
     var tableName = $("#tableName").val();
     var authStatus = $("#authStatus option:selected").val();

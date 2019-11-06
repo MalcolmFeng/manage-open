@@ -145,7 +145,7 @@ function initTopApiCountEcharts() {
     var option = {
         title: {
             text: '热门API TOP5七日榜',
-            subtext: '最近7天成功调用最多的API前5名'
+            subtext: '最近7天成功调用最多的API前5'
         },
         tooltip: {
             trigger: 'axis',

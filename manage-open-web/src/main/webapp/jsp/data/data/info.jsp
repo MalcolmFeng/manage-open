@@ -39,7 +39,7 @@
 	<div class="container" style="width: 98%; padding-top:10px;">
 		<div class="row tab-con">
 			<ul id="myTab" class="tab">
-				<li class="active" data-toggle="tab"><a href="#overview" data-tab="overview" >概览</a></li>
+				<li data-toggle="tab" class="active"><a href="#overview" data-tab="overview" >概览</a></li>
 				<li data-toggle="tab"><a href="#sjlb" data-tab="sjlb">数据列表</a></li>
 			</ul>
 		</div>

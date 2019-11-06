@@ -597,11 +597,6 @@ public class ServiceExecuteController {
             String fixedValue = serviceInput.getFixedValue();
             int required = serviceInput.getRequired();
 
-            // 如果是body参数，不做处理（已经赋值到instream）
-//            if (StringUtils.equals(postionType, OpenServiceConstants.SC_PARAMTYPE_BODY)) {
-//                continue;
-//            }
-
             // 判断是文件类型还是基本类型
             if (StringUtils.equals(paramType, OpenServiceConstants.SC_TYPE_FILE)){
                 MultipartHttpServletRequest multipartRequest = (MultipartHttpServletRequest) request;
@@ -926,10 +921,17 @@ public class ServiceExecuteController {
             } else if (paramPositionType.equalsIgnoreCase(OpenServiceConstants.SC_PARAMTYPE_HEAD)) {
                 headerMap.put(paramsName, (String)decryptedParam);
             } else if (paramPositionType.equalsIgnoreCase(OpenServiceConstants.SC_PARAMTYPE_BODY)) {
-                if (StringUtils.isEmpty(instream) && decryptedParam != null) {
-                    instream = (String)decryptedParam;
+                // 如果选择了Body类型，但不是raw类型，跟query一样，也放到 K-V Map
+                if (!serviceInput.getScType().equals(OpenServiceConstants.SC_TYPE_APPLICATION_JSON) && !serviceInput.getScType().equals(OpenServiceConstants.SC_TYPE_TEXT_XML)) {
+                    if (decryptedParam != null ) {
+                        paramsMap.put(paramsName, decryptedParam);
+                    }
+                } else {
+                    if (StringUtils.isEmpty(instream) && decryptedParam != null) {
+                        instream = (String) decryptedParam;
+                    }
+                    scType = serviceInput.getScType();
                 }
-                scType = serviceInput.getScType();
             }
             paramsTypeMap.put(paramsName,paramsType);
         }
@@ -1325,13 +1327,17 @@ public class ServiceExecuteController {
             HttpEntity httpEntity = entityBuilder.build();
             httpPost.setEntity(httpEntity);
 
-        } else if (StringUtils.isNotEmpty(instream) && (scType.equals(OpenServiceConstants.SC_TYPE_APPLICATION_JSON) || scType.equals(OpenServiceConstants.SC_TYPE_TEXT_XML))) {
+//        } else if (StringUtils.isNotEmpty(instream) && (scType.equals(OpenServiceConstants.SC_TYPE_APPLICATION_JSON) || scType.equals(OpenServiceConstants.SC_TYPE_TEXT_XML))) {
+        } else if (StringUtils.isNotEmpty(instream)) {
             switch (scType) {
                 case OpenServiceConstants.SC_TYPE_APPLICATION_JSON:
                     httpPost.addHeader("Content-Type", OpenServiceConstants.content_type_json);
                     break;
                 case OpenServiceConstants.SC_TYPE_TEXT_XML:
                     httpPost.addHeader("Content-Type", OpenServiceConstants.content_type_text_xml);
+                    break;
+                default:
+                    httpPost.addHeader("Content-Type", "text/plain");
                     break;
             }
             try {
