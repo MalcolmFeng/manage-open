@@ -1237,6 +1237,8 @@ public class ServiceExecuteController {
         }
 
         InputStream inputStream = entity.getContent();
+
+        // 生成本地文件
 //        File tmp = File.createTempFile("tmp", filename, new File("C:\\"));
 //        OutputStream os1 = new FileOutputStream(tmp);
 //        int bytesRead = 0;
@@ -1302,6 +1304,7 @@ public class ServiceExecuteController {
         }
 
         // 如果参数不为空
+        File file = null;
         if (paramsMap.size()>0) {
             // 复杂Entity构造器
             MultipartEntityBuilder entityBuilder = MultipartEntityBuilder.create();
@@ -1312,7 +1315,8 @@ public class ServiceExecuteController {
                 if(paramsType.get(entry.getKey()).equals(SC_TYPE_FILE)){
                     //添加上传的文件
                     MultipartFile mulFile = (MultipartFile) entry.getValue();
-                    File file = asFile(mulFile.getInputStream());
+                    String fileName = mulFile.getOriginalFilename();
+                    file = asFile(mulFile.getInputStream(),fileName);
                     entityBuilder.addPart(entry.getKey(),new FileBody(file));
                 }else{
                     entityBuilder.addTextBody(entry.getKey(), (String)entry.getValue());
@@ -1336,38 +1340,40 @@ public class ServiceExecuteController {
                 e.printStackTrace();
             }
         }
+
+        // 执行请求
         String result = "";
         try{
             final CloseableHttpClient httpclient = createCloseableHttpClient(url);
-
-            // 执行请求
             final CloseableHttpResponse response = httpclient.execute(httpPost);
-
             // 请求成功
             if (response.getStatusLine().getStatusCode() == 200){
                 success = true;
             }
-
             // 响应Entity
             HttpEntity entity = response.getEntity();
-
             if (StringUtils.equals(dataType,"binary")){
                 createResponseFile(headersMap, responseOut, response, entity, serviceInputList);
             }else{
                 result = EntityUtils.toString(entity, "utf-8");
             }
-
             EntityUtils.consume(entity);
         } catch (Exception e) {
             result = "API网关POST method failed to access URL!";
             e.printStackTrace();
             log.error("API网关POST method failed to access URL，URL：" + url, e);
+        }finally {
+            if (file != null){
+                file.delete();
+            }
         }
+
         return result;
     }
 
-    public static File asFile(InputStream inputStream) throws IOException{
-        File tmp = File.createTempFile("hdsp", ".zip", new File("C:\\"));
+    public static File asFile(InputStream inputStream,String fileName) throws IOException{
+        File tmp = File.createTempFile(fileName+"-", ".zip", new File("/usr/local/tempFile/"));
+//        File tmp = File.createTempFile(fileName+"-", ".zip", new File("C:\\"));
         OutputStream os = new FileOutputStream(tmp);
         int bytesRead = 0;
         byte[] buffer = new byte[8192];
