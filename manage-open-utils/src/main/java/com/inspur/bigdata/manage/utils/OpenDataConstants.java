@@ -23,9 +23,14 @@ public class OpenDataConstants {
         return false;
     }
     public static String getRealm() {
+        System.out.println("getRealm");
 		String krbPrincipalName = AuthenticationProvider.getKrbPrincipalName();
+        System.out.println("krbPrincipalName:" + krbPrincipalName);
+        if (krbPrincipalName == null){
+            return null;
+        }
 		String realm=krbPrincipalName.substring(krbPrincipalName.lastIndexOf("-") + 1);
-     //String realm="realm1234";
+        // String realm="realm1234";
         return realm;
     }
 

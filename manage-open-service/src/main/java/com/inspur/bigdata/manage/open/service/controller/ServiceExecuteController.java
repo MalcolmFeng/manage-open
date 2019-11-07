@@ -624,14 +624,18 @@ public class ServiceExecuteController {
                 }
 
                 // 校验 (参数类型和必填性)
-                checkData(paramType, (String)serviceInput.getValue(), paramName,required);
+                checkData(paramType, (String)serviceInput.getValue(), paramName,required,postionType);
             }
         }
     }
 
-    private void checkData(String type, String value, String key,Integer required) throws Exception {
+    private void checkData(String type, String value, String key,Integer required,String postionType) throws Exception {
         // 如果是必填参数，校验是否为空
         if (required == 1){
+            // body参数 raw类型，不执行校验
+            if (StringUtils.equals(postionType,"body") && (type.toLowerCase().equals("application/json") || type.toLowerCase().equals("application/xml") )){
+                return;
+            }
             if (value == null){
                 throw new Exception("请输入必填参数[" + key + "]");
             }
@@ -985,7 +989,7 @@ public class ServiceExecuteController {
             Object decryptedParam = decryptedParam(serviceInput, serviceDef.getEncryptionType());
             serviceInputParam.put(serviceInput.getScName(), decryptedParam);
 
-            checkData(serviceInput.getScType(), (String)decryptedParam, serviceInput.getScName(),serviceInput.getRequired());//判断参数类型是否正确
+            checkData(serviceInput.getScType(), (String)decryptedParam, serviceInput.getScName(),serviceInput.getRequired(),serviceInput.getScParamType());//判断参数类型是否正确
             String paramType = serviceInput.getScParamType();
 
             if (paramType.equalsIgnoreCase(OpenServiceConstants.SC_PARAMTYPE_QUERY)) {
