@@ -336,8 +336,17 @@
                 </tr>
                 <tr>
                     <td colspan="3" class="ng-binding"><span class="console-grey ng-binding">返回结果查看：</span><span>
-                    <c:if test="${not empty resultFile }"><a href="${resultFile}" target="返回结果下载"
-                                                             title="返回结果下载">点击下载</a></c:if>
+                    <c:if test="${not empty resultFile }">
+                        <%
+                            String excleAPi = "/manage-open/service/api/execute/do/92fcd23169094b209dc6ab07b8a15036/hbExportExcel?xCaKey=517479&xCaSignature=e0a08fb968942e3fcdbb67417dc26b82&content=";
+                            String content = (String) request.getAttribute("resultFile");
+                            if (content != null && content.length() > 0) {
+                                out.print("<a href='" + excleAPi + content + "' target=\"返回结果下载\" title=\"返回结果下载\">点击下载</a>");
+                            } else {
+                                out.print("暂无文件下载");
+                            }
+                        %>
+                    </c:if>
                     <c:if test="${empty resultFile }">暂无文件下载</c:if>
                 </span></td>
                 </tr>
