@@ -7,12 +7,10 @@ $(function() {
     //清空子分组
     $("#subGroupList").empty();
 
-    $(document).on("click", "#applyBtn", function(){
-        var openServiceId = $(this).attr("data-id");
-        loadAppList(openServiceId);
-    });
 });
-
+function todetail(data) {
+    window.location.href = context + "/jsp/data/data/getDetail.jsp?remoteId="+data;
+}
 function pageSelectCallback(curPage, pagination) {
     initServiceList(curPage,"page");
 }

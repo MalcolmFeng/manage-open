@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<%@ page pageEncoding="UTF-8" language="java" %>
+<%@ taglib uri="/tags/loushang-web" prefix="l" %>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
+<%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
+<%
+    String resourceId = request.getParameter("resourceId");
+    String dataSourceType = request.getParameter("dataSourceType");
+%>
+<html lang="en" style="height:100%">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
+    <title>开放平台-首页</title>
+
+    <!-- 需要引用的CSS -->
+    <link rel="shortcut icon" href="<l:asset path='platform/img/favicon.ico'/>"/>
+    <link rel="stylesheet" type="text/css" href="<l:asset path='css/bootstrap.css'/>"/>
+    <link rel="stylesheet" type="text/css" href="<l:asset path='css/font-awesome.css'/>"/>
+    <link rel="stylesheet" type="text/css" href="<l:asset path='css/ui.css'/>"/>
+    <link rel="stylesheet" type="text/css" href="<l:asset path='css/form.css'/>"/>
+<%--    <link rel="stylesheet" type="text/css" href="<l:asset path='css/select2.min.css'/>" />--%>
+<%--    <link rel="stylesheet" type="text/css" href="<l:asset path='platform/css/home.css'/>"/>--%>
+
+    <script type="text/javascript" src="<l:asset path='jquery.js'/>" ></script>
+    <script type="text/javascript" src="<l:asset path='bootstrap.js'/>" ></script>
+    <script type="text/javascript" src="<l:asset path='form.js'/>" ></script>
+    <script type="text/javascript" src="<l:asset path='arttemplate.js'/>" ></script>
+    <script type="text/javascript" src="<l:asset path='ui.js'/>"></script>
+    <script type="text/javascript" src="<l:asset path='knockout.js'/>"></script>
+    <script type="text/javascript" src="<l:asset path='data/data/getDetail.js'/>"></script>
+    <script type="text/javascript" src="<l:asset path='data/data/select2.min.js'/>" ></script>
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+    <script src="<l:asset path='html5shiv.js'/>"></script>
+    <script src="<l:asset path='respond.js'/>"></script>
+    <![endif]-->
+    <script type="text/javascript">
+        //项目上下文
+        var context = "<%=request.getContextPath()%>";
+        //获取静态资源上下文路径
+        var assetPath = "<l:assetcontext/>";
+
+    </script>
+</head>
+
+</head>
+<style>
+    #sjlb{
+        font-family:Microsoft YaHei;
+        color:#333;
+        font-size: 14px;
+    }
+    .navLeft{
+        width: 12%;
+        /*height: 100%;*/
+        margin-top: 15px;
+        margin-left: 15px;
+        border-right: 1px solid #EEE;
+        margin-bottom: 20px;
+    }
+    .contentRight{
+        width: 84%;
+        height: 100%;
+        margin-left: 20px;
+    }
+    .titleLeft{
+        font-size: 16px;
+        font-weight: bold;
+        margin-bottom: 10px;
+        border:none;
+        font-weight:bold;
+        width: 140px;
+    }
+    #tableNameList{
+        height: 30px;
+        line-height: 30px;
+    }
+    #tableNameList>li{
+        padding-left: 30px;
+        margin-left: -30px;
+    }
+    #tableNameList>li.active {
+        background-color: RGBA(187,220,253,0.4);
+        cursor: pointer;
+    }
+    /*.btnicon{*/
+    /*    width:50px;*/
+    /*    height: 25px;*/
+    /*    color: #fff;*/
+    /*    background-color: #4094FB ;*/
+    /*    float: right;*/
+    /*    border: none;*/
+    /*    margin-left: 10px;*/
+    /*    margin-top: 15px;*/
+    /*}*/
+    .content{
+        margin-top: 50px;
+    }
+    .hr_tall{
+        width: 30%;
+        margin-bottom: -20px;
+    }
+    .hr_tall>span{
+        font-weight: bold;
+        margin-left: 5px;
+
+    }
+    .lineBlue {
+        width: 4px;
+        height: 12px;
+        background-color:#4094FB;
+        display: inline-block;
+        margin-top: 2px;
+    }
+    .pull-right{
+        margin-bottom: 5px;
+    }
+    .smallLine{
+        width: 2px;
+        height: 12px;
+        background-color:#4094FB;
+        display: inline-block;
+        margin-top: 2px;
+    }
+    #getSqlBtn{
+        margin-left: -20px;
+    }
+    .select2-container--classic{
+        display: none;
+    }
+    #seleteAllColumnsBtn{
+        margin-left: 60px;
+    }
+    #returnColumnsDiv{
+        margin-top: 40px;
+    }
+    #tableNameList>input{
+        float: left;
+        margin-top:8px;
+    }
+    .buttonGroup{
+        margin-top: 80px;
+        margin-left: -40px;
+    }
+    #nextBtn{
+        width:80px;
+        height:36px;
+        background-color: #4094FB;
+        border: none;
+        border-radius:4px;
+        color: #fff;
+
+    }
+    #backBtn{
+        margin-left: 20px;
+        width:80px;
+        height:36px;
+        border: none;
+        background-color: #DDDDDD;
+        color:#333 ;
+        border-radius:4px;
+    }
+    li{
+        cursor: pointer;
+    }
+    .lastStep{
+        width: 100%;
+        height: 500px;
+    }
+    iframe{
+        width: 100%;
+        height: 500px;
+    }
+</style>
+<body style="width: 100%;height: 100%">
+<div>
+
+</div>
+<div id="sjlb" style="width: 100%;height: 100%;display: flex;flex-direction: row;">
+
+    <div class="navLeft">
+        <select class="titleLeft">数据列表</select>
+        <ul id="tableNameList">
+            <li>无表格</li>
+        </ul>
+    </div>
+    <div class="contentRight">
+        <input type="hidden" name="inputParam" id="inputParam"/>
+        <input type="hidden" name="outputParam" id="outputParam"/>
+        <input type="hidden" name="filterParam" id="filterParam"/>
+        <input type="hidden" name="orderParam" id="orderParam" value=[]>
+        <input type="hidden" name="setName" id="setName"/>
+        <input type="hidden" name="setId" id="setId"/>
+        <input type="hidden" name="sql" id="sql"/>
+        <input type="hidden" id="tableName" name="tableName" ></input>
+        <input type="hidden" id="resourceId" >
+
+        <div class="form-hr">
+            <div class="shown"><label id="resourceName" data-bind="text:resourceName"> </label></div>
+            <div class="fieldInput">
+            <div class="clear"></div>
+        </div>
+        <div class="form-hr content ">
+            <div class="fieldLabel hr_tall"><div class="lineBlue "></div><span>服务逻辑</span></div>
+            <div class="fieldInput">
+                <div id="conditionColumnsDiv">
+                    <div class="pull-right">
+                        <button class="btn btn-link" type="button" id="addConditionRowBtn" onclick="addConditionRow()"> 增加</button>
+                        <div class="smallLine"></div>
+                        <button class="btn btn-link"  id="deleteConditionRowBtn" type="button" onclick="deleteConditionRow()"> 删除 </button>
+                    </div>
+                    <table class="table table-hover table-bordered" id="conditionColumnsTable">
+                        <thead>
+                        <tr role="row">
+                            <th style="width: 5%;" ><input type="checkbox" class="select-condition-all"></th>
+                            <th  style="width: 30%;"  >字段名称</th>
+                            <th  style="width: 15%;" >字段类型</th>
+                            <th  style="width: 15%;" >运算符</th>
+                            <th  style="width: 35%;" ><div class="Tipchecktip Tipwrong">*值(like,not like自定通配符)</div></th>
+                        </tr>
+                        </thead>
+                        <tbody id="conditionColumns_tbody">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="clear"></div>
+        </div>
+        <div class="form-hr ">
+            <div class="fieldLabel hr_tall "><div class="lineBlue "></div><span>返回字段</span>
+                <button class="btn btn-link" id="seleteAllColumnsBtn" type="button" onclick="seleteAllColumns()"> <i class="fa fa-check-square fa-fw"></i>全选 </button>
+                <button class="btn btn-link"  id="seleteRevsernColumnsBtn" type="button" onclick="seleteRevsernColumns()"> <i class="fa fa-check-square-o fa-fw"></i>反选 </button>
+            </div>
+            <div class="fieldInput">
+                <div id="returnColumnsDiv">
+                    <div style="margin-top: -20px;">
+                        <ul class="returnColumns clearfix" id="returnColumns">
+                        </ul>
+                    </div>
+                </div>
+            </div>
+<%--            <div class="clear"  style="margin-bottom: 20px;"></div>--%>
+        </div>
+        <div class="form-hr">
+            <div class="fieldLabel "><button class="btn btn-link" type="button" id="getSqlBtn" onclick="getSql()" style="margin-left:6px"> <i class="fa fa-hand-o-right fa-fw"></i>生成SQL </button></div>
+            <div class="fieldInput"><textarea id="serviceSql" readonly
+                                              style="resize: none; word-wrap: break-word; margin-left: 0px; margin-right: 0px; width: 100%; height: 100px;"
+                                              class="form-control"></textarea></div>
+            <div class="clear"></div>
+        </div>
+        <div class="buttonGroup" style="width: 100%;height: 100%;display: flex;flex-direction: row;justify-content: center;">
+        <button type="button" class="btnicon" id="nextBtn" onclick="nextstep()">保存</button>
+        <button type="button" class="btnicon" id="backBtn">返回</button>
+        </div>
+    </div>
+
+</div>
+</div>
+<div class="body">
+    <iframe id="wf" name="wf" style="width: 100%;height: 100%;border: none"></iframe>
+    <div class="row">
+        <div class="col-md-12">
+            <button class="btn ue-btn" onclick="submit()">提交</button>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    var context = "<l:assetcontext/>";
+    $(function () {
+        $("#wf").attr("src","http://172.19.221.67:7070/open-bsp/command/dispatcher/org.loushang.workflow.tasklist.forward.TaskListDispatcherCmd/newTaskForward?procDefUniqueId=2c935dc36e67aeaf016e680d3aa80979")
+    })
+    function submit() {
+        wf.window.createAndSend();
+    }
+</script>
+<!--表-->
+<script type="text/html" id="tableTemp">
+    {{each tableList as table}}
+    <input type="checkbox" id="{{table.resourceId}}" > <li data-resourceId='{{table.resourceId}}' data-text="{{table.tableName}}"> &nbsp;&nbsp;{{table.resourceName}}</li>
+    {{/each}}
+</script>
+</body>
+</html>

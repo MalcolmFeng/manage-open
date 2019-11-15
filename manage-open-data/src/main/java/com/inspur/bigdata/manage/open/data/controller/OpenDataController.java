@@ -50,6 +50,7 @@ public class OpenDataController {
 	@Autowired
 	private IDataApplyService dataApplyService;
 
+
 	/**
 	 * 数据发布列表页面
 	 * @return
@@ -91,6 +92,23 @@ public class OpenDataController {
 		return new ModelAndView("data/data/applyList",model);
 	}
 
+	/**
+	 * 专病队列详情
+	 *
+	 */
+
+	@RequestMapping(value = "/getDetailPage/{id}/get")
+	@ResponseBody
+	public ModelAndView getDetailPage(@PathVariable("id") String id) {
+		Map<String, Object> model = new HashMap<String, Object>();
+		Map<String, Object> param = new HashMap<String, Object>();
+//		DataDef dataDef = openDataService.getDataDef(id);
+		model.put("groupList",getTableInfoById(id));
+//		param.put("parentId",-1);
+//		List<DataGroup> groupList=groupService.getGroupList(param);
+//		model.put("groupList",groupList);
+		return new ModelAndView("data/data/detailList",getTableInfoById(id));
+	}
 	/**
 	 * 数据申请页面
 	 * @return
@@ -467,6 +485,31 @@ public class OpenDataController {
 	@RequestMapping(value = "getItemsByResourceId")
 	@ResponseBody
 	public Map<String,Object> getItemsByResourceId(@RequestParam String resourceId,@RequestParam String limit,@RequestParam String start){
+		Map<String, Object> result=new HashMap<>();
+		if (StringUtils.isNotEmpty(resourceId)) {
+			String url = PropertiesUtil.getValue(OpenDataConstants.CONF_PROPERTIES, "od.domain") + "/service/rest/resource/getItemsByResourceId?resourceId=" + resourceId+"&limit="+limit+"&start="+start;
+			String resultStr = HttpRequestUtils.get(url);
+			if (StringUtils.isNotEmpty(resultStr)) {
+				result.put("json", resultStr);
+				result.put("msg", "获取字段信息成功！");
+			} else {
+				result.put("msg", "未获取到字段信息");
+			}
+		}else{
+			result.put("msg","表id不能为空");
+		}
+		return result;
+	}
+	/**
+	 * 根据表id获取表字段 调用数据管理接口
+	 * @param resourceId
+	 * @return
+	 */
+	@RequestMapping(value = "getItemsByRI")
+	@ResponseBody
+	public Map<String,Object> getItemsByRI(@RequestParam String resourceId){
+		int limit = 1000;
+		int start = 0;
 		Map<String, Object> result=new HashMap<>();
 		if (StringUtils.isNotEmpty(resourceId)) {
 			String url = PropertiesUtil.getValue(OpenDataConstants.CONF_PROPERTIES, "od.domain") + "/service/rest/resource/getItemsByResourceId?resourceId=" + resourceId+"&limit="+limit+"&start="+start;

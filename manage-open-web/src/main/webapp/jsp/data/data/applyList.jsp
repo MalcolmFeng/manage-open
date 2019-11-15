@@ -84,7 +84,9 @@
                         <div class="queue-desc" title='{{item.description}}'>{{item.description}}</div>
                     </div>
                 </div>
-                <button type="button" id="applyBtn" data-id={{item.id}}>申请</button>
+				<a onclick="todetail('{{item.remoteId}}&{{item.dataSourceId}}')">
+					<button type="button" id="applyBtn" data-id={{item.id}} data-dataSourceId={{item.dataSourceId}}>申请</button>
+				</a>
             </div>
             {{/each}}
 		</script>
