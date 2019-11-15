@@ -5,6 +5,7 @@ var dataSourceId=0;
 var dataSetSelect=[];
 var dataSetSelectid=0
 var allData=[];
+var applyId = 0;
 
 $(function() {
     var search=location.search;
@@ -19,12 +20,20 @@ $(function() {
 $(document).on("click", "#tableNameList>li", tableLiClick);
 
 function nextstep(){
+    applyId = Math.random()*10^64;
+    var data ={
+        allData: allData,
+        comment:"药品研究所用数据资源",
+        jdbcUser:"ceshi",
+    }
     $.ajax({
         type: "post",
-        url:'http://172.19.221.67:9071/manage-open/service/open/data/applyNew',
-        data: JSON.stringify(allData),
-        async:false,
-        contentType:"json",
+        // url:'http://172.19.221.67:9071/manage-open/service/open/data/applyNew',
+        url: "http://172.19.221.67:9071/manage-open/service/open/data/applyNew",
+        data: {
+           json:JSON.stringify(data)
+        },
+        // dataType:"json",
         success: function(result) {
            if(result.result){
                alert("保存成功");
@@ -49,6 +58,16 @@ function parse(search){
     initTableName();
 }
 $(document).on("change", ".titleLeft", initTableName);
+$(document).on("click", "#nextBtn", function (){
+    $("#sjlb").css({"display":"none"});
+    $(".showpage").css({"display":""})
+    $(".firstStep").css({"background-color":"rgba(64,148,251,1)"});
+    $(".firstStep").css({"color":"#FFFFFF"});
+    $(".thirdStep").css({"background-color":"rgba(238,238,238,1)"});
+    $(".firstStep").css({"color":"rgba(102,102,102,1)"});
+});
+
+
 
 //初始化服务列表,获取数据集
 function initServiceList() {
@@ -201,7 +220,8 @@ function  saveState(){
                         allData.push(data);
                     }
                 }
-            } else {
+            }
+            else if(allData.length==0) {
                 var data = {
                     setName: setName,
                     setId: setId,

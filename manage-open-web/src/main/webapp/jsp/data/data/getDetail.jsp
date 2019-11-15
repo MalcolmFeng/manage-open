@@ -56,7 +56,7 @@
         font-size: 14px;
     }
     .navLeft{
-        width: 12%;
+        width: 15%;
         /*height: 100%;*/
         margin-top: 15px;
         margin-left: 15px;
@@ -64,7 +64,7 @@
         margin-bottom: 20px;
     }
     .contentRight{
-        width: 84%;
+        width: 82%;
         height: 100%;
         margin-left: 20px;
     }
@@ -88,16 +88,6 @@
         background-color: RGBA(187,220,253,0.4);
         cursor: pointer;
     }
-    /*.btnicon{*/
-    /*    width:50px;*/
-    /*    height: 25px;*/
-    /*    color: #fff;*/
-    /*    background-color: #4094FB ;*/
-    /*    float: right;*/
-    /*    border: none;*/
-    /*    margin-left: 10px;*/
-    /*    margin-top: 15px;*/
-    /*}*/
     .content{
         margin-top: 50px;
     }
@@ -165,6 +155,15 @@
         color:#333 ;
         border-radius:4px;
     }
+    #saveBtn{
+        width:80px;
+        height:36px;
+        background-color: #4094FB;
+        border: none;
+        border-radius:4px;
+        color: #fff;
+        margin-left: 20px;
+    }
     li{
         cursor: pointer;
     }
@@ -172,17 +171,49 @@
         width: 100%;
         height: 500px;
     }
-    iframe{
-        width: 100%;
-        height: 500px;
+
+    .showpage{
+        height: 1000px;
+        overflow-x: hidden;
+        overflow: hidden;
     }
+   .thirdbtn{
+       position: absolute;
+       left: 50%;
+       width:80px;
+       height:36px;
+       margin-left: -40px;
+   }
+    #submitbtn{
+        position: absolute;
+        left: 50%;
+        width:80px;
+        height:36px;
+        margin-left: -40px;
+    }
+
+
+
 </style>
 <body style="width: 100%;height: 100%">
-<div>
+    <div style="background-color: rgba(248,248,248,1); width: 90%;border: 1px solid rgba(238,238,238,1);height: 100px;margin: 0 auto;margin-top: 30px;display: flex;justify-content: center;align-items: center;">
+        <div style="display: flex;flex-direction: column;align-items: center;">
+            <div class="firstStep" style="height: 40px;width: 40px;border-radius: 20px;background-color: rgba(64,148,251,1);color: #FFFFFF;text-align: center;line-height: 40px;;">01</div>
+            <div>选择数据集</div>
+        </div>
+        <div style="width: 20%;height: 2px;border: 1px solid rgba(238,238,238,1);background-color: rgba(238,238,238,1);"></div>
 
-</div>
-<div id="sjlb" style="width: 100%;height: 100%;display: flex;flex-direction: row;">
-
+        <div style="display: flex;flex-direction: column;align-items: center;">
+            <div class="secondStep" style="height: 40px;width: 40px;border-radius: 20px;background-color: rgba(238,238,238,1);color: rgba(102,102,102,1);text-align: center;line-height: 40px;;">02</div>
+            <div>已选择数据集预览</div>
+        </div>
+        <div style="width: 20%;height: 2px;border: 1px solid rgba(238,238,238,1);background-color: rgba(238,238,238,1);"></div>
+        <div class="thirdStep" style="display: flex;flex-direction: column;align-items: center;">
+            <div style="height: 40px;width: 40px;border-radius: 20px;background-color: rgba(238,238,238,1);color: rgba(102,102,102,1);text-align: center;line-height: 40px;;">03</div>
+            <div>填写表单</div>
+        </div>
+    </div>
+    <div id="sjlb" style="width: 100%;height: 100%;display: flex;flex-direction: row;">
     <div class="navLeft">
         <select class="titleLeft">数据列表</select>
         <ul id="tableNameList">
@@ -254,18 +285,20 @@
             <div class="clear"></div>
         </div>
         <div class="buttonGroup" style="width: 100%;height: 100%;display: flex;flex-direction: row;justify-content: center;">
-        <button type="button" class="btnicon" id="nextBtn" onclick="nextstep()">保存</button>
+        <button type="button" class="btnicon" id="nextBtn" >下一步</button>
+        <button type="button" class="btnicon" id="saveBtn" onclick="nextstep()">保存</button>
         <button type="button" class="btnicon" id="backBtn">返回</button>
         </div>
     </div>
 
 </div>
 </div>
-<div class="body">
-    <iframe id="wf" name="wf" style="width: 100%;height: 100%;border: none"></iframe>
+<div class="body showpage" style="display: none" >
+    <iframe id="wf" name="wf" style="width: 100%;height: 100%;border: none;"></iframe>
     <div class="row">
-        <div class="col-md-12">
-            <button class="btn ue-btn" onclick="submit()">提交</button>
+        <div class="col-md-12" class="thirdbtn">
+            <button class="btn ue-btn "  id="submitbtn" onclick="submit()">提交</button>
+<%--            <button type="button" class="btnicon" id="saveBtn" onclick="nextstep()">保存</button>--%>
         </div>
     </div>
 </div>
@@ -275,7 +308,7 @@
         $("#wf").attr("src","http://172.19.221.67:7070/open-bsp/command/dispatcher/org.loushang.workflow.tasklist.forward.TaskListDispatcherCmd/newTaskForward?procDefUniqueId=2c935dc36e67aeaf016e680d3aa80979")
     })
     function submit() {
-        wf.window.createAndSend();
+        wf.window.createAndSend(applyId);
     }
 </script>
 <!--表-->
