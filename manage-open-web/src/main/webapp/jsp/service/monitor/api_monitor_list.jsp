@@ -138,6 +138,8 @@
             if ("200" == full.result) {
                 if("b983cc8ee7814d2d9d4702fa08f230e7" == full.apiServiceId){
                     return '<a onclick="toDetails(\'' + full.id + '\')">' + '成功' + '</a>';
+                } else if ("b983c3452346456v224562fa08f230e4" == full.apiServiceId) {
+                    return '<a onclick="toDetails(\'' + full.id + '\')">' + '成功' + '</a>';
                 }else {
                     return "成功";
                 }

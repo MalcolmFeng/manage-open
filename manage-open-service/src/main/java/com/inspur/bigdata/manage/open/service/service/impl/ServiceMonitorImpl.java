@@ -122,7 +122,7 @@ public class ServiceMonitorImpl implements IServiceMonitorService {
         if (StringUtil.isEmpty(apiServiceId)) {
 //            apiServiceId = "b983cc8ee7814d2d9d4702fa08f230e7";
         }
-        queryParam.put("apiServiceId", apiServiceId);
+//        queryParam.put("apiServiceId", apiServiceId);
         queryParam.put("result", "200");
         List<ApiServiceMonitor> apiServiceMonitors = serviceMonitorService.query(queryParam);
         ApiServiceMonitor apiServiceMonitor = null;
@@ -139,7 +139,12 @@ public class ServiceMonitorImpl implements IServiceMonitorService {
             String requestTime = apiServiceMonitor.getRequestTime();
             String responseTime = apiServiceMonitor.getResponseTime();
             String openServiceOutput = apiServiceMonitor.getOpenServiceOutput();
-            JSONObject openServiceOutputJson = JSON.parseObject(openServiceOutput);
+            JSONObject openServiceOutputJson = null;
+            try {
+                openServiceOutputJson = JSON.parseObject(openServiceOutput);
+            } catch (Exception e) {
+                return new ModelAndView("service/monitor/api_monitor_detail", model);
+            }
             if (openServiceOutputJson == null || openServiceOutputJson.size() == 0) {
                 return new ModelAndView("service/monitor/api_monitor_detail", model);
             }
@@ -153,10 +158,21 @@ public class ServiceMonitorImpl implements IServiceMonitorService {
                 model.put("error", "用户模型解密失败，请联系管理员或稍后重试");
                 return new ModelAndView("service/monitor/api_monitor_detail", model);
             }
-            JSONObject getLogDataJson = JSON.parseObject(getLogDataStr);
+            JSONObject getLogDataJson = null;
+            try {
+                getLogDataJson = JSON.parseObject(getLogDataStr);
+            } catch (Exception e) {
+                model.put("error", "用户模型解密失败，请联系管理员或稍后重试");
+                return new ModelAndView("service/monitor/api_monitor_detail", model);
+            }
+            if (getLogDataJson == null || getLogDataJson.size() == 0) {
+                model.put("error", "用户模型解密失败，请联系管理员或稍后重试");
+                return new ModelAndView("service/monitor/api_monitor_detail", model);
+            }
             totalPositiveRecord = getLogDataJson.getString("dataCount");
             totalPositivePopulation = getLogDataJson.getString("realPeopleCount");
-            resultFile = "../exportExcelById/" + monitorId;
+//            resultFile = "../exportExcelById/" + monitorId;
+            resultFile = instream.toString();
             isSuccess = "success";
 
             model.put("isSuccess", isSuccess);
