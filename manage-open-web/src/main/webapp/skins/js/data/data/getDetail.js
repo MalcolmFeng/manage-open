@@ -25,6 +25,7 @@ function nextstep(){
         allData: allData,
         comment:"药品研究所用数据资源",
         jdbcUser:"ceshi",
+        applyId:applyId
     }
     $.ajax({
         type: "post",
