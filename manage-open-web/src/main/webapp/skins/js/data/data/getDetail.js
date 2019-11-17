@@ -10,6 +10,7 @@ var uploadData=[];
 var tableRecord=[];
 function submit() {
     wf.window.createAndSend(applyId);
+    $("#submitbtn").css({"display":"none"});
 }
 $(function() {
     var search=location.search;
@@ -157,12 +158,12 @@ function nextstep(){
         // url: "http://172.19.221.67:7070/manage-open/service/open/data/applyNew",
         url: "http://172.16.12.95:7070/manage-open/service/open/data/applyNew",
         data: {
-            json:JSON.stringify(ignoreSpaces(data))
+            json:JSON.stringify(data)
         },
         // dataType:"json",
         success: function(result) {
             if(result.result){
-                alert("保存成功");
+                sticky("保存成功");
             }
         }
     });
@@ -189,11 +190,11 @@ function parse(search){
 $(document).on("click", "#nextBtn", function (){
     nextstep();
     $("#sjlb").css({"display":"none"});
-    $(".showpage").css({"display":""})
-    $(".firstStep").css({"background-color":"rgba(64,148,251,1)"});
-    $(".firstStep").css({"color":"#FFFFFF"});
-    $(".thirdStep").css({"background-color":"rgba(238,238,238,1)"});
-    $(".firstStep").css({"color":"rgba(102,102,102,1)"});
+    $(".showpage").css({"display":""});
+    $(".firstStep").removeClass("activeStep");
+    $(".thirdStep").addClass("activeStep");
+    $(".firstStep").addClass("otherStep");
+    $(".thirdStep").removeClass("otherStep");
 });
 
 //初始化服务列表,获取数据集

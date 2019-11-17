@@ -194,23 +194,41 @@
     .returnDiv{
         margin-top: 23px;
     }
+    .activeStep{
+        height: 40px;
+        width: 40px;
+        border-radius: 20px;
+        background-color: rgba(64,148,251,1);
+        color: #FFFFFF;
+        text-align: center;
+        line-height: 40px;
+    }
+    .otherStep{
+        height: 40px;
+        width: 40px;
+        border-radius: 20px;
+        background-color: rgba(238,238,238,1);
+        color: rgba(102,102,102,1);
+        text-align: center;
+        line-height: 40px;
+    }
 
 </style>
 <body style="width: 100%;height: 100%;">
     <div class="topTitle" style="background-color: rgba(248,248,248,1); width: 97%;border: 1px solid rgba(238,238,238,1);height: 100px;margin: 0 auto;margin-top: 30px;display: flex;justify-content: center;align-items: center;">
         <div style="display: flex;flex-direction: column;align-items: center;">
-            <div class="firstStep" style="height: 40px;width: 40px;border-radius: 20px;background-color: rgba(64,148,251,1);color: #FFFFFF;text-align: center;line-height: 40px;;">01</div>
+            <div class="firstStep  activeStep">01</div>
             <div>选择数据集</div>
         </div>
         <div style="width:37%;height: 2px;border: 1px solid rgba(238,238,238,1);background-color: rgba(238,238,238,1);"></div>
 
         <div style="display: flex;flex-direction: column;align-items: center;">
-            <div class="secondStep" style="height: 40px;width: 40px;border-radius: 20px;background-color: rgba(238,238,238,1);color: rgba(102,102,102,1);text-align: center;line-height: 40px;;">02</div>
+            <div class="secondStep otherStep">02</div>
             <div>已选择数据集预览</div>
         </div>
         <div style="width:37%;height: 2px;border: 1px solid rgba(238,238,238,1);background-color: rgba(238,238,238,1);"></div>
-        <div class="thirdStep" style="display: flex;flex-direction: column;align-items: center;">
-            <div style="height: 40px;width: 40px;border-radius: 20px;background-color: rgba(238,238,238,1);color: rgba(102,102,102,1);text-align: center;line-height: 40px;;">03</div>
+        <div class="" style="display: flex;flex-direction: column;align-items: center;">
+            <div class=" thirdStep otherStep" >03</div>
             <div>填写表单</div>
         </div>
     </div>
