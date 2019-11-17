@@ -127,8 +127,20 @@ function reloadServiceListBySubGroupId(groupId) {
 }
 
 function loadAppList(openServiceId) {
-    window.location.href = context + "/service/open/data/get/" + openServiceId+"/apply";
+
+    window.location.href = context + "/service/open/data/get/" + ignoreSpaces(openServiceId)+"/apply";
 }
 function loadServiceInfo(openServiceId) {
-    window.location.href = context + "/service/open/data/get/" + openServiceId+"/apply";
+    window.location.href = context + "/service/open/data/get/" + ignoreSpaces(openServiceId)+"/apply";
+}
+/**
+ * 删除所有空格
+ */
+function ignoreSpaces(string) {
+    var temp = "";
+    string = '' + string;
+    var splitstring = string.split(" ");
+    for(var i = 0; i < splitstring.length; i++)
+        temp += splitstring[i];
+    return temp;
 }

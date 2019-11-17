@@ -3,6 +3,7 @@
 <%@ taglib uri="/tags/loushang-web" prefix="l" %>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
+<%@ page trimDirectiveWhitespaces="true" %>
 <%
     String resourceId = request.getParameter("resourceId");
     String dataSourceType = request.getParameter("dataSourceType");
@@ -21,8 +22,6 @@
     <link rel="stylesheet" type="text/css" href="<l:asset path='css/font-awesome.css'/>"/>
     <link rel="stylesheet" type="text/css" href="<l:asset path='css/ui.css'/>"/>
     <link rel="stylesheet" type="text/css" href="<l:asset path='css/form.css'/>"/>
-<%--    <link rel="stylesheet" type="text/css" href="<l:asset path='css/select2.min.css'/>" />--%>
-<%--    <link rel="stylesheet" type="text/css" href="<l:asset path='platform/css/home.css'/>"/>--%>
 
     <script type="text/javascript" src="<l:asset path='jquery.js'/>" ></script>
     <script type="text/javascript" src="<l:asset path='bootstrap.js'/>" ></script>
@@ -59,12 +58,12 @@
         width: 15%;
         /*height: 100%;*/
         margin-top: 15px;
-        margin-left: 15px;
+        margin-left: 25px;
         border-right: 1px solid #EEE;
         margin-bottom: 20px;
     }
     .contentRight{
-        width: 82%;
+        width: 79%;
         height: 100%;
         margin-left: 20px;
     }
@@ -74,7 +73,7 @@
         margin-bottom: 10px;
         border:none;
         font-weight:bold;
-        width: 140px;
+        width: 150px;
     }
     #tableNameList{
         height: 30px;
@@ -108,7 +107,7 @@
         margin-top: 2px;
     }
     .pull-right{
-        margin-bottom: 5px;
+        margin-bottom: 2px;
     }
     .smallLine{
         width: 2px;
@@ -123,19 +122,14 @@
     .select2-container--classic{
         display: none;
     }
-    #seleteAllColumnsBtn{
-        margin-left: 60px;
-    }
-    #returnColumnsDiv{
-        margin-top: 40px;
-    }
+
     #tableNameList>input{
         float: left;
         margin-top:8px;
     }
     .buttonGroup{
-        margin-top: 80px;
-        margin-left: -40px;
+        margin-top: 30px;
+        margin-left: -80px;
     }
     #nextBtn{
         width:80px;
@@ -171,7 +165,6 @@
         width: 100%;
         height: 500px;
     }
-
     .showpage{
         height: 1000px;
         overflow-x: hidden;
@@ -184,36 +177,44 @@
        height:36px;
        margin-left: -40px;
    }
+   .topTitle{
+       position: relative;
+   }
     #submitbtn{
-        position: absolute;
+        position: fixed;
+        top: 90%;
         left: 50%;
         width:80px;
         height:36px;
         margin-left: -40px;
     }
-
-
+    .content{
+        margin-top: -8px;
+    }
+    .returnDiv{
+        margin-top: 23px;
+    }
 
 </style>
-<body style="width: 100%;height: 100%">
-    <div style="background-color: rgba(248,248,248,1); width: 90%;border: 1px solid rgba(238,238,238,1);height: 100px;margin: 0 auto;margin-top: 30px;display: flex;justify-content: center;align-items: center;">
+<body style="width: 100%;height: 100%;">
+    <div class="topTitle" style="background-color: rgba(248,248,248,1); width: 97%;border: 1px solid rgba(238,238,238,1);height: 100px;margin: 0 auto;margin-top: 30px;display: flex;justify-content: center;align-items: center;">
         <div style="display: flex;flex-direction: column;align-items: center;">
             <div class="firstStep" style="height: 40px;width: 40px;border-radius: 20px;background-color: rgba(64,148,251,1);color: #FFFFFF;text-align: center;line-height: 40px;;">01</div>
             <div>选择数据集</div>
         </div>
-        <div style="width: 20%;height: 2px;border: 1px solid rgba(238,238,238,1);background-color: rgba(238,238,238,1);"></div>
+        <div style="width:37%;height: 2px;border: 1px solid rgba(238,238,238,1);background-color: rgba(238,238,238,1);"></div>
 
         <div style="display: flex;flex-direction: column;align-items: center;">
             <div class="secondStep" style="height: 40px;width: 40px;border-radius: 20px;background-color: rgba(238,238,238,1);color: rgba(102,102,102,1);text-align: center;line-height: 40px;;">02</div>
             <div>已选择数据集预览</div>
         </div>
-        <div style="width: 20%;height: 2px;border: 1px solid rgba(238,238,238,1);background-color: rgba(238,238,238,1);"></div>
+        <div style="width:37%;height: 2px;border: 1px solid rgba(238,238,238,1);background-color: rgba(238,238,238,1);"></div>
         <div class="thirdStep" style="display: flex;flex-direction: column;align-items: center;">
             <div style="height: 40px;width: 40px;border-radius: 20px;background-color: rgba(238,238,238,1);color: rgba(102,102,102,1);text-align: center;line-height: 40px;;">03</div>
             <div>填写表单</div>
         </div>
     </div>
-    <div id="sjlb" style="width: 100%;height: 100%;display: flex;flex-direction: row;">
+    <div id="sjlb" style="width: 100%;display: flex;flex-direction: row;">
     <div class="navLeft">
         <select class="titleLeft">数据列表</select>
         <ul id="tableNameList">
@@ -237,7 +238,9 @@
             <div class="clear"></div>
         </div>
         <div class="form-hr content ">
-            <div class="fieldLabel hr_tall"><div class="lineBlue "></div><span>服务逻辑</span></div>
+            <div class="fieldLabel hr_tall"><div class="lineBlue "></div><span>服务逻辑</span>
+
+            </div>
             <div class="fieldInput">
                 <div id="conditionColumnsDiv">
                     <div class="pull-right">
@@ -267,7 +270,7 @@
                 <button class="btn btn-link" id="seleteAllColumnsBtn" type="button" onclick="seleteAllColumns()"> <i class="fa fa-check-square fa-fw"></i>全选 </button>
                 <button class="btn btn-link"  id="seleteRevsernColumnsBtn" type="button" onclick="seleteRevsernColumns()"> <i class="fa fa-check-square-o fa-fw"></i>反选 </button>
             </div>
-            <div class="fieldInput">
+            <div class="fieldInput returnDiv">
                 <div id="returnColumnsDiv">
                     <div style="margin-top: -20px;">
                         <ul class="returnColumns clearfix" id="returnColumns">
@@ -279,19 +282,19 @@
         </div>
         <div class="form-hr">
             <div class="fieldLabel "><button class="btn btn-link" type="button" id="getSqlBtn" onclick="getSql()" style="margin-left:6px"> <i class="fa fa-hand-o-right fa-fw"></i>生成SQL </button></div>
-            <div class="fieldInput"><textarea id="serviceSql" readonly
+            <div class="fieldInput  fieldInputsql"><textarea id="serviceSql" readonly
                                               style="resize: none; word-wrap: break-word; margin-left: 0px; margin-right: 0px; width: 100%; height: 100px;"
                                               class="form-control"></textarea></div>
             <div class="clear"></div>
         </div>
-        <div class="buttonGroup" style="width: 100%;height: 100%;display: flex;flex-direction: row;justify-content: center;">
-        <button type="button" class="btnicon" id="nextBtn" >下一步</button>
-        <button type="button" class="btnicon" id="saveBtn" onclick="nextstep()">保存</button>
-        <button type="button" class="btnicon" id="backBtn">返回</button>
+            <div class="buttonGroup" style="width: 100%;display: flex;justify-content: center;">
+            <button type="button" class="btnicon" id="nextBtn" >下一步</button>
+            <%--        <button type="button" class="btnicon" id="saveBtn" onclick="nextstep()">保存</button>--%>
+            <button type="button" class="btnicon" id="backBtn" onclick="history.back();">返回</button>
         </div>
     </div>
-
 </div>
+
 </div>
 <div class="body showpage" style="display: none" >
     <iframe id="wf" name="wf" style="width: 100%;height: 100%;border: none;"></iframe>
@@ -305,16 +308,14 @@
 <script type="text/javascript">
     var context = "<l:assetcontext/>";
     $(function () {
-        $("#wf").attr("src","http://172.19.221.67:7070/open-bsp/command/dispatcher/org.loushang.workflow.tasklist.forward.TaskListDispatcherCmd/newTaskForward?procDefUniqueId=2c935dc36e67aeaf016e680d3aa80979")
+        $("#wf").attr("src","http://172.16.12.95:7070/open-bsp/command/dispatcher/org.loushang.workflow.tasklist.forward.TaskListDispatcherCmd/newTaskForward?procDefUniqueId=2c935dc36e67aeaf016e680d3aa80979")
     })
-    function submit() {
-        wf.window.createAndSend(applyId);
-    }
+
 </script>
 <!--表-->
 <script type="text/html" id="tableTemp">
     {{each tableList as table}}
-    <input type="checkbox" id="{{table.resourceId}}" > <li data-resourceId='{{table.resourceId}}' data-text="{{table.tableName}}"> &nbsp;&nbsp;{{table.resourceName}}</li>
+    <input type="checkbox" id="{{table.resourceId}}" name="COLUNM_LEFT_LIST" > <li data-resourceId='{{table.resourceId}}' data-text="{{table.tableName}}"> &nbsp;&nbsp;{{table.resourceName}}</li>
     {{/each}}
 </script>
 </body>

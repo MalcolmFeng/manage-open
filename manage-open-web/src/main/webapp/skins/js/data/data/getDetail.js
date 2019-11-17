@@ -5,8 +5,12 @@ var dataSourceId=0;
 var dataSetSelect=[];
 var dataSetSelectid=0
 var allData=[];
-var applyId = 0;
-
+var applyId = generateUUID();
+var uploadData=[];
+var tableRecord=[];
+function submit() {
+    wf.window.createAndSend(applyId);
+}
 $(function() {
     var search=location.search;
     $(".titleLeft").select2({
@@ -17,12 +21,132 @@ $(function() {
     loadDataColumnsToSelect();
     parse(search);
 })
+
+$(document).on("click", "#returnColumns>li>label>input,#seleteAllColumnsBtn,#seleteRevsernColumnsBtn", function () {
+    var resourceId =$("#resourceId").val();
+    getOutParam();
+    getFilterParam();
+    // getSql();
+    if($('input[name="checkbox-ReturnColumn"]:checked').length!==0) {
+        $("#" + resourceId).prop("checked", true);
+        // initSave();
+        saveState();
+    }
+    else {
+        $("#" + resourceId).prop("checked", false);
+    }
+});
+$(document).on("change", "input[name=COLUMN_VALUEorNAME]", function () {
+    var resourceId =$("#resourceId").val();
+    getFilterParam();
+    getOutParam();
+    if(($('input[name=COLUMN_VALUEorNAME]').value)!=="") {
+        $("#" + resourceId).prop("checked", true);
+        // initSave();
+        saveState();
+    }
+    else {
+        $("#" + resourceId).prop("checked", false);
+    }
+});
 $(document).on("click", "#tableNameList>li", tableLiClick);
 
+$(document).on("change", ".titleLeft", function () {
+    var setId = $(".titleLeft option:selected").attr("data-id");
+    $("#setId").val(setId);
+    initTableName();
+    $("#serviceSql").empty();
+    callTableData();
+    $("#tableNameList>li").eq(0).click();
+
+
+});
+$(document).on("click", ".titleLeft", function () {
+    recordTable();
+    getallData();
+});
+
+
+//记录不同数据集所选的表
+function recordTable(){
+    $('input[name="COLUNM_LEFT_LIST"]:checked').each(function(){
+        var resourceId = $(this).next().attr("data-resourceid");
+        var setId = $(".titleLeft option:selected").attr("data-id");
+        var data = {
+            setId: setId,
+            resourceId: resourceId,
+        };
+        tableRecord.push(data);
+    });
+}
+//切换数据集时回显之前所选的数据
+function callTableData(){
+    var setId = $("#setId").val();
+    if(tableRecord.length>0){
+        console.log(dataSet);
+        for (var i =0 ;i<dataSet.length ;i++){
+            for ( var j =0 ; j<tableRecord.length;j++){
+                if(setId==tableRecord[j].setId&&dataSet[i].resourceId==tableRecord[j].resourceId){
+                    $("#" + dataSet[i].resourceId).prop("checked", true);
+                }
+            }
+
+        }
+    }
+}
+//生成一个随机数id
+function generateUUID() {
+    var d = new Date().getTime();
+    if (window.performance && typeof window.performance.now === "function") {
+        d += performance.now(); //use high-precision timer if available
+    }
+    var uuid = 'xxxxxxxxxxxx4xxxyxxxxxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+        var r = (d + Math.random() * 16) % 16 | 0;
+        d = Math.floor(d / 16);
+        return (c == 'x' ? r : (r & 0x3 | 0x8)).toString(16);
+    });
+    return uuid;
+}
+function getallData() {
+    var setId = $(".titleLeft option:selected").attr("data-id");
+    var setName =$(".titleLeft option:selected").text();
+    $('input[name="COLUNM_LEFT_LIST"]:checked').each(function(){
+        var resourceId = $(this).next().attr("data-resourceid");
+        var tableName =$(this).next().attr("data-text");
+        if(allData.length>0) {
+            var flag = 0;
+            for (var i = 0; i < allData.length; i++) {
+                if (setId == allData[i].setId && resourceId == allData[i].resourceId) {
+                    uploadData.push(allData[i]);
+                    flag =1;
+                }
+            }
+            if(flag = 0){
+                    var data = {
+                        setName: setName,
+                        setId: setId,
+                        tableName: tableName,
+                        resourceId: resourceId,
+                    };
+                    uploadData.push(data);
+                }
+        }else {
+            var data = {
+                setName: setName,
+                setId: setId,
+                tableName: tableName,
+                resourceId: resourceId,
+            };
+            uploadData.push(data);
+        }
+    });
+}
+
+//保存功能
 function nextstep(){
-    applyId = Math.random()*10^64;
+    getallData();
     var data ={
-        allData: allData,
+        allData: uploadData,
         comment:"药品研究所用数据资源",
         jdbcUser:"ceshi",
         applyId:applyId
@@ -30,15 +154,16 @@ function nextstep(){
     $.ajax({
         type: "post",
         // url:'http://172.19.221.67:9071/manage-open/service/open/data/applyNew',
-        url: "http://172.19.221.67:9071/manage-open/service/open/data/applyNew",
+        // url: "http://172.19.221.67:7070/manage-open/service/open/data/applyNew",
+        url: "http://172.16.12.95:7070/manage-open/service/open/data/applyNew",
         data: {
-           json:JSON.stringify(data)
+            json:JSON.stringify(ignoreSpaces(data))
         },
         // dataType:"json",
         success: function(result) {
-           if(result.result){
-               alert("保存成功");
-           }
+            if(result.result){
+                alert("保存成功");
+            }
         }
     });
 }
@@ -58,8 +183,11 @@ function parse(search){
     dataSourceId=strs[1];
     initTableName();
 }
-$(document).on("change", ".titleLeft", initTableName);
+
+
+//顶部步骤蓝切换样式变化
 $(document).on("click", "#nextBtn", function (){
+    nextstep();
     $("#sjlb").css({"display":"none"});
     $(".showpage").css({"display":""})
     $(".firstStep").css({"background-color":"rgba(64,148,251,1)"});
@@ -67,8 +195,6 @@ $(document).on("click", "#nextBtn", function (){
     $(".thirdStep").css({"background-color":"rgba(238,238,238,1)"});
     $(".firstStep").css({"color":"rgba(102,102,102,1)"});
 });
-
-
 
 //初始化服务列表,获取数据集
 function initServiceList() {
@@ -102,12 +228,14 @@ function loadDataColumnsToSelect(){
 }
 //获取表名
 function initTableName() {
-    var remoteId = $(".titleLeft option:selected").val();
+    var remoteId = ignoreSpaces( $(".titleLeft option:selected").val());
     var setid = $(".titleLeft option:selected").attr("data-id");
     $("#setName").val($(".titleLeft option:selected").text());
     $("#setId").val(setid);
     $.ajax({
-        url: context + "/service/open/data/getTableInfo?remoteId=" + remoteId,
+        type: "post",
+        async:false,
+        url: context + "/service/open/data/getTableInfo?remoteId=" + ignoreSpaces(remoteId),
         success: function(data) {
             dataSet = eval(data.json);
             if(dataSet.length > 0) {
@@ -127,19 +255,23 @@ function initTableName() {
         }
     });
 }
+//默认保存页面
 // function initSave(){
-//         var setName = $("#setName").val();
-//         var setId = $("#setId").val();
-//         for (var i=0; i<dataSet.length;i++){
-//             var tableName = dataSet[i].tableName;
-//             var resourceId = dataSet[i].resourceId
-//             var data = {setName:setName,setId:setId,tableName:tableName,resourceId:resourceId};
+//     var setName = $("#setName").val();
+//     var setId = $("#setId").val();
+//     var tableName = $("#tableName").val();
+//     var resourceId = $("#resourceId").val()
+//     var data = {setName:setName,setId:setId,tableName:tableName,resourceId:resourceId};
+//     for (var i=0 ; i<allData.length ;i++) {
+//         if (setId == allData[i].setId && resourceId == allData[i].resourceId) {
+//             return;
+//         } else {
 //             allData.push(data);
 //         }
+//     }
 // }
 // 切换表格
 function tableLiClick() {
-    saveState();
     $(this).addClass("active").siblings().removeClass("active");
     var resourceId = $(this).attr("data-resourceid");
     var tableName = $(this).attr("data-text");
@@ -148,19 +280,20 @@ function tableLiClick() {
     initTableCol(resourceId);
     callData(resourceId);
 }
-//显示数据
+//回显数据
 function callData(resourceId){
     var setId = $("#setId").val();
     $("#conditionColumns_tbody").empty();
     $("#serviceSql").empty();
     for (var i=0;i<allData.length;i++){
-        if(setId==allData[i].setId&&resourceId==allData[i].resourceId){
-            var outputParamName= allData[i].outputParamName;
-            if(outputParamName!==undefined){
-                var filterParam = allData[i].filterParam;
-                filterParam = eval(filterParam);
-                var sql = allData[i].sql;
-                for(var j=0 ; j <filterParam.length;j++) {
+        if(setId==allData[i].setId&&resourceId==allData[i].resourceId) {
+            var outputParamName = allData[i].outputParamName;
+            // if(outputParamName!==undefined){
+            var filterParam = allData[i].filterParam;
+            filterParam = eval(filterParam);
+            var sql = allData[i].sql;
+            if (filterParam!==undefined) {
+                for (var j = 0; j < filterParam.length; j++) {
                     addConditionRow();
                     var aa = filterParam[j].column;
                     var bb = ($("select[name='CONDITION_COLUMN_NAME']").find("option[value='" + aa + "']")).text();
@@ -169,60 +302,43 @@ function callData(resourceId){
                     $("select[name='COLUMN_OPERATOR']").eq(j).val(filterParam[j].operation);
                     $("input[name=COLUMN_VALUEorNAME]").eq(j).val(filterParam[j].param);
                 }
-                $("#serviceSql").html(sql);
-                outputParamName = eval(outputParamName);
-                for (var j=0;j<outputParamName.length;j++){
-                    console.log($("label[value='outputParamName[j]']"))
-                    // var selector =outputParamName[j];
-                    $("label[value='"+outputParamName[j]+"']").children().prop("checked",true);
-                }
-
             }
-            else{
-                // $("#resourceId").val(resourceId);
-                $("#serviceSql").empty();
+            $("#serviceSql").html(sql);
+            outputParamName = eval(outputParamName);
+            for (var j=0;j<outputParamName.length;j++){
+                console.log($("label[value='outputParamName[j]']"))
+                // var selector =outputParamName[j];
+                $("label[value='"+outputParamName[j]+"']").children().prop("checked",true);
             }
-
         }
-        // else {
-        //     $("#serviceSql").empty();
-        // }
     }
 }
 // $(document).on("click", "#tableNameList>li>input", function(){
 //     $(this).prop('checked',false);
 //     throw SyntaxError();
 // });
+
 function  saveState(){
-        var setName = $("#setName").val();
-        var setId = $("#setId").val();
-        var tableName = $("#tableName").val();
-        var resourceId =$("#resourceId").val();
-        var filterParam = $("#filterParam").val();
-        var outputParamName = $("#outputParam").val();
-        var sql = $("#sql").val();
-        if(sql!=="") {
-            if (allData.length > 0) {
-                for (var i = 0; i < allData.length; i++) {
-                    if (setId == allData[i].setId && resourceId == allData[i].resourceId) {
-                        allData[i].outputParamName = outputParamName;
-                        allData[i].filterParam = filterParam;
-                        allData[i].sql = sql;
-                    } else {
-                        var data = {
-                            setName: setName,
-                            setId: setId,
-                            tableName: tableName,
-                            resourceId: resourceId,
-                            outputParamName: outputParamName,
-                            filterParam: filterParam,
-                            sql: sql
-                        };
-                        allData.push(data);
-                    }
-                }
+    var setName = $("#setName").val();
+    var setId = $("#setId").val();
+    var tableName = $("#tableName").val();
+    var resourceId =$("#resourceId").val();
+    var filterParam = $("#filterParam").val();
+    var outputParamName = $("#outputParam").val();
+    var sql = $("#sql").val();
+    // if(outputParamName!=="") {
+    if (allData.length > 0) {
+        var flag = 0 ;
+        for (var i = 0; i<allData.length; i++) {
+            if (setId == allData[i].setId && resourceId == allData[i].resourceId) {
+                allData[i].outputParamName = outputParamName;
+                allData[i].filterParam = filterParam;
+                allData[i].sql = sql;
+                flag = 1;
+                break;
             }
-            else if(allData.length==0) {
+        }
+            if(flag == 0){
                 var data = {
                     setName: setName,
                     setId: setId,
@@ -234,17 +350,27 @@ function  saveState(){
                 };
                 allData.push(data);
             }
-            $("#" + resourceId).prop("checked", true);
-        }
-        $("#filterParam").val("");
-        $("#outputParam").val("");
-        $("#sql").val("");
+
+    }
+    else if(allData.length==0) {
+        var data = {
+            setName: setName,
+            setId: setId,
+            tableName: tableName,
+            resourceId: resourceId,
+            outputParamName: outputParamName,
+            filterParam: filterParam,
+            sql: sql
+        };
+        allData.push(data);
+    }
+    $("#" + resourceId).prop("checked", true);
 }
 function initTableCol(resourceId) {
     $.ajax({
         type: "post",
         async:false,
-        url: context + "/service/open/data/getItemsByRI?resourceId=" + resourceId,
+        url: context + "/service/open/data/getItemsByRI?resourceId=" + ignoreSpaces(resourceId),
         success: function (data) {
             var dataSet = eval("(" + data.json + ")");
             if (dataSet.recordSet.length > 0) {
@@ -258,59 +384,59 @@ function initTableCol(resourceId) {
     return 1;
 }
 
-    /**
-     * 增加过滤参数
-     */
+/**
+ * 增加过滤参数
+ */
 
-    function addConditionRow(){
-        exitNum++;
-        var _row = "<tr role='row' class='data_service service-condition'>";
-        var row_ ="</tr>";
-        var tdcs = "<td class=' center'>";
-        var tdfs = "<td class=''>";
-        var tde = "</td>";
-        //复选框
-        var checkbox = "<input type='checkbox' name='checkbox-condition' class='select-condition-all-member' value='"+exitNum+"'>"+
-            "<input type='hidden' id='condition-itemId"+exitNum+"' value='"+exitNum+"'></input>";
-        //参数名称
-        var column_name="<select class='form-control' onchange='changeConditionColumnNameAction("+exitNum+")' id='CONDITION_COLUMN_NAME"+exitNum+"' name='CONDITION_COLUMN_NAME'></select>";
-        // 参数类型
-        var column_type="<input type='text' name='CONDITION_COLUMN_TYPE' readonly id='CONDITION_COLUMN_TYPE"+exitNum+"' value='' class='form-control'></input>";
-        //运算符
-        var option= "<option value='=' selected>=</option><option value='>'>></option><option value='>='>>=</option>" +
-            "<option value='<'><</option><option value='<='><=</option><option value='in'>in</option><option value='!='>!=</option><option value='like'>like</option><option value='not like'>not like</option>";
-        var column_operator="<select  class='form-control' id='COLUMN_OPERATOR"+exitNum+"' name='COLUMN_OPERATOR'>" + option+"</select>";
-        //值、参数名称
-        var column_valueOrName ="<input type='text' placeholder='参数值' readonly  onChange=' checkConditionColumnOrValue("+exitNum+
-            ");' id='COLUMN_VALUEorNAME"+exitNum+"'  name='COLUMN_VALUEorNAME' value='' class='form-control'></input><label id='COLUMN_VALUEorNAMEError"+exitNum+"' class=' Validformwrong Validformchecktip' style='display:none;'></label>";
+function addConditionRow(){
+    exitNum++;
+    var _row = "<tr role='row' class='data_service service-condition'>";
+    var row_ ="</tr>";
+    var tdcs = "<td class=' center'>";
+    var tdfs = "<td class=''>";
+    var tde = "</td>";
+    //复选框
+    var checkbox = "<input type='checkbox' name='checkbox-condition' class='select-condition-all-member' value='"+exitNum+"'>"+
+        "<input type='hidden' id='condition-itemId"+exitNum+"' value='"+exitNum+"'></input>";
+    //参数名称
+    var column_name="<select class='form-control' onchange='changeConditionColumnNameAction("+exitNum+")' id='CONDITION_COLUMN_NAME"+exitNum+"' name='CONDITION_COLUMN_NAME'></select>";
+    // 参数类型
+    var column_type="<input type='text' name='CONDITION_COLUMN_TYPE' readonly id='CONDITION_COLUMN_TYPE"+exitNum+"' value='' class='form-control'></input>";
+    //运算符
+    var option= "<option value='=' selected>=</option><option value='>'>></option><option value='>='>>=</option>" +
+        "<option value='<'><</option><option value='<='><=</option><option value='in'>in</option><option value='!='>!=</option><option value='like'>like</option><option value='not like'>not like</option>";
+    var column_operator="<select  class='form-control' id='COLUMN_OPERATOR"+exitNum+"' name='COLUMN_OPERATOR'>" + option+"</select>";
+    //值、参数名称
+    var column_valueOrName ="<input type='text' placeholder='参数值' readonly  onChange=' checkConditionColumnOrValue("+exitNum+
+        ");' id='COLUMN_VALUEorNAME"+exitNum+"'  name='COLUMN_VALUEorNAME' value='' class='form-control'></input><label id='COLUMN_VALUEorNAMEError"+exitNum+"' class=' Validformwrong Validformchecktip' style='display:none;'></label>";
 
-        //组装结果
-        var row	= _row
-            +tdcs + checkbox + tde
-            +tdfs + column_name + tde
-            +tdfs + column_type + tde
-            +tdfs + column_operator + tde
-            +tdfs + column_valueOrName + tde
-            + row_;
-        //显示
-        $("#conditionColumns_tbody").append(row);
-        changeColour();
-        $("#COLUMN_OPERATOR"+exitNum).select2({
-            allowClear: true,
-            theme: "classic"
-        });
-        loadFilterColumnsToSelect();
-        $("#CONDITION_COLUMN_NAME"+exitNum).select2({
-            allowClear: true,
-            theme: "classic"
-        });
-    }
-    /**
-     * 删除过滤参数行
-     */
-    function deleteConditionRow(){
-        var count = $("input[name='checkbox-condition']:checked").length;
-        if(count>0){
+    //组装结果
+    var row	= _row
+        +tdcs + checkbox + tde
+        +tdfs + column_name + tde
+        +tdfs + column_type + tde
+        +tdfs + column_operator + tde
+        +tdfs + column_valueOrName + tde
+        + row_;
+    //显示
+    $("#conditionColumns_tbody").append(row);
+    changeColour();
+    $("#COLUMN_OPERATOR"+exitNum).select2({
+        allowClear: true,
+        theme: "classic"
+    });
+    loadFilterColumnsToSelect();
+    $("#CONDITION_COLUMN_NAME"+exitNum).select2({
+        allowClear: true,
+        theme: "classic"
+    });
+}
+/**
+ * 删除过滤参数行
+ */
+function deleteConditionRow(){
+    var count = $("input[name='checkbox-condition']:checked").length;
+    if(count>0){
         $.dialog({
             type: 'confirm',
             content: '确认删除?',
@@ -324,15 +450,15 @@ function initTableCol(resourceId) {
             },
             cancel: function(){
             }
-                });
-            }else{
-            sticky("提示:请至少选择一行！");
-            // $(".select-condition-all").attr("checked",false);
-            return false;
-        }};
-    function delRow(i) {
-        $(i).parent().parent().remove();
-    }
+        });
+    }else{
+        sticky("提示:请至少选择一行！");
+        // $(".select-condition-all").attr("checked",false);
+        return false;
+    }};
+function delRow(i) {
+    $(i).parent().parent().remove();
+}
 /**更新弹窗提示*/
 function sticky(msg, style, position) {
     var type = style ? style : 'success';
@@ -497,16 +623,20 @@ function getSql(){
     if(getInputParam()&&getFilterParam()&&judgeSql()){
         var filterParam =  encodeURI(encodeURI($("#filterParam").val()));
         var outputParamName = $("#outputParam").val();
+        // var outputParam = encodeURI(encodeURI(JSON.parse($("#outputParam").val())));
         var outputParam = encodeURI(encodeURI(JSON.parse(JSON.stringify("[]"))));
         var orderParam = encodeURI(encodeURI(JSON.parse(JSON.stringify("[]"))));
         var tableName = encodeURI(encodeURI(JSON.parse(JSON.stringify(ignoreSpaces($("#tableName").val())))));
         var sourceId = encodeURI(encodeURI(JSON.parse(JSON.stringify(ignoreSpaces((dataSourceId))))));
 
-        var data = {sourceId:sourceId,filterParam:filterParam,outputParam:outputParam,tableName:tableName,orderParam:orderParam};
+        // var data = {sourceId:sourceId,filterParam:filterParam,outputParam:outputParam,tableName:tableName,orderParam:orderParam};
+        var data = {filterParam:filterParam,outputParam:outputParam,tableName:tableName,orderParam:orderParam};
+
         //进行请求
         $.ajax({
             async: false,
-            url:  "http://172.19.221.67:8191/odmgr/command/dispatcher/com.inspur.od.dataService.servicePublish.cmd.ServicePublishDispatcherCmd/getSqlByOutputAndFilterParams",
+            // url:  "http://172.19.221.67:7070/odmgr/command/dispatcher/com.inspur.od.dataService.servicePublish.cmd.ServicePublishDispatcherCmd/getSqlByOutputAndFilterParams",
+            url:  "http://172.16.12.95:7070/odmgr/command/dispatcher/com.inspur.od.dataService.servicePublish.cmd.ServicePublishDispatcherCmd/getSqlByOutputAndFilterParams",
             type: "POST",
             data: data,
             success: function(data) {
@@ -517,11 +647,13 @@ function getSql(){
                 sql = a[0]+'\xa0'+JSON.parse(outputParamName) +right;
                 $("#serviceSql").html(sql);
                 var sqlstatement =$("#serviceSql").val();
+                $("#sql").val();
                 $("#sql").val(sqlstatement);
                 isSql=true;
             }
         });
     }
+    saveState();
     return isSql;
 }
 /**
@@ -541,7 +673,7 @@ function judgeSql(){
     }
     return true;
 }
- function encode(s){
+function encode(s){
     if (/["\\\x00-\x1f]/.test(s)) {
         return '"' + s.replace(/([\x00-\x1f\\"])/g, function(a, b) {
             var c = m[b];
@@ -666,7 +798,7 @@ function getOutParam() {
         var obj = $(this).parent().attr("value");
         output.push(obj);
         isHas = true;
-        });
-        $("#outputParam").val(JSON.stringify(output));
-        return isHas;
+    });
+    $("#outputParam").val(JSON.stringify(output));
+    return isHas;
 }
