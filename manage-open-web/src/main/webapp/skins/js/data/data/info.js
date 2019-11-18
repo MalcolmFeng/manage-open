@@ -9,6 +9,11 @@ $(function() {
     $(document).on("click", "#tableNameList>li", tableLiClick);
 
 });
+$(document).on("click", "#downLoadBtn", function () {
+    $('input[type="checkbox"]:checked').each(function(){
+
+    })
+})
 
 // 切换tab页
 function switchTabClick() {

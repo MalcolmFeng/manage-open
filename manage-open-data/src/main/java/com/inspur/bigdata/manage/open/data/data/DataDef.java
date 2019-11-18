@@ -110,6 +110,17 @@ public class DataDef implements Serializable{
 	private String dataSourceId;
 	@Column(name="INSTANCE_NAME")
 	private String instanceName;
+	@Column(name="SERVICE_TYPE")
+	private String serviceType;
+
+	public String getServiceType() {
+		return serviceType;
+	}
+
+	public void setServiceType(String serviceType) {
+		this.serviceType = serviceType;
+	}
+
 	/**
 	 * 数据产品分析详情页面url
 	 */

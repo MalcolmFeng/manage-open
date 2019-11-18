@@ -54,8 +54,11 @@
 						<c:if test="${serviceInfo.auditStatus eq 'reject' }">拒绝上线</c:if>
 						<div class="button-group">
 							<button type="button" onclick="history.back();" id="backBtn">返回</button>
-							<c:if test="${apply}">
+							<c:if test="${apply && serviceInfo.serviceType eq '2'}">
 								<button type="button" onclick="applyDataDef('${serviceInfo.id}')" id="applyBtn">申请</button>
+							</c:if>
+							<c:if test="${serviceInfo.serviceType eq '1'}">
+								<button type="button" onclick="applyDataDef('${serviceInfo.id}')" id="downLoadBtn">下载</button>
 							</c:if>
 						</div>
 
@@ -105,11 +108,22 @@
 					</c:otherwise>
 				</c:choose>
 			</div>
-
-			<div class="row">
-				<div class="service_info_title">数据统计</div>
-				<iframe id="detailPage" frameborder="0" src='${serviceInfo.dataDetailUrl}' width="100%" height="100%"></iframe>
+			<div class="row" style="margin-bottom: 10px;">
+				<div class="service_info_title">文件下载</div>
+				<div>
+					<ul class="downLoadBtn">
+						<li><span style="background-color:#c0a16b;"><a>XLSX</a></span></li>
+						<li><span style="background-color:#00B83F;"><a>JSON</a></span></li>
+						<li><span style="background-color:#0D8ABF;"><a>XML</a></span></li>
+						<li><span style="background-color:#880000;"><a>CSV</a></span></li>
+					</ul>
+				</div>
 			</div>
+
+<%--			<div class="row">--%>
+<%--				<div class="service_info_title">数据统计</div>--%>
+<%--				<iframe id="detailPage" frameborder="0" src='${serviceInfo.dataDetailUrl}' width="100%" height="100%"></iframe>--%>
+<%--			</div>--%>
 
 		</div>
 		<div id="sjlb" style="display: none">
