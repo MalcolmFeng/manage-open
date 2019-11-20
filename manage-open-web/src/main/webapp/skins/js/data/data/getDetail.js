@@ -108,6 +108,7 @@ function generateUUID() {
     });
     return uuid;
 }
+
 function getallData() {
     var setId = $(".titleLeft option:selected").attr("data-id");
     var setName =$(".titleLeft option:selected").text();
@@ -177,6 +178,7 @@ function parse(search){
     for (var i=0;i<dataSetSelect.length;i++) {
         if(dataSetSelectid==dataSetSelect[i].remoteId){
             $(".titleLeft").val(dataSetSelectid);
+            // $(".titleLeft").find("option[value='dataSetSelectid']").attr("selected",true);
             // $("#setName").val(dataSetSelect[i].name);
             // $("#setId").val(dataSetSelect[i].id);
         }
@@ -307,7 +309,7 @@ function callData(resourceId){
             $("#serviceSql").html(sql);
             outputParamName = eval(outputParamName);
             for (var j=0;j<outputParamName.length;j++){
-                console.log($("label[value='outputParamName[j]']"))
+                // console.log($("label[value='outputParamName[j]']"))
                 // var selector =outputParamName[j];
                 $("label[value='"+outputParamName[j]+"']").children().prop("checked",true);
             }

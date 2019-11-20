@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<%@ page pageEncoding="UTF-8" language="java" %>
+<%@ taglib uri="/tags/loushang-web" prefix="l" %>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
+<html lang="en" style="height:100%">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
+    <title>开放平台-首页</title>
+
+    <!-- 需要引用的CSS -->
+    <link rel="shortcut icon" href="<l:asset path='platform/img/favicon.ico'/>"/>
+    <link rel="stylesheet" type="text/css" href="<l:asset path='css/bootstrap.css'/>"/>
+    <link rel="stylesheet" type="text/css" href="<l:asset path='css/font-awesome.css'/>"/>
+    <link rel="stylesheet" type="text/css" href="<l:asset path='css/ui.css'/>"/>
+    <link rel="stylesheet" type="text/css" href="<l:asset path='css/form.css'/>"/>
+    <link rel="stylesheet" type="text/css" href="<l:asset path='platform/css/home.css'/>"/>
+
+    <script type="text/javascript" src="<l:asset path='knockout.js'/>"></script>
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+    <script src="<l:asset path='html5shiv.js'/>"></script>
+    <script src="<l:asset path='respond.js'/>"></script>
+    <![endif]-->
+    <script type="text/javascript">
+        //项目上下文
+        var context = "<%=request.getContextPath()%>";
+        //获取静态资源上下文路径
+        var assetPath = "<l:assetcontext/>";
+    </script>
+</head>
+
+</head>
+<style>
+    @font-face {
+        font-family: 'dsdigit';
+        <%--src: url(<l:asset path='fonts/dsdigit.ttf'/>);--%>
+        src: url(../../skins/skin/fonts/dsdigit.ttf);
+        font-weight: 600;
+        font-style: normal
+    }
+    body{
+        font-family:Microsoft YaHei;
+    }
+    .bg{
+        margin: 0;
+        padding: 0;
+    }
+    .bg>img{
+        /*position: absolute;*/
+        top: 0;
+        left: 0;
+        width:100%;
+        display: block;
+        margin: 0;
+        padding: 0;
+    }
+    body,div{
+        margin: 0px 0px;
+        padding: 0px 0px;
+    }
+
+    .data{
+        border: 1px solid #eee;
+        margin: 10px;
+        height: 220px;
+        width: 220px;
+        margin:15px;
+        position: relative;
+    }
+    .sub-title{
+        font-size: 14px;
+        color: #aaa;
+    }
+    .title{
+        font-size: 20px;
+        font-weight:bold;
+        color:#333;
+        position: relative;
+        margin-top: 9px;
+    }
+    .data-img{
+        width: 70px;
+        height: 70px;
+        position: absolute;
+        text-align: center;
+        left: 50%;
+        margin-left: -35px;
+        border-radius: 35px;
+        border: 1px dotted darkgrey;
+        margin-top: 20px;
+    }
+    .data-img>img{
+        width: 35px;
+        height: 35px;
+        margin-top: 15px;
+    }
+    .data-ch {
+        /*font-family:Digital-7 Mono;*/
+        font-family: dsdigit;
+        color: #333744;
+        font-size: 50px;
+        font-weight: normal;
+        text-align: center;
+        margin-top: 120px;
+        cursor: pointer;
+    }
+    /*.data-ch>span{*/
+    /*    font-size:35px;*/
+    /*}*/
+
+    .data-en{
+        font-size: 10px;
+        text-align: center;
+        margin-top: 7px;
+        margin-left: 2px;
+        cursor: pointer;
+
+    }
+    .service{
+        /*border: 1px solid darkgrey;*/
+        margin: 10px;
+        height: 280px;
+        width: 300px;
+        margin: 20px;
+        background-color: #fff;
+    }
+    .service-ch{
+        /*text-align: center;*/
+        font-size: 10px;
+        color: #333;
+        margin: 20px;
+        text-indent:2em;
+        font-weight: 500;
+    }
+    .service>div:first-child{
+        width: 300px;
+        height: 150px;
+        text-align: center;
+        line-height: 150px;
+        color: #fff;
+        font-size:20px;
+    }
+    .servicedata{
+        background: url(<l:asset path='img/icon/capability_service/1.png'/>) center center;
+    }
+    .serviceserver{
+        background: url(<l:asset path='img/icon/capability_service/2.png'/>) center center;
+    }
+    .servicecloud{
+        background: url(<l:asset path='img/icon/capability_service/3.png'/>) center center;
+    }
+    .center{
+        border: 1px solid #eee;
+        margin: 20px;
+        height: 400px;
+        width: 300px;
+        position: relative;
+
+    }
+    .center-img>img{
+        width: 120px;
+        position: absolute;
+        left: 50%;
+        margin-left: -60px;
+        margin-top: 20px;
+    }
+    .center-ch{
+        font-size: 24px;
+        margin-top: 170px;
+        text-align: center;
+        font-weight: bold;
+    }
+    .center-en{
+        font-size: 10px;
+        margin-top: 20px;
+        margin-right: 10px;
+    }
+      .center-ul li{
+        list-style-type: none;
+        background: url(<l:asset path='img/icon/data_center/4.png'/>) no-repeat 0rem 0.3rem;
+        background-size: 8px 8px;
+        text-indent: 1.5em;
+         margin-left: 15px;
+          /*line-height: 30px;*/
+          margin-top: 10px;
+          /*cursor: pointer;*/
+    }
+    .center-ul>li>span{
+        float: right
+    }
+    .centermore{
+        width: 70px;
+        height: 25px;
+        background-color: #4094FB;
+        text-align: center;
+        line-height: 25px;
+        color: #fff;
+        position: absolute;
+        left: 50%;
+        margin-left: -30px;
+        margin-top: 10px;
+        cursor: pointer;
+    }
+    .type{
+        height: 200px;
+        width: 170px;
+        margin:15px;
+        position: relative;
+    }
+    .type-img{
+        width: 120px;
+        height: 120px;
+        position: absolute;
+        text-align: center;
+        left: 50%;
+        margin-left: -60px;
+        border-radius: 60px;
+        background-color: #fff;
+        margin-top: 20px;
+    }
+    .type-img>img{
+        margin-top: 15px;
+    }
+    .type-ch{
+        margin-top: 150px;
+        font-size: 18px;
+        font-weight: 600;
+        text-align: center;
+        cursor: pointer;
+
+    }
+</style>
+
+<body>
+
+<div class="bg">
+    <img src="<l:asset path='img/icon/banner.png'/>">
+</div>
+
+
+<!-- 开放数据 -->
+<div>
+    <div style="width: 100%;display: flex;flex-direction: column;align-items: center;align-content: center;padding: 10px;">
+        <div class="sub-title">Open data</div>
+        <div class="title">[开放数据]</div>
+    </div>
+    <div style="width: 100%;height: 250px;display: flex;flex-direction: row;justify-content: center;">
+        <div class="data">
+           <div class="data-img"><img  src="<l:asset path='img/icon/open_data/shujuku1.png'/>"></div>
+            <div class="data-ch">46</div>
+            <div class="data-en">数据集（个）</div>
+        </div>
+        <div class="data">
+            <div class="data-img"><img src="<l:asset path='img/icon/open_data/jiekou-(1).png'/>"></div>
+            <div class="data-ch">15</div>
+            <div class="data-en">数据接口（个）</div>
+        </div>
+        <div class="data">
+            <div class="data-img"><img src="<l:asset path='img/icon/open_data/jurassic_danju.png'/>"></div>
+            <div class="data-ch">179</div>
+            <div class="data-en">数据表（张）</div>
+        </div>
+        <div class="data">
+            <div class="data-img"><img src="<l:asset path='img/icon/open_data/shuju.png'/>"></div>
+            <div class="data-ch">101<span></span></div>
+            <div class="data-en">数据总量（亿条）</div>
+        </div>
+    </div>
+</div>
+
+
+<!-- 平台能力 -->
+<div style="background-color: #F5F5F5;">
+    <div style="width: 100%;display: flex;flex-direction: column;align-items: center;align-content: center;padding: 10px;">
+        <div class="sub-title">Capability service</div>
+        <div class="title">[开放能力]</div>
+    </div>
+    <div style="width: 100%;height: 320px;display: flex;flex-direction: row;justify-content: center;">
+        <div class="service">
+            <div class="servicedata">数据服务</div>
+            <div class="service-ch"><p>        基于省平台四大库、五大业务应用系统的数据资源，面向医疗机构、科研团体和企业等机构采用申请入驻平台管理机制，提供各专项数据集、数据表等资源的申请调阅，助力机构挖掘数据价值。
+
+            </p>
+            </div>
+        </div>
+        <div class="service">
+            <div class="serviceserver">API服务</div>
+<%--            <img src="<l:asset path='img/icon/capability_service/2.png'/>">--%>
+            <div class="service-ch">           基于省平台四大库、五大业务应用系统的数据资源，面向医疗机构、科研团体和企业等平台入驻机构提供数据API接口调用服务，满足机构数据调用需求。
+            </div>
+        </div>
+        <div class="service">
+            <div class="servicecloud">云资源服务</div>
+<%--            <img src="<l:asset path='img/icon/capability_service/3.png'/>">--%>
+            <div class="service-ch">        面向入驻机构用户提供云主机服务、关系型数据库服务和大数据服务，用户可根据自身业务需求申请云资源相关配置。
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- 数据中心 -->
+<div>
+    <div style="width: 100%;display: flex;flex-direction: column;align-items: center;align-content: center;padding: 10px;">
+        <div class="sub-title">Data center</div>
+        <div class="title">[数据中心]</div>
+    </div>
+    <div style="width: 100%;height: 450px;display: flex;flex-direction: row;justify-content: center;">
+        <div class="center">
+            <div class="center-img"><img src="<l:asset path='img/icon/data_center/1.png'/>"></div>
+            <div class="center-ch">热门数据</div>
+            <div class="center-en">
+                <ul class="center-ul">
+                    <li><a href="http://172.19.221.67/dataJson">重点专科医院</a><span>2019/10/21</span></li>
+                    <li>全员人口信息 <span>2019/10/21</span></li>
+                    <li>健康体检<span>2019/10/21</span></li>
+                    <li>居民健康档案<span>2019/10/21</span></li>
+                    <li>出生医学证明<span>2019/10/21</span></li>
+                </ul>
+<%--                <div class="centermore">查看更多</div>--%>
+            </div>
+        </div>
+        <div class="center">
+            <div class="center-img"><img src="<l:asset path='img/icon/data_center/2.png'/>"></div>
+            <div class="center-ch">最新数据</div>
+            <div class="center-en">
+                <ul class="center-ul">
+                    <li><a href="http://172.19.221.67/dataJson">重点专科医院</a><span>2019/10/21</span></li>
+                    <li>护士执业资格证书 <span>2019/10/21</span></li>
+                    <li>医疗机构执业许可证<span>2019/10/21</span></li>
+                    <li>外国医师短期行医许可证<span>2019/10/21</span></li>
+                    <li>中小学体检信息<span>2019/10/21</span></li>
+                </ul>
+<%--                <div class="centermore">查看更多</div>--%>
+            </div>
+        </div>
+        <div class="center">
+            <div class="center-img"><img src="<l:asset path='img/icon/data_center/3.png'/>"></div>
+            <div class="center-ch">热门API</div>
+            <div class="center-en">
+                <ul class="center-ul">
+                    <li>医保药品目录<span>2019/10/21</span></li>
+                    <li>社会医疗保险定点医疗机构名单 <span>2019/10/21</span></li>
+                    <li>开展健康体检服务的医疗机构<span>2019/10/21</span></li>
+                    <li>疾病预防控制中心信息<span>2019/10/21</span></li>
+                    <li>中医医院等级情况<span>2019/10/21</span></li>
+                </ul>
+<%--                <div class="centermore">查看更多</div>--%>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<!-- 数据类型 -->
+
+<div style="background-color: black;color: #FFFFFF;padding: 40px;width: 100%;display: flex;flex-direction: column;align-items: center;align-content: center;padding: 10px;">
+    <div style="margin-top: 5px;margin-bottom: 5px;">版权所有：山东省卫生健康委员会  鲁ICP备05023201号-4</div>
+    <div style="margin-top: 5px"> 技术支持：浪潮软件集团有限公司</div>
+</div>
+
+<script type="text/javascript">
+    document.getElementsByTagName("html")[0].style.fontSize = document.body.clientWidth / 1920 + "px";
+    document.documentElement.style.fontSize = document.documentElement.clientWidth / 100 + 'px';
+</script>
+<script type="text/html" id="loginTemp">
+    <li id="avatar-img">
+        <img src="<l:asset path='img/avatar.png'/>" class="img-circle">
+    </li>
+    <li class="dropdown">
+        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+            {{data.userName}} <b class="caret"></b>
+        </a>
+        <ul class="dropdown-menu" style="min-width: 100%;">
+            <li><a id="logout" href="#">退出登录</a></li>
+        </ul>
+    </li>
+</script>
+</body>
+</html>
