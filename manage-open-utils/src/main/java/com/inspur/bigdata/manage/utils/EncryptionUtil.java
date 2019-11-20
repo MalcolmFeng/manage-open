@@ -7,6 +7,7 @@ import sun.misc.BASE64Decoder;
 import sun.misc.BASE64Encoder;
 
 import java.io.IOException;
+import java.net.URLEncoder;
 import java.security.MessageDigest;
 import java.util.HashMap;
 import java.util.Map;
@@ -107,7 +108,7 @@ public class EncryptionUtil {
         try {
             Map<String, Object> params = new HashMap<>();
 //            params.put(name, value);
-            params.put("content", value);
+            params.put("content", URLEncoder.encode(value));
             HttpResponse response = HttpUtils.doGetSSL(url,params);
             if (response.getStatusLine().getStatusCode() == 200) {
                 String entity = EntityUtils.toString(response.getEntity(), "UTF-8");

@@ -546,6 +546,7 @@ public class ServiceExecuteController {
             }
             responseTime = DateUtil.getCurrentTime2();
             long serviceTime = System.currentTimeMillis() - startTime;
+            apiServiceMonitor.setServiceTotalTime((int) serviceTime);
             if (log.isDebugEnabled()) {
                 log.debug("调用api执行的时间" + (serviceTime) + "毫秒");
             }
@@ -557,7 +558,6 @@ public class ServiceExecuteController {
                         payService.subPayAccountByUserId(requestUserId, servicePrice + "");
                     }
                 }
-                apiServiceMonitor.setServiceTotalTime((int) serviceTime);
             }
             apiServiceMonitor.setResponseTime(responseTime);
             apiServiceMonitor.setCreateTime(DateUtil.getCurrentTime2());
