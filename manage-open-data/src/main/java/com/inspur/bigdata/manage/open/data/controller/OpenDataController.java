@@ -145,7 +145,7 @@ public class OpenDataController {
 		{
 			for(int i=0;i<list.size();i++)
 			{
-                groupArr.add(list.get(i).getId());
+				groupArr.add(list.get(i).getId());
 			}
 			parameters.put("groupArr",groupArr);
 			parameters.put("groupId","");
@@ -155,6 +155,32 @@ public class OpenDataController {
 
 		}
 
+		List<DataDef> dataDefs = openDataService.listDataDefs(parameters);
+		if (StringUtil.isEmpty(dataDefs)) {
+			mpMap.put("total", 0);
+			mpMap.put("data", new ArrayList<DataDef>());
+			return mpMap;
+		}
+		// 排序
+		int total = PageUtil.getTotalCount();
+		mpMap.put("total", total != -1 ? total : dataDefs.size());
+		mpMap.put("data", dataDefs);
+
+		return mpMap;
+	}
+	/**
+	 * 查询数据服务
+	 *
+	 * @param parameters
+	 * @return
+	 */
+	@RequestMapping(value = "/getDataApplyList", method = RequestMethod.POST)
+	@ResponseBody
+	public Map<String, Object> getDataApplyList(@RequestParam Map<String, Object> parameters) {
+		Map<String, Object> mpMap = new HashMap<String, Object>();
+		parameters.put("auditStatus", OpenDataConstants.data_audit_pass);
+		Map<String, Object> param=new HashMap<String,Object>();
+		List<String> groupArr=new ArrayList<String>();
 		List<DataDef> dataDefs = openDataService.listDataDefs(parameters);
 		if (StringUtil.isEmpty(dataDefs)) {
 			mpMap.put("total", 0);
