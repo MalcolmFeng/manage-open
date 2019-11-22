@@ -359,38 +359,38 @@
             <div class="directTitle">数据分类</div>
             <div class="directsubTitle dzblTitle" value="ff8080816e725c2b016e72688fd70001">电子病历</div>
             <div class="directsubTitle jkdaTitle" value="ff8080816e73cd2f016e73cd2fd30000">健康档案</div>
-            <div class="directsubTitle qyrkTitle" value="ff8080816e725c2b016e725c2b1c0000">全员人口</div>
+            <div class="directsubTitle qyrkTitle" value="ff8080816e73cd2f016e73ceab910001">全员人口</div>
             <div class="directsubTitle jczyTitle" value="ff8080816e81c020016e81c020850000">基础资源</div>
             <div class="directsubTitle dzzzTitle">电子证照</div>
             <div class="directsubTitle qtzyTitle">其他资源</div>
         </div>
         <div class="active directRight"   id="dzbl">
-            <div style="width: 90%;display: flex;flex-direction: row; flex-wrap: wrap">
-                <div class="serviceContent"><img  src="<l:asset path='img/homeicon/dzbl/mjzgh.png'/>"><div>门诊/急诊挂号</div></div>
-                <div class="serviceContent"><img  src="<l:asset path='img/homeicon/dzbl/jyjl.png'/>"><div>检验记录</div></div>
-                <div class="serviceContent"><img  src="<l:asset path='img/homeicon/dzbl/jyjgmx.png'/>"><div>检验结果明细</div></div>
-                <div class="serviceContent"><img  src="<l:asset path='img/homeicon/dzbl/jcjl.png'/>"><div>检查记录</div></div>
-                <div class="serviceContent"><img  src="<l:asset path='img/homeicon/dzbl/zy.png'/>"><div>入院记录</div></div>
-                <div class="serviceContent"><img  src="<l:asset path='img/homeicon/dzbl/tjbgd.png'/>"><div>体检报告单</div></div>
-                <div class="serviceContent"><img  src="<l:asset path='img/homeicon/dzbl/tjxmb.png'/>"><div>体检项目表</div></div>
-                <div class="serviceContent"><img  src="<l:asset path='img/homeicon/dzbl/tjxmmx.png'/>"><div>体检项目明细</div></div>
-                <div class="serviceContent"><img  src="<l:asset path='img/homeicon/dzbl/jybgd.png'/>"><div>检验报告单</div></div>
-                <div class="serviceContent"><img  src="<l:asset path='img/homeicon/dzbl/blxx.png'/>"><div>病历信息</div></div>
-                <div class="serviceContent"><img  src="<l:asset path='img/homeicon/dzbl/zybasy.png'/>"><div>住院病案首页</div></div>
-                <div class="serviceContent"><img  src="<l:asset path='img/homeicon/dzbl/cyjl.png'/>"><div>出院记录</div></div>
-                <div class="serviceContent"><img  src="<l:asset path='img/homeicon/dzbl/yzxx.png'/>"><div>住院医嘱信息</div></div>
-                <div class="serviceContent"><img  src="<l:asset path='img/homeicon/dzbl/zyfyxx.png'/>"><div>门诊 /急诊 /住院费用信息</div></div>
+            <div id="dzblContent" style="width: 90%;display: flex;flex-direction: row; flex-wrap: wrap">
+                <div class="serviceContent"><img  src="<l:asset path='img/homeicon/dzbl/1.png'/>"><div>门诊/急诊挂号</div></div>
+                <div class="serviceContent"><img  src="<l:asset path='img/homeicon/dzbl/2.png'/>"><div>检验记录</div></div>
+                <div class="serviceContent"><img  src="<l:asset path='img/homeicon/dzbl/3.png'/>"><div>检验结果明细</div></div>
+                <div class="serviceContent"><img  src="<l:asset path='img/homeicon/dzbl/4.png'/>"><div>检查记录</div></div>
+                <div class="serviceContent"><img  src="<l:asset path='img/homeicon/dzbl/5.png'/>"><div>入院记录</div></div>
+                <div class="serviceContent"><img  src="<l:asset path='img/homeicon/dzbl/6.png'/>"><div>体检报告单</div></div>
+                <div class="serviceContent"><img  src="<l:asset path='img/homeicon/dzbl/7.png'/>"><div>体检项目表</div></div>
+                <div class="serviceContent"><img  src="<l:asset path='img/homeicon/dzbl/8.png'/>"><div>体检项目明细</div></div>
+                <div class="serviceContent"><img  src="<l:asset path='img/homeicon/dzbl/9.png'/>"><div>检验报告单</div></div>
+                <div class="serviceContent"><img  src="<l:asset path='img/homeicon/dzbl/10.png'/>"><div>病历信息</div></div>
+                <div class="serviceContent"><img  src="<l:asset path='img/homeicon/dzbl/11.png'/>"><div>住院病案首页</div></div>
+                <div class="serviceContent"><img  src="<l:asset path='img/homeicon/dzbl/12.png'/>"><div>出院记录</div></div>
+                <div class="serviceContent"><img  src="<l:asset path='img/homeicon/dzbl/13.png'/>"><div>住院医嘱信息</div></div>
+                <div class="serviceContent"><img  src="<l:asset path='img/homeicon/dzbl/14.png'/>"><div>门诊 /急诊 /住院费用信息</div></div>
                 <div class="serviceContent"><div style="margin-top: 35px;">更多……</div></div>
             </div>
         </div>
         <div class="directRight  nonactive"  id="jkda" >
-            <div style="width: 90%;display: flex;flex-direction: row;flex-wrap: wrap">
-                <div class="serviceContent"><img  src="<l:asset path='img/homeicon/jkda/grjkxx.png'/>"><div>个人健康信息</div></div>
-                <div class="serviceContent"><img  src="<l:asset path='img/homeicon/jkda/jktjb.png'/>"><div>健康体检表</div></div>
-                <div class="serviceContent"><img  src="<l:asset path='img/homeicon/jkda/jzjl.png'/>"><div>接诊记录</div></div>
-                <div class="serviceContent"><img  src="<l:asset path='img/homeicon/jkda/hyjl.png'/>"><div>会诊记录</div></div>
-                <div class="serviceContent"><img  src="<l:asset path='img/homeicon/jkda/jtcy.png'/>"><div>家庭成员</div></div>
-                <div class="serviceContent"><img  src="<l:asset path='img/homeicon/jkda/jtjbxx.png'/>"><div>家庭基本信息数据</div></div>
+            <div id="jkdaContent" style="width: 90%;display: flex;flex-direction: row;flex-wrap: wrap">
+                <div class="serviceContent"><img  src="<l:asset path='img/homeicon/jkda/1.png'/>"><div>个人健康信息</div></div>
+                <div class="serviceContent"><img  src="<l:asset path='img/homeicon/jkda/2.png'/>"><div>健康体检表</div></div>
+                <div class="serviceContent"><img  src="<l:asset path='img/homeicon/jkda/3.png'/>"><div>接诊记录</div></div>
+                <div class="serviceContent"><img  src="<l:asset path='img/homeicon/jkda/4.png'/>"><div>会诊记录</div></div>
+                <div class="serviceContent"><img  src="<l:asset path='img/homeicon/jkda/5.png'/>"><div>家庭成员</div></div>
+                <div class="serviceContent"><img  src="<l:asset path='img/homeicon/jkda/6.png'/>"><div>家庭基本信息数据</div></div>
                 <div class="serviceContent"><img  src="<l:asset path='img/homeicon/jkda/7.png'/>"><div>产前检查记录表</div></div>
                 <div class="serviceContent"><img  src="<l:asset path='img/homeicon/jkda/8.png'/>"><div>新生儿访视记录表</div></div>
                 <div class="serviceContent"><img  src="<l:asset path='img/homeicon/jkda/9.png'/>"><div>儿童健康体检记录表</div></div>
@@ -403,7 +403,7 @@
             </div>
         </div>
         <div class="directRight  nonactive" id="qyrk">
-            <div style="width: 90%;display: flex;flex-direction: row; flex-wrap: wrap;">
+            <div id="qyrkContent" style="width: 90%;display: flex;flex-direction: row; flex-wrap: wrap;">
                 <div class="serviceContent"><img  src="<l:asset path='img/homeicon/qyrk/1.png'/>"><div>居民个人基本信息</div></div>
                 <div class="serviceContent"><img  src="<l:asset path='img/homeicon/qyrk/2.png'/>"><div>社保信息</div></div>
                 <div class="serviceContent"><img  src="<l:asset path='img/homeicon/qyrk/3.png'/>"><div>住房信息</div></div>
@@ -411,7 +411,7 @@
             </div>
         </div>
         <div class="directRight  nonactive" id="jczy" >
-            <div style="width: 90%;display: flex;flex-direction: row; flex-wrap: wrap">
+            <div id="jczyContent"style="width: 90%;display: flex;flex-direction: row; flex-wrap: wrap">
                 <div class="serviceContent"><img  src="<l:asset path='img/homeicon/jczy/1.png'/>"><div>区域总体情况</div></div>
                 <div class="serviceContent"><img  src="<l:asset path='img/homeicon/jczy/2.png'/>"><div>机构信息（医院、院区）</div></div>
                 <div class="serviceContent"><img  src="<l:asset path='img/homeicon/jczy/3.png'/>"><div>科室</div></div>
@@ -430,7 +430,7 @@
             </div>
         </div>
         <div class="directRight  nonactive" id="dzzz" >
-            <div style="width: 90%;display: flex;flex-direction: row; flex-wrap: wrap">
+            <div id="dzzzContent" style="width: 90%;display: flex;flex-direction: row; flex-wrap: wrap">
                 <div class="serviceContent"><img  src="<l:asset path='img/homeicon/dzzz/1.png'/>"><div>医师资格证书</div></div>
                 <div class="serviceContent"><img  src="<l:asset path='img/homeicon/dzzz/2.png'/>"><div>医师执业证书</div></div>
                 <div class="serviceContent"><img  src="<l:asset path='img/homeicon/dzzz/3.png'/>"><div>护士执业资格证书</div></div>
@@ -447,7 +447,7 @@
 
         </div>
         <div class="directRight  nonactive" id="qtzy" >
-            <div style="width: 90%;display: flex;flex-direction: row;flex-wrap: wrap">
+            <div id="qtzyContent" style="width: 90%;display: flex;flex-direction: row;flex-wrap: wrap">
                 <div class="serviceContent"><img  src="<l:asset path='img/homeicon/qt/1.png'/>"><div>食品安全企业标准备案信息</div></div>
                 <div class="serviceContent"><img  src="<l:asset path='img/homeicon/qt/2.png'/>"><div>中小学生体检信息</div></div>
                 <div class="serviceContent"><img  src="<l:asset path='img/homeicon/qt/3.png'/>"><div>药品采购信息</div></div>
@@ -516,11 +516,8 @@
     </li>
 </script>
 <script>
-
     //顶部步骤蓝切换样式变化
     $(document).on("mouseover", ".dzblTitle", function (){
-        // var obj = $(".dzblTitle");
-        // initTable(obj);
         $("#jkda,#qyrk,#jczy,#dzzz,#qtzy").css({"display":"none"});
         $("#dzbl").css({"display":"flex"});
     });
@@ -594,40 +591,51 @@
     //         }
     //     })
     // }
- //    function initTable(obj) {
- //        console.log(obj);
- //        var dataSourceId =$(obj).attr("value");
- //       var data={
- //            "params": {
- //            "javaClass": "ParameterSet",
- //                "map": {
- //                "needTotal": true,
- //                    "DATA_SOURCE_ID": dataSourceId,
- //                    "start": 0,
- //                    "limit": 10
- //            },
- //            "length": 7
- //        },
- //            "context": {
- //            "javaClass": "HashMap",
- //                "map": {},
- //            "length": 0
- //        }
- //        }
- // $.ajax({
- //     type: "post",
- //     url:  "http://172.16.12.95:7070/odmgr/command/ajax/com.inspur.od.dataSource.cmd.DataSourceQueryCmd/getReourceByDataSource",
- //     async:false,
- //     contentType:"application/json",
- //     data: JSON.stringify(data),
- //     success: function(result) {
- //         console.log(result);
- //         dataCatalog=result;
- //
- //         }
- //
- // })
- //    }
+    $(function() {
+        initTable();
+    })
+
+    function initTable( ) {
+        var obj =[$(".dzblTitle"),$(".jkdaTitle"),$(".qyrkTitle"),$(".jczyTitle")]
+        var tar =[$("#dzblContent"),$("#jkdaContent"),$("#qyrkContent"),$("#jczyContent")]
+        var img=["dzbl","jkda","qyrk","jczy"]
+        for (var i =0 ; i<4 ;i++) {
+            var dataSourceId = $(obj[i]).attr("value");
+            var data = {
+                "params": {
+                    "javaClass": "ParameterSet",
+                    "map": {
+                        "needTotal": true,
+                        "DATA_SOURCE_ID": dataSourceId,
+                        "start": 0,
+                        "limit": 10
+                    },
+                    "length": 7
+                },
+                "context": {
+                    "javaClass": "HashMap",
+                    "map": {},
+                    "length": 0
+                }
+            }
+            $.ajax({
+                type: "post",
+                url: "http://172.16.12.95:7070/odmgr/command/ajax/com.inspur.od.dataSource.cmd.DataSourceQueryCmd/getReourceByDataSource",
+                async: false,
+                contentType: "application/json",
+                data: JSON.stringify(data),
+                dataType: "json",
+                success: function (result) {
+                    result = result.rows;
+                    var html = "";
+                    for (var j = 0; j < result.length; j++) {
+                        html = html + "<div class=\"serviceContent\"><img  src='/open-portal/skins/skin/img/homeicon/"+img[i]+"/"+[j+1]+".png'><div>" + result[j].resourceName + "</div></div>\n"
+                    }
+                    $(tar[i]).empty().append(html);
+                }
+
+            })
+        } }
 </script>
 </body>
 </html>

@@ -29,7 +29,7 @@
     <script type="text/javascript" src="<l:asset path='arttemplate.js'/>" ></script>
     <script type="text/javascript" src="<l:asset path='ui.js'/>"></script>
     <script type="text/javascript" src="<l:asset path='knockout.js'/>"></script>
-    <script type="text/javascript" src="<l:asset path='data/data/getDetail.js'/>"></script>
+    <script type="text/javascript" src="<l:asset path='data/data/getDetail.js.bak1121'/>"></script>
     <script type="text/javascript" src="<l:asset path='data/data/select2.min.js'/>" ></script>
 
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->

@@ -37,6 +37,56 @@ $(document).on("click", "#returnColumns>li>label>input,#seleteAllColumnsBtn,#sel
         $("#" + resourceId).prop("checked", false);
     }
 });
+$(document).on("click", "#tableNameList>input", function () {
+    getOutParam();
+    getFilterParam();
+    var setId = $(".titleLeft option:selected").attr("data-id");
+    var setName = $(".titleLeft option:selected").text();
+    var resourceId = $(this).next().attr("data-resourceid");
+    var tableName = $(this).next().attr("data-text");
+    if ($(this).is(':checked')) {
+        if (allData.length > 0) {
+            var flag = 0;
+            for (var i = 0; i < allData.length; i++) {
+                if (setId == allData[i].setId && resourceId == allData[i].resourceId) {
+                    flag = 1;
+                }
+            }
+            if (flag == 0) {
+                var data = {
+                    setName: setName,
+                    setId: setId,
+                    tableName: tableName,
+                    resourceId: resourceId,
+                };
+                allData.push(data);
+            }
+        } else {
+            var data = {
+                setName: setName,
+                setId: setId,
+                tableName: tableName,
+                resourceId: resourceId,
+            };
+            allData.push(data);
+        }
+    }
+    else {
+            var j = 0
+            var flag = 0;
+            for (var i = 0; i < allData.length; i++) {
+                if (setId == allData[i].setId && resourceId == allData[i].resourceId) {
+                    j=i;
+                    flag = 1;
+                }
+            }
+            if (flag == 1) {
+               var index = allData.indexOf(allData[j]);
+                allData.splice(index,1);
+            }
+
+    }
+});
 $(document).on("change", "input[name=COLUMN_VALUEorNAME]", function () {
     var resourceId =$("#resourceId").val();
     getFilterParam();
@@ -60,11 +110,9 @@ $(document).on("change", ".titleLeft", function () {
     callTableData();
     $("#tableNameList>li").eq(0).click();
 
-
 });
 $(document).on("click", ".titleLeft", function () {
-    recordTable();
-    getallData();
+    // recordTable();
 });
 
 
@@ -83,11 +131,10 @@ function recordTable(){
 //切换数据集时回显之前所选的数据
 function callTableData(){
     var setId = $("#setId").val();
-    if(tableRecord.length>0){
-        console.log(dataSet);
+    if(allData.length>0){
         for (var i =0 ;i<dataSet.length ;i++){
-            for ( var j =0 ; j<tableRecord.length;j++){
-                if(setId==tableRecord[j].setId&&dataSet[i].resourceId==tableRecord[j].resourceId){
+            for ( var j =0 ; j<allData.length;j++){
+                if(setId==allData[j].setId&&dataSet[i].resourceId==allData[j].resourceId){
                     $("#" + dataSet[i].resourceId).prop("checked", true);
                 }
             }
@@ -108,30 +155,29 @@ function generateUUID() {
     });
     return uuid;
 }
-
 function getallData() {
     var setId = $(".titleLeft option:selected").attr("data-id");
     var setName =$(".titleLeft option:selected").text();
-    $('input[name="COLUNM_LEFT_LIST"]:checked').each(function(){
-        var resourceId = $(this).next().attr("data-resourceid");
-        var tableName =$(this).next().attr("data-text");
+    var resourceId = "";
+    var tableName ="";
         if(allData.length>0) {
             var flag = 0;
-            for (var i = 0; i < allData.length; i++) {
+            var i =0;
+            for ( i ; i < allData.length; i++) {
+                $('input[name="COLUNM_LEFT_LIST"]:checked').each(function(){
+                    var resourceId = $(this).next().attr("data-resourceid");
+                    var tableName =$(this).next().attr("data-text");
                 if (setId == allData[i].setId && resourceId == allData[i].resourceId) {
-                    uploadData.push(allData[i]);
+                    // uploadData.push(allData[i]);
                     flag =1;
                 }
+            })
+                  if(flag == 0){
+                var indexs = allData.indexOf(allData[i]);
+                allData.splice(indexs,1);
             }
-            if(flag = 0){
-                    var data = {
-                        setName: setName,
-                        setId: setId,
-                        tableName: tableName,
-                        resourceId: resourceId,
-                    };
-                    uploadData.push(data);
-                }
+            }
+          
         }else {
             var data = {
                 setName: setName,
@@ -139,35 +185,41 @@ function getallData() {
                 tableName: tableName,
                 resourceId: resourceId,
             };
-            uploadData.push(data);
+            if(data.resourceId!==""&&tableName!==""){
+                allData.push(data);} 
         }
-    });
 }
 
 //保存功能
 function nextstep(){
-    getallData();
-    var data ={
-        allData: uploadData,
-        comment:"药品研究所用数据资源",
-        jdbcUser:"ceshi",
-        applyId:applyId
-    }
-    $.ajax({
-        type: "post",
-        // url:'http://172.19.221.67:9071/manage-open/service/open/data/applyNew',
-        // url: "http://172.19.221.67:7070/manage-open/service/open/data/applyNew",
-        url: "http://172.16.12.95:7070/manage-open/service/open/data/applyNew",
-        data: {
-            json:JSON.stringify(data)
-        },
-        // dataType:"json",
-        success: function(result) {
-            if(result.result){
-                sticky("保存成功");
-            }
+    // getallData();
+    if (allData.length>0) {
+        var data = {
+            allData: allData,
+            comment: "药品研究所用数据资源",
+            jdbcUser: "ceshi",
+            applyId: applyId
         }
-    });
+        $.ajax({
+            type: "post",
+            // url:'http://172.19.221.67:9071/manage-open/service/open/data/applyNew',
+            // url: "http://172.19.221.67:7070/manage-open/service/open/data/applyNew",
+            url: "http://172.16.12.95:7070/manage-open/service/open/data/applyNew",
+            data: {
+                json: JSON.stringify(data)
+            },
+            // dataType:"json",
+            success: function (result) {
+                if (result.result) {
+                    sticky("保存成功");
+                }
+            }
+        });
+        return 1;
+    }else {
+        sticky("请选择表");
+        return 0;
+    }
 }
 //获取传过来的参数
 function parse(search){
@@ -178,7 +230,6 @@ function parse(search){
     for (var i=0;i<dataSetSelect.length;i++) {
         if(dataSetSelectid==dataSetSelect[i].remoteId){
             $(".titleLeft").val(dataSetSelectid);
-            // $(".titleLeft").find("option[value='dataSetSelectid']").attr("selected",true);
             // $("#setName").val(dataSetSelect[i].name);
             // $("#setId").val(dataSetSelect[i].id);
         }
@@ -190,13 +241,15 @@ function parse(search){
 
 //顶部步骤蓝切换样式变化
 $(document).on("click", "#nextBtn", function (){
-    nextstep();
-    $("#sjlb").css({"display":"none"});
-    $(".showpage").css({"display":""});
-    $(".firstStep").removeClass("activeStep");
-    $(".thirdStep").addClass("activeStep");
-    $(".firstStep").addClass("otherStep");
-    $(".thirdStep").removeClass("otherStep");
+    var returnval=nextstep();
+    if (returnval==1) {
+        $("#sjlb").css({"display": "none"});
+        $(".showpage").css({"display": ""});
+        $(".firstStep").removeClass("activeStep");
+        $(".thirdStep").addClass("activeStep");
+        $(".firstStep").addClass("otherStep");
+        $(".thirdStep").removeClass("otherStep");
+    }
 });
 
 //初始化服务列表,获取数据集
@@ -250,9 +303,6 @@ function initTableName() {
                 $("#resourceId").val(resourceId);
                 $("#tableName").val(tableName);
                 initTableCol(resourceId);
-                // console.log("initTableName","dataSet");
-                // console.log(dataSet);
-                // initSave();
             }
             else {$("#tableNameList").empty()};
         }
@@ -309,8 +359,6 @@ function callData(resourceId){
             $("#serviceSql").html(sql);
             outputParamName = eval(outputParamName);
             for (var j=0;j<outputParamName.length;j++){
-                // console.log($("label[value='outputParamName[j]']"))
-                // var selector =outputParamName[j];
                 $("label[value='"+outputParamName[j]+"']").children().prop("checked",true);
             }
         }
@@ -378,8 +426,6 @@ function initTableCol(resourceId) {
             var dataSet = eval("(" + data.json + ")");
             if (dataSet.recordSet.length > 0) {
                 existColumn=dataSet.recordSet;
-                // console.log("initTableCol","existColumn");
-                console.log(existColumn)
                 loadExistedDataItemsOzone();
             }
         }
