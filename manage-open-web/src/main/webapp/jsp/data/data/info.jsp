@@ -57,9 +57,9 @@
 							<c:if test="${apply && serviceInfo.serviceType eq '2'}">
 								<button type="button" onclick="applyDataDef('${serviceInfo.id}')" id="applyBtn">申请</button>
 							</c:if>
-							<c:if test="${serviceInfo.serviceType eq '1'}">
-								<button type="button" onclick="applyDataDef('${serviceInfo.id}')" id="downLoadBtn">下载</button>
-							</c:if>
+<%--							<c:if test="${serviceInfo.serviceType eq '1'}">--%>
+<%--&lt;%&ndash;								<button type="button" onclick="applyDataDef('${serviceInfo.id}')" id="downLoadBtn">下载</button>&ndash;%&gt;--%>
+<%--							</c:if>--%>
 						</div>
 
 					</div>
@@ -108,6 +108,8 @@
 					</c:otherwise>
 				</c:choose>
 			</div>
+			<c:if test="${serviceInfo.serviceType eq '1'}">
+				<%--								<button type="button" onclick="applyDataDef('${serviceInfo.id}')" id="downLoadBtn">下载</button>--%>
 			<div class="row" style="margin-bottom: 10px;">
 				<div class="service_info_title">文件下载</div>
 				<div>
@@ -119,6 +121,7 @@
 					</ul>
 				</div>
 			</div>
+			</c:if>
 
 <%--			<div class="row">--%>
 <%--				<div class="service_info_title">数据统计</div>--%>
