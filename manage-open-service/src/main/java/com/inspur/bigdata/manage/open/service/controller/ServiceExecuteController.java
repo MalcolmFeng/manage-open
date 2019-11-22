@@ -17,8 +17,14 @@ import com.inspur.bigdata.manage.utils.SM3;
 import com.inspur.bigdata.manage.utils.StringUtil;
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
 import net.sf.json.JSONObject;
+import org.apache.axis.AxisEngine;
 import org.apache.axis.client.Call;
 import org.apache.axis.client.Service;
+import org.apache.axis.constants.Style;
+import org.apache.axis.constants.Use;
+import org.apache.axis.description.OperationDesc;
+import org.apache.axis.description.ParameterDesc;
+import org.apache.axis.soap.SOAPConstants;
 import org.apache.axis2.client.Options;
 import org.apache.axis2.rpc.client.RPCServiceClient;
 import org.apache.commons.io.IOUtils;
@@ -65,6 +71,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import java.io.*;
 import java.math.BigDecimal;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
@@ -84,6 +92,7 @@ import static com.inspur.bigdata.manage.utils.EncryptionUtil.*;
 
 
 import javax.xml.namespace.QName;
+import javax.xml.rpc.ServiceException;
 
 import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
@@ -240,7 +249,8 @@ public class ServiceExecuteController {
                     result_str = executeAxis2(success, serviceDef, listServiceInput, new ApiServiceMonitor());
                 } else if ("RPC".equals(type)) {
 //                    result_str = executeRPC(success, serviceDef, listServiceInput);
-                    result_str = executeRPCAxis(success, serviceDef, listServiceInput, new ApiServiceMonitor());
+//                    result_str = executeRPCAxis(success, serviceDef, listServiceInput, new ApiServiceMonitor());
+                    result_str = executeRPCAxisClient(success, serviceDef, listServiceInput, new ApiServiceMonitor());
                 }
             } else {
                 result_str = doRequest(response, success,"", serviceDef, listServiceInput, new ApiServiceMonitor());
@@ -507,7 +517,8 @@ public class ServiceExecuteController {
                         result_str = executeAxis2(success, serviceDef, listServiceInput, apiServiceMonitor);
                     } else if ("RPC".equals(type)) {
 //                        result_str = executeRPC(success,serviceDef, listServiceInput);
-                        result_str = executeRPCAxis(success, serviceDef, listServiceInput, apiServiceMonitor);
+//                        result_str = executeRPCAxis(success, serviceDef, listServiceInput, apiServiceMonitor);
+                        result_str = executeRPCAxisClient(success, serviceDef, listServiceInput, apiServiceMonitor);
                     }
                 } else {
                     result_str = doRequest(response,success, instream, serviceDef, listServiceInput, apiServiceMonitor);
@@ -767,6 +778,80 @@ public class ServiceExecuteController {
         return result;
     }
 
+    private String executeRPCAxisClient(boolean success, ServiceDef ws, List<ServiceInput> serviceInputList, ApiServiceMonitor apiServiceMonitor) throws Exception {
+        JSONObject serviceInputParam = new JSONObject();
+        Object[] parameters = new Object[serviceInputList.size()];
+        Call call = initAxisClientCall(ws.getScAddr(), ws.getNameSpace(), ws.getSc_ws_function(), serviceInputList, parameters, serviceInputParam);
+        apiServiceMonitor.setServiceInput(serviceInputParam.toString());
+        String resp = (String) call.invoke(parameters);
+        return resp;
+    }
+
+    /**
+     * 初始化Call
+     *
+     * @param address           调用地址
+     * @param namespaceURI      命名空间地址
+     * @param localPart         方法名
+     * @param serviceInputList  入参List
+     * @param parameters        webservice调用参数
+     * @param serviceInputParam monitor记录入参信息
+     * @return
+     * @throws ServiceException
+     * @throws MalformedURLException
+     */
+    private static Call initAxisClientCall(String address, String namespaceURI, String localPart, List<ServiceInput> serviceInputList,
+                                           Object[] parameters, JSONObject serviceInputParam) throws ServiceException, MalformedURLException {
+        Service service = new Service();
+        Call call = null;
+        call = (Call) service.createCall();
+        call.setTargetEndpointAddress(new URL(address));
+        call.setOperation(initAxisClientOperation(namespaceURI, localPart, localPart, serviceInputList, parameters, serviceInputParam));
+        call.setUseSOAPAction(true);
+        call.setSOAPActionURI(namespaceURI + localPart);
+        call.setEncodingStyle(null);
+        call.setProperty(Call.SEND_TYPE_ATTR, Boolean.FALSE);
+        call.setProperty(AxisEngine.PROP_DOMULTIREFS, Boolean.FALSE);
+        call.setSOAPVersion(SOAPConstants.SOAP11_CONSTANTS);
+        call.setOperationName(new QName(namespaceURI, localPart));
+        return call;
+    }
+
+    /**
+     * 初始化服务描述
+     *
+     * @param namespaceURI      命名空间地址
+     * @param localPart         方法名
+     * @param returnName        ReturnQName，暂时写为方法名也能调通
+     * @param serviceInputList
+     * @param parameters
+     * @param serviceInputParam
+     * @return
+     */
+    private static OperationDesc initAxisClientOperation(String namespaceURI, String localPart, String returnName, List<ServiceInput> serviceInputList,
+                                                         Object[] parameters, JSONObject serviceInputParam) {
+        OperationDesc oper;
+        ParameterDesc param;
+        oper = new OperationDesc();
+        oper.setName(localPart);
+        int j = 0;
+        //取出所有的入参并赋值
+        for (ServiceInput in : serviceInputList) {
+            param = new ParameterDesc(new QName(namespaceURI, in.getScName()),
+                    ParameterDesc.IN, new QName(namespaceURI, "string"), String.class, false, false);
+            param.setOmittable(true);
+            oper.addParameter(param);
+            parameters[j++] = in.getValue();
+            serviceInputParam.put(in.getScName(), in.getValue());
+        }
+        //暂时只支持string格式的返回值
+        oper.setReturnType(new QName(namespaceURI, "string"));
+        oper.setReturnClass(String.class);
+        oper.setReturnQName(new QName(namespaceURI, returnName));
+        oper.setStyle(Style.WRAPPED);
+        oper.setUse(Use.LITERAL);
+        return oper;
+    }
 
     public static String getResults(OMElement element) {
         if (element == null) {
