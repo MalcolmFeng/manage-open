@@ -226,6 +226,8 @@
 					<div class="col-xs-10 col-md-10 text-left radio" style="margin-top: 5px;">
 						<label><input type="radio" name="scFrame" value="RPC"  nullmsg="必填" <c:if test="${serviceDef.scFrame eq 'RPC' }"> checked="checked"</c:if>/>RPC</label>
 						<label><input type="radio" name="scFrame" value="Axiom"  nullmsg="必填" <c:if test="${serviceDef.scFrame eq 'Axiom' }"> checked="checked"</c:if>/>Axiom</label>
+                        <label><input type="radio" name="scFrame" value="RPCAxis" nullmsg="必填" <c:if
+                                test="${serviceDef.scFrame eq 'RPCAxis' }"> checked="checked"</c:if>/>RPCAxis</label>
 						<span class="Validform_checktip"></span>
 					</div>
 				</div>

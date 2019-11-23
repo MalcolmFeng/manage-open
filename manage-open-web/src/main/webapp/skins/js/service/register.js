@@ -268,7 +268,11 @@ var register = {
 
 
         // serviceInfo.scProtocol = $('input[name=serviceProtocol]:checked').val();//后端请求协议
-        serviceInfo.scProtocol = "http";//后端请求协议
+        // serviceInfo.scProtocol = "http";//后端请求协议
+        serviceInfo.scProtocol = $('input[name=scProtocol]:checked').val();//请求协议
+        serviceInfo.scFrame = $('input[name=scFrame]:checked').val();//框架
+        serviceInfo.sc_ws_function = $('#sc_ws_function').val();//请求方法名
+        serviceInfo.nameSpace = $("#sc_ws_namespace").val();//命名空间
         serviceInfo.scAddr = $('#serviceAddr').val();//后端服务地址
         serviceInfo.scHttpMethod = $('#serviceHttpMethod').val();//后端httpMethod
         serviceInfo.contentType = $('#responseContentType').val();//返回ContentType

@@ -519,6 +519,8 @@ public class ServiceExecuteController {
 //                        result_str = executeRPC(success,serviceDef, listServiceInput);
 //                        result_str = executeRPCAxis(success, serviceDef, listServiceInput, apiServiceMonitor);
                         result_str = executeRPCAxisClient(success, serviceDef, listServiceInput, apiServiceMonitor);
+                    } else if ("RPCAxis".equals(type)) {
+                        result_str = executeRPCAxis(success, serviceDef, listServiceInput, apiServiceMonitor);
                     }
                 } else {
                     result_str = doRequest(response,success, instream, serviceDef, listServiceInput, apiServiceMonitor);
