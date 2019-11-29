@@ -53,6 +53,23 @@
                 `create_time`
     </sql>
 
+    <sql id="Monitor_List">
+                `id`,
+                `api_service_id`,
+                `api_service_name`,
+                `open_service_request_url`,
+                `result`,
+                `caller_ip`,
+                `caller_app_id`,
+                `caller_user_id`,
+                `request_time`,
+                `response_time`,
+                `service_total_time`,
+                `notes`,
+                `create_time`
+    </sql>
+
+
     <insert id="insert" useGeneratedKeys="true" keyColumn="id"
             parameterType="com.inspur.bigdata.manage.open.service.data.ApiServiceMonitor">
         INSERT INTO api_service_monitor
@@ -255,6 +272,49 @@
     <select id="query" resultMap="BaseResultMap" parameterType="map">
         SELECT
         <include refid="Base_Column_List"/>
+        FROM api_service_monitor WHERE 1=1
+        <if test="null != id and '' != id">and id = #{id}</if>
+        <if test="null != apiServiceId and '' != apiServiceId">and api_service_id = #{apiServiceId}</if>
+        <if test="null != apiServiceName and '' != apiServiceName">and api_service_name like '%${apiServiceName}%'</if>
+        <if test="null != openServiceRequestURL and '' != openServiceRequestURL">
+            and open_service_request_url = #{openServiceRequestURL}
+        </if>
+        <if test="null != openServiceRequestURLLike and '' != openServiceRequestURLLike">
+            and open_service_request_url like '%${openServiceRequestURL}%'
+        </if>
+        <if test="null != openServiceInput and '' != openServiceInput">and open_service_input = #{openServiceInput}</if>
+        <if test="null != openServiceInputHeader and '' != openServiceInputHeader">and open_service_input_header =
+            #{openServiceInputHeader}
+        </if>
+        <if test="null != openServiceOutput and '' != openServiceOutput">and open_service_output =
+            #{openServiceOutput}
+        </if>
+        <if test="null != openServiceMethod and '' != openServiceMethod">and open_service_method =
+            #{openServiceMethod}
+        </if>
+        <if test="null != serviceInput and '' != serviceInput">and service_input = #{serviceInput}</if>
+        <if test="null != serviceInputHeader and '' != serviceInputHeader">and open_service_input_header =
+            #{serviceInputHeader}
+        </if>
+        <if test="null != serviceOutput and '' != serviceOutput">and service_output = #{serviceOutput}</if>
+        <if test="null != serviceMethod and '' != serviceMethod">and service_method = #{serviceMethod}</if>
+        <if test="null != result and '' != result">and result = #{result}</if>
+        <if test="null != callerIp and '' != callerIp">and caller_ip = #{callerIp}</if>
+        <if test="null != callerAppId and '' != callerAppId">and caller_app_id = #{callerAppId}</if>
+        <if test="null != callerUserId and '' != callerUserId">and caller_user_id = #{callerUserId}</if>
+        <if test="null != requestTime and '' != requestTime">and request_time = #{requestTime}</if>
+        <if test="null != responseTime and '' != responseTime">and response_time = #{responseTime}</if>
+        <if test="null != serviceTotalTime and '' != serviceTotalTime">and service_total_time = #{serviceTotalTime}</if>
+        <if test="null != notes and '' != notes">and notes = #{notes}</if>
+        <if test="null != createTime and '' != createTime">and create_time = #{createTime}</if>
+        <if test="null != startTime and '' != startTime">and request_time > #{startTime}</if>
+        <if test="null != endTime and '' != endTime">and request_time <![CDATA[ <= ]]> #{endTime}</if>
+        ORDER BY request_time DESC
+    </select>
+
+    <select id="queryList" resultMap="BaseResultMap" parameterType="map">
+        SELECT
+        <include refid="Monitor_List"/>
         FROM api_service_monitor WHERE 1=1
         <if test="null != id and '' != id">and id = #{id}</if>
         <if test="null != apiServiceId and '' != apiServiceId">and api_service_id = #{apiServiceId}</if>

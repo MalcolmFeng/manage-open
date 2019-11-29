@@ -49,6 +49,8 @@ public interface ServiceMonitorMapper extends EntityMapper<ApiServiceMonitor> {
     @Override
     List<ApiServiceMonitor> query(Map param);
 
+    List<ApiServiceMonitor> queryList(Map param);
+
     List<Map<String, String>> getAllCount();
 
     List<Map<String, String>> getDayCount(Map<String, String> map);

@@ -201,7 +201,8 @@ public class ServiceMonitorImpl implements IServiceMonitorService {
                 parameters.put("callerUserId", userId);
             }
         }
-        List<ApiServiceMonitor> ApiServiceMonitors = serviceMonitorService.query(parameters);
+//        List<ApiServiceMonitor> ApiServiceMonitors = serviceMonitorService.query(parameters);
+        List<ApiServiceMonitor> ApiServiceMonitors = serviceMonitorMapper.queryList(parameters);
         if (StringUtil.isEmpty(ApiServiceMonitors)) {
             mpMap.put("total", 0);
             mpMap.put("data", new ArrayList<ApiServiceMonitor>());

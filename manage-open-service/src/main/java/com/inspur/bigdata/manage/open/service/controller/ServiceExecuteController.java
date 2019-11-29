@@ -222,7 +222,15 @@ public class ServiceExecuteController {
             }
             for (Object key : json.keySet()) {
                 if (serviceInput.getName().equals(String.valueOf(key))) {
-                    String value = URLDecoder.decode(String.valueOf(json.get(key)));
+                    String value = null;
+                    try {
+                        value = URLDecoder.decode(String.valueOf(json.get(key)), "UTF-8");
+                    } catch (UnsupportedEncodingException e) {
+                        Map<String, Object> result = new HashMap<String, Object>();
+                        result.put("result", false);
+                        result.put("info", e.getMessage());
+                        return result;
+                    }
                     if (StringUtil.isNotEmpty(value)) serviceInput.setValue(value);
                     break;
                 }
@@ -251,6 +259,8 @@ public class ServiceExecuteController {
 //                    result_str = executeRPC(success, serviceDef, listServiceInput);
 //                    result_str = executeRPCAxis(success, serviceDef, listServiceInput, new ApiServiceMonitor());
                     result_str = executeRPCAxisClient(success, serviceDef, listServiceInput, new ApiServiceMonitor());
+                } else if ("RPCAxis".equals(type)) {
+                    result_str = executeRPCAxis(success, serviceDef, listServiceInput, new ApiServiceMonitor());
                 }
             } else {
                 result_str = doRequest(response, success,"", serviceDef, listServiceInput, new ApiServiceMonitor());
@@ -507,8 +517,14 @@ public class ServiceExecuteController {
                     urlTarget = httpUrlBuffer(serviceDef, listServiceInput, apiServiceMonitor);
                     success = true;
                     response.sendRedirect( urlTarget );
+                    apiServiceMonitor.setResult(ASM_SUCCESS);
                 }catch (Exception e){
                     log.error(e.getMessage());
+                    Map<String, Object> errorResult = new HashMap<String, Object>();
+                    errorResult.put("error", "执行服务出错");
+                    errorResult.put("error_description", e.getMessage());
+                    apiServiceMonitor.setNotes(String.valueOf(errorResult));
+                    apiServiceMonitor.setResult(ASM_ERROR_UNKNOWN);
                 }
             }else{
                 if (serviceDef.getScProtocol().equals("webService")) {
