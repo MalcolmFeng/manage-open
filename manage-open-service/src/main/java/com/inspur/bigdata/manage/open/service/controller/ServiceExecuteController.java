@@ -8,6 +8,7 @@ import com.inspur.bigdata.manage.open.service.data.*;
 import com.inspur.bigdata.manage.open.service.pay.data.PayAccountCapital;
 import com.inspur.bigdata.manage.open.service.pay.service.IPayService;
 import com.inspur.bigdata.manage.open.service.service.*;
+import com.inspur.bigdata.manage.open.service.util.AxisClientUtil;
 import com.inspur.bigdata.manage.open.service.util.apimonitor.ApiServiceMonitorUtil;
 import com.inspur.bigdata.manage.open.service.util.OpenServiceConstants;
 import com.inspur.bigdata.manage.open.service.util.sign.*;
@@ -29,6 +30,7 @@ import org.apache.axis2.client.Options;
 import org.apache.axis2.rpc.client.RPCServiceClient;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.cxf.jaxws.endpoint.dynamic.JaxWsDynamicClientFactory;
 import org.apache.http.Header;
 import org.apache.http.HeaderElement;
 import org.apache.http.HttpEntity;
@@ -87,6 +89,8 @@ import java.util.concurrent.Executors;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static com.inspur.bigdata.manage.open.service.util.NetworkUtil.isHostConnectable;
+import static com.inspur.bigdata.manage.open.service.util.NetworkUtil.isReachableByPing;
 import static com.inspur.bigdata.manage.open.service.util.OpenServiceConstants.*;
 import static com.inspur.bigdata.manage.open.service.util.apimonitor.ApiServiceMonitorThread.getNcpu;
 import static com.inspur.bigdata.manage.utils.EncryptionUtil.*;
@@ -262,6 +266,10 @@ public class ServiceExecuteController {
                     result_str = executeRPCAxisClient(success, serviceDef, listServiceInput, new ApiServiceMonitor());
                 } else if ("RPCAxis".equals(type)) {
                     result_str = executeRPCAxis(success, serviceDef, listServiceInput, new ApiServiceMonitor());
+                } else if ("CXF".equals(type)) {
+                    result_str = callCxfByService(success, serviceDef, listServiceInput, new ApiServiceMonitor());
+                } else if ("RPCAxis2".equals(type)) {
+                    result_str = AxisClientUtil.executeRPCAxisClient(success, serviceDef, listServiceInput, new ApiServiceMonitor());
                 }
             } else {
                 result_str = doRequest(response, success,"", serviceDef, listServiceInput, new ApiServiceMonitor());
@@ -544,7 +552,13 @@ public class ServiceExecuteController {
 //                        result_str = executeRPCAxis(success, serviceDef, listServiceInput, apiServiceMonitor);
                         result_str = executeRPCAxisClient(success, serviceDef, listServiceInput, apiServiceMonitor);
                     } else if ("RPCAxis".equals(type)) {
+                        //todo:赤峰市医院和赤峰第二医院使用，后续更新到RPCAxis2
                         result_str = executeRPCAxis(success, serviceDef, listServiceInput, apiServiceMonitor);
+                    } else if ("CXF".equals(type)) {
+                        result_str = callCxfByService(success, serviceDef, listServiceInput, apiServiceMonitor);
+                    } else if ("RPCAxis2".equals(type)) {
+                        //todo:阿鲁科尔沁旗中医院预约挂号接口
+                        result_str = AxisClientUtil.executeRPCAxisClient(success, serviceDef, listServiceInput, apiServiceMonitor);
                     }
                 } else {
                     System.out.println(logId+" ---- "+new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()) +" ---- "+ "8.doRequest开始");
@@ -865,7 +879,7 @@ public class ServiceExecuteController {
         //取出所有的入参并赋值
         for (ServiceInput in : serviceInputList) {
             param = new ParameterDesc(new QName(namespaceURI, in.getScName()),
-                    ParameterDesc.IN, new QName(namespaceURI, "string"), String.class, false, false);
+                    ParameterDesc.IN, new QName("http://www.w3.org/2001/XMLSchema", "string"), String.class, false, false);
             param.setOmittable(true);
             oper.addParameter(param);
             parameters[j++] = in.getValue();
@@ -1053,14 +1067,12 @@ public class ServiceExecuteController {
             }
             paramsTypeMap.put(paramsName,paramsType);
         }
-
         int timeout = 30000;
         String method = serviceDef.getScHttpMethod().toUpperCase();
         String result = null;
         apiServiceMonitor.setServiceInput(serviceInputParam.toString());
         apiServiceMonitor.setServiceInputHeader(JSONObject.fromObject(headerMap).toString());
         apiServiceMonitor.setServiceMethod(method);
-        System.out.println("请其头为:" + JSONObject.fromObject(headerMap).toString());
         switch (method) {
             case "GET":
                 System.out.println(apiServiceMonitor.getId()+" ---- "+new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()) +" ---- "+ "11.执行get转发开始");
@@ -1547,4 +1559,55 @@ public class ServiceExecuteController {
         return sc;
     }
 
+    protected String callCxfByService(boolean success, ServiceDef ws, List<ServiceInput> serviceInputList, ApiServiceMonitor apiServiceMonitor) throws Exception {
+        JSONObject serviceInputParam = new JSONObject();
+        ServiceInput input = serviceInputList.get(0);
+        serviceInputParam.put(input.getScName(), input.getValue());
+        apiServiceMonitor.setServiceInput(serviceInputParam.toString());
+        return callCxf(ws.getScAddr(), ws.getNameSpace(), ws.getSc_ws_function(), input.getValue() == null ? "" : String.valueOf(input.getValue()));
+    }
+
+    public static String callCxf(String wsdl, String namespaceURI, String localPart, String xmlStr) throws Exception {
+        System.out.println("wsdl = [" + wsdl + "], namespaceURI = [" + namespaceURI + "], localPart = [" + localPart + "], xmlStr = [" + xmlStr + "]");
+        JaxWsDynamicClientFactory dcf = JaxWsDynamicClientFactory.newInstance();
+        org.apache.cxf.endpoint.Client client = dcf.createClient(wsdl);
+        // url为调用webService的wsdl地址
+        QName name = new QName(namespaceURI, localPart);
+        // namespace是命名空间，methodName是方法名
+        // paramvalue为参数值
+        Object[] objects;
+        objects = client.invoke(name, xmlStr);
+        return objects[0].toString();
+    }
+
+    @RequestMapping("/testWebserviceByCxf")
+    @ResponseBody
+    public String testWebserviceByCxf(HttpServletRequest request) {
+        try {
+            String wsdlUrl = request.getParameter("wsdlUrl");
+            String namespaceURI = request.getParameter("namespaceURI");
+            String localPart = request.getParameter("localPart");
+            String xmlStr = request.getParameter("xmlStr");
+            return callCxf(wsdlUrl, namespaceURI, localPart, xmlStr);
+        } catch (Exception e) {
+            log.error("\n-------CXF TEST FALSE :\n" + e.getMessage());
+            return "CXF TEST FALSE :\n" + e.getMessage();
+        }
+    }
+
+    @RequestMapping("/testHostAndPort")
+    @ResponseBody
+    public String testHostAndPort(HttpServletRequest request) {
+        String ping = request.getParameter("ping");
+        String host = request.getParameter("host");
+        if (StringUtil.isNotEmpty(ping)) {
+            return "" + isReachableByPing(host);
+        } else {
+            String port = request.getParameter("port");
+            if (StringUtil.isEmpty(port)) {
+                port = "80";
+            }
+            return "" + isHostConnectable(host, port);
+        }
+    }
 }
