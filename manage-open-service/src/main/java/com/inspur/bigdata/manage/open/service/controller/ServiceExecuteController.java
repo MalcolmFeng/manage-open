@@ -80,6 +80,7 @@ import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -305,6 +306,7 @@ public class ServiceExecuteController {
         ApiServiceMonitor apiServiceMonitor = new ApiServiceMonitor();
         String logId = UUIDGenerator.getUUID();
         apiServiceMonitor.setId(logId);
+        System.out.println(logId+" ---- "+new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()) +" ---- "+ "1.接受请求");
         try {
             /**获取请求者IP*/
             String requestIp = ApiServiceMonitorUtil.getClientIp(request);
@@ -336,6 +338,7 @@ public class ServiceExecuteController {
                 apiServiceMonitor.setResult(ASM_ERROR_IP_REFUSE);
                 return;
             }
+            System.out.println(logId+" ---- "+new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()) +" ---- "+ "2.IP黑名单校验结束");
             //  ---------------- IP黑名单 end ----------------
 
 
@@ -379,6 +382,7 @@ public class ServiceExecuteController {
             requestUserId = appList.get(0).getUserId();
             apiServiceMonitor.setCallerAppId(appId);
             apiServiceMonitor.setCallerUserId(requestUserId);
+            System.out.println(logId+" ---- "+new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()) +" ---- "+ "3.查询应用信息结束");
             // ---------------- 查询APP end ----------------
 
 
@@ -391,6 +395,7 @@ public class ServiceExecuteController {
                 apiServiceMonitor.setResult(ASM_ERROR_SIGNATURE);
                 return;
             }
+            System.out.println(logId+" ---- "+new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()) +" ---- "+ "4.验证签名结束");
             // ---------------- 判断签名正确性 end ----------------
 
 
@@ -413,6 +418,7 @@ public class ServiceExecuteController {
                 apiServiceMonitor.setResult(ASM_ERROR_SERVICE_NO_PASS);
                 return;
             }
+            System.out.println(logId+" ---- "+new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()) +" ---- "+ "5.API是否存在和状态结束");
             // ----------------通过context,reqPath关联查询API是否存在和状态 end ----------------
 
 
@@ -460,6 +466,7 @@ public class ServiceExecuteController {
                     }
                 }
             }
+            System.out.println(logId+" ---- "+new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()) +" ---- "+ "6.判断余额结束");
             // ---------------- 余额判断 end ----------------
 
 
@@ -484,6 +491,7 @@ public class ServiceExecuteController {
                 apiServiceMonitor.setResult(ASM_ERROR_PARAMETER);
                 return;
             }
+            System.out.println(logId+" ---- "+new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()) +" ---- "+ "7.入参初始化结束");
             // ---------------- 入参初始化 end ----------------
 
 
@@ -539,6 +547,7 @@ public class ServiceExecuteController {
                         result_str = executeRPCAxis(success, serviceDef, listServiceInput, apiServiceMonitor);
                     }
                 } else {
+                    System.out.println(logId+" ---- "+new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()) +" ---- "+ "8.doRequest开始");
                     result_str = doRequest(response,success, instream, serviceDef, listServiceInput, apiServiceMonitor);
                 }
                 response.addHeader("Content-Type", OpenServiceConstants.getContentType(serviceDef.getContentType()));
@@ -1012,7 +1021,9 @@ public class ServiceExecuteController {
             String paramPositionType = serviceInput.getScParamType();
 
             // 入参解密
+            System.out.println(apiServiceMonitor.getId()+" ---- "+new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()) +" ---- "+ "9.解密开始");
             Object decryptedParam = decryptedParam(serviceInput, serviceDef.getEncryptionType());
+            System.out.println(apiServiceMonitor.getId()+" ---- "+new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()) +" ---- "+ "10.解密结束");
             if (decryptedParam!=null){
                 serviceInputParam.put(paramsName, decryptedParam.toString());
             }
@@ -1052,10 +1063,14 @@ public class ServiceExecuteController {
         System.out.println("请其头为:" + JSONObject.fromObject(headerMap).toString());
         switch (method) {
             case "GET":
+                System.out.println(apiServiceMonitor.getId()+" ---- "+new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()) +" ---- "+ "11.执行get转发开始");
                 result = execGet(dataType,response,success, httpurl.toString(), timeout, headerMap,paramsMap,listServiceInput);
+                System.out.println(apiServiceMonitor.getId()+" ---- "+new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()) +" ---- "+ "12.执行post转发结束");
                 break;
             case "POST":
+                System.out.println(apiServiceMonitor.getId()+" ---- "+new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()) +" ---- "+ "11.执行post转发开始");
                 result = execPost(dataType,response,success, instream, scType, httpurl.toString(), timeout, headerMap, paramsMap, paramsTypeMap,listServiceInput);
+                System.out.println(apiServiceMonitor.getId()+" ---- "+new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()) +" ---- "+ "12.执行post转发结束");
                 break;
             default:
                 result = "{error:404}";
@@ -1063,6 +1078,7 @@ public class ServiceExecuteController {
         apiServiceMonitor.setServiceOutput(result);
 
         result = encryptionResult(result, serviceDef.getEncryptionType());
+        System.out.println(apiServiceMonitor.getId()+" ---- "+new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()) +" ---- "+ "13.执行结束");
         return result;
     }
 
@@ -1115,8 +1131,6 @@ public class ServiceExecuteController {
         apiServiceMonitor.setServiceInput(serviceInputParam.toString());
         apiServiceMonitor.setServiceInputHeader(JSONObject.fromObject(header).toString());
         apiServiceMonitor.setServiceMethod(serviceDef.getScHttpMethod().toUpperCase());
-
-        System.out.println("请其头为:" + JSONObject.fromObject(header).toString());
         return httpurl.toString();
     }
 
@@ -1160,6 +1174,7 @@ public class ServiceExecuteController {
         }
         // 赋值后进行参数级加解密
         serviceInput.setValue(decryptedParamStr);
+
         return decryptedParam_paramLevel(serviceInput);
     }
 
@@ -1291,7 +1306,6 @@ public class ServiceExecuteController {
         httpGet.setConfig(requestConfig);
         if (StringUtil.isNotEmpty(headersMap)) {
             for (String key : headersMap.keySet()) {
-                System.out.println("赋值head："+key+"  "+headersMap.get(key));
                 httpGet.addHeader(key, headersMap.get(key));
             }
         }

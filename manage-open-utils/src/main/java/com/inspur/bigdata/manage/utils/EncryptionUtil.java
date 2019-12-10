@@ -104,7 +104,6 @@ public class EncryptionUtil {
     }
 
     private static String crypt(String url, String name, String value) {
-        System.out.println("开始执行加解密。。。");
         try {
             Map<String, Object> params = new HashMap<>();
 //            params.put(name, value);
@@ -112,11 +111,10 @@ public class EncryptionUtil {
             HttpResponse response = HttpUtils.doGetSSL(url,params);
             if (response.getStatusLine().getStatusCode() == 200) {
                 String entity = EntityUtils.toString(response.getEntity(), "UTF-8");
-                System.out.println("解密后结果："+ entity);
                 return entity;
             }
         } catch (Exception e) {
-            System.out.println(e.toString());
+            System.out.println("参数Rest解密异常：" + e.toString());
         }
         return null;
     }
