@@ -28,8 +28,8 @@
   <security-constraint>
     <web-resource-collection>
       <web-resource-name>All Resources</web-resource-name>
-      <url-pattern>/service/*</url-pattern>
-      <url-pattern>*.jsp</url-pattern>
+<!--      <url-pattern>/service/*</url-pattern>-->
+<!--      <url-pattern>*.jsp</url-pattern>-->
     </web-resource-collection>
     <auth-constraint>
       <role-name>*</role-name>
