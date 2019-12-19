@@ -1,12 +1,4 @@
-//{
-//  "realm": "indata",
-//  "auth-server-url": "http://10.111.24.95:19080/auth",
-//  "ssl-required": "none",
-//  "resource": "manage-open",
-//  "public-client": true
-//}
 
-// pro
 {
   "realm": "realm2959",
   "auth-server-url": "http://172.19.221.1:19080/auth",

@@ -279,6 +279,19 @@
             <version>2.3.28</version>
         </dependency>
 
+        <!-- https://mvnrepository.com/artifact/org.apache.axis2/axis2-transport-http -->
+        <dependency>
+            <groupId>org.apache.axis2</groupId>
+            <artifactId>axis2-transport-http</artifactId>
+            <version>1.7.9</version>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/commons-logging/commons-logging -->
+        <dependency>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+            <version>1.1.1</version>
+        </dependency>
 
     </dependencies>
 

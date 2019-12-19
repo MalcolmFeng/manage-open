@@ -10,6 +10,7 @@ import com.inspur.bigdata.manage.open.service.pay.service.IPayService;
 import com.inspur.bigdata.manage.open.service.service.*;
 import com.inspur.bigdata.manage.open.service.util.apimonitor.ApiServiceMonitorUtil;
 import com.inspur.bigdata.manage.open.service.util.OpenServiceConstants;
+import com.inspur.bigdata.manage.open.service.util.http.HttpDelete;
 import com.inspur.bigdata.manage.open.service.util.sign.*;
 import com.inspur.bigdata.manage.open.service.util.signconstants.Constants;
 import com.inspur.bigdata.manage.utils.OpenDataConstants;
@@ -38,6 +39,7 @@ import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpPut;
 import org.apache.http.config.Registry;
 import org.apache.http.config.RegistryBuilder;
 import org.apache.http.conn.socket.ConnectionSocketFactory;
@@ -1072,6 +1074,16 @@ public class ServiceExecuteController {
                 result = execPost(dataType,response,success, instream, scType, httpurl.toString(), timeout, headerMap, paramsMap, paramsTypeMap,listServiceInput);
                 System.out.println(apiServiceMonitor.getId()+" ---- "+new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()) +" ---- "+ "12.执行post转发结束");
                 break;
+            case "DELETE":
+                System.out.println(apiServiceMonitor.getId() + " ---- " + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()) + " ---- " + "11.执行DELETE转发开始");
+                result = execDelete(dataType, response, success, instream, scType, httpurl.toString(), timeout, headerMap, paramsMap, paramsTypeMap, listServiceInput);
+                System.out.println(apiServiceMonitor.getId() + " ---- " + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()) + " ---- " + "12.执行DELETE转发结束");
+                break;
+            case "PUT":
+                System.out.println(apiServiceMonitor.getId() + " ---- " + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()) + " ---- " + "11.执行put转发开始");
+                result = execPut(dataType, response, success, instream, scType, httpurl.toString(), timeout, headerMap, paramsMap, paramsTypeMap, listServiceInput);
+                System.out.println(apiServiceMonitor.getId() + " ---- " + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()) + " ---- " + "12.执行put转发结束");
+                break;
             default:
                 result = "{error:404}";
         }
@@ -1545,6 +1557,190 @@ public class ServiceExecuteController {
         };
         sc.init(null, new TrustManager[]{trustManager}, null);
         return sc;
+    }
+
+    /**
+     * Delete方法访问URL
+     *
+     * @param url
+     * @param timeout
+     * @return
+     */
+
+    public static String execDelete(String dataType, HttpServletResponse responseOut, boolean success, String instream, String scType, String url, int timeout, Map<String, String> headersMap, Map<String, Object> paramsMap, Map<String, Object> paramsType, List<ServiceInput> serviceInputList) throws IOException {
+        // 创建请求对象，进行初始化设置
+        HttpDelete httpDelete = new HttpDelete(url);
+        RequestConfig requestConfig = RequestConfig.custom().setSocketTimeout(timeout).setConnectTimeout(timeout).build();//设置请求和传输超时时间
+        httpDelete.setConfig(requestConfig);
+
+        // 赋值请求头
+        if (StringUtil.isNotEmpty(headersMap)) {
+            for (String key : headersMap.keySet()) {
+                httpDelete.addHeader(key, headersMap.get(key));
+            }
+        }
+
+        // 如果参数不为空
+        File file = null;
+        if (paramsMap.size() > 0) {
+            // 复杂Entity构造器
+            MultipartEntityBuilder entityBuilder = MultipartEntityBuilder.create();
+
+            // 遍历Query参数，赋值到 entityBuilder
+            for (Map.Entry<String, Object> entry : paramsMap.entrySet()) {
+                //添加普通参数
+                if (paramsType.get(entry.getKey()).equals(SC_TYPE_FILE)) {
+                    //添加上传的文件
+                    MultipartFile mulFile = (MultipartFile) entry.getValue();
+                    String fileName = mulFile.getOriginalFilename();
+                    file = asFile(mulFile.getInputStream(), fileName);
+                    entityBuilder.addPart(entry.getKey(), new FileBody(file));
+                } else {
+                    entityBuilder.addTextBody(entry.getKey(), (String) entry.getValue());
+                }
+            }
+            HttpEntity httpEntity = entityBuilder.build();
+            httpDelete.setEntity(httpEntity);
+
+        } else if (StringUtils.isNotEmpty(instream)) {
+            switch (scType) {
+                case OpenServiceConstants.SC_TYPE_APPLICATION_JSON:
+                    httpDelete.addHeader("Content-Type", OpenServiceConstants.content_type_json);
+                    break;
+                case OpenServiceConstants.SC_TYPE_TEXT_XML:
+                    httpDelete.addHeader("Content-Type", OpenServiceConstants.content_type_text_xml);
+                    break;
+                default:
+                    httpDelete.addHeader("Content-Type", "text/plain");
+                    break;
+            }
+            try {
+                httpDelete.setEntity(new StringEntity(instream, "utf-8"));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        // 执行请求
+        String result = "";
+        try {
+            final CloseableHttpClient httpclient = createCloseableHttpClient(url);
+            final CloseableHttpResponse response = httpclient.execute(httpDelete);
+            // 请求成功
+            if (response.getStatusLine().getStatusCode() == 200) {
+                success = true;
+            }
+            // 响应Entity
+            HttpEntity entity = response.getEntity();
+            if (StringUtils.equals(dataType, "binary")) {
+                createResponseFile(headersMap, responseOut, response, entity, serviceInputList);
+            } else {
+                result = EntityUtils.toString(entity, "utf-8");
+            }
+            EntityUtils.consume(entity);
+        } catch (Exception e) {
+            result = "API网关DELETE method failed to access URL!";
+            e.printStackTrace();
+            log.error("API网关DELETE method failed to access URL，URL：" + url, e);
+        } finally {
+            if (file != null) {
+                file.delete();
+            }
+        }
+
+        return result;
+    }
+
+    /**
+     * PUT方法访问URL
+     *
+     * @param url
+     * @param timeout
+     * @return
+     */
+
+    public static String execPut(String dataType, HttpServletResponse responseOut, boolean success, String instream, String scType, String url, int timeout, Map<String, String> headersMap, Map<String, Object> paramsMap, Map<String, Object> paramsType, List<ServiceInput> serviceInputList) throws IOException {
+        // 创建请求对象，进行初始化设置
+        HttpPut httpPut = new HttpPut(url);
+        RequestConfig requestConfig = RequestConfig.custom().setSocketTimeout(timeout).setConnectTimeout(timeout).build();//设置请求和传输超时时间
+        httpPut.setConfig(requestConfig);
+
+        // 赋值请求头
+        if (StringUtil.isNotEmpty(headersMap)) {
+            for (String key : headersMap.keySet()) {
+                httpPut.addHeader(key, headersMap.get(key));
+            }
+        }
+
+        // 如果参数不为空
+        File file = null;
+        if (paramsMap.size() > 0) {
+            // 复杂Entity构造器
+            MultipartEntityBuilder entityBuilder = MultipartEntityBuilder.create();
+
+            // 遍历Query参数，赋值到 entityBuilder
+            for (Map.Entry<String, Object> entry : paramsMap.entrySet()) {
+                //添加普通参数
+                if (paramsType.get(entry.getKey()).equals(SC_TYPE_FILE)) {
+                    //添加上传的文件
+                    MultipartFile mulFile = (MultipartFile) entry.getValue();
+                    String fileName = mulFile.getOriginalFilename();
+                    file = asFile(mulFile.getInputStream(), fileName);
+                    entityBuilder.addPart(entry.getKey(), new FileBody(file));
+                } else {
+                    entityBuilder.addTextBody(entry.getKey(), (String) entry.getValue());
+                }
+            }
+            HttpEntity httpEntity = entityBuilder.build();
+            httpPut.setEntity(httpEntity);
+
+        } else if (StringUtils.isNotEmpty(instream)) {
+            switch (scType) {
+                case OpenServiceConstants.SC_TYPE_APPLICATION_JSON:
+                    httpPut.addHeader("Content-Type", OpenServiceConstants.content_type_json);
+                    break;
+                case OpenServiceConstants.SC_TYPE_TEXT_XML:
+                    httpPut.addHeader("Content-Type", OpenServiceConstants.content_type_text_xml);
+                    break;
+                default:
+                    httpPut.addHeader("Content-Type", "text/plain");
+                    break;
+            }
+            try {
+                httpPut.setEntity(new StringEntity(instream, "utf-8"));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        // 执行请求
+        String result = "";
+        try {
+            final CloseableHttpClient httpclient = createCloseableHttpClient(url);
+            final CloseableHttpResponse response = httpclient.execute(httpPut);
+            // 请求成功
+            if (response.getStatusLine().getStatusCode() == 200) {
+                success = true;
+            }
+            // 响应Entity
+            HttpEntity entity = response.getEntity();
+            if (StringUtils.equals(dataType, "binary")) {
+                createResponseFile(headersMap, responseOut, response, entity, serviceInputList);
+            } else {
+                result = EntityUtils.toString(entity, "utf-8");
+            }
+            EntityUtils.consume(entity);
+        } catch (Exception e) {
+            result = "API网关PUT method failed to access URL!";
+            e.printStackTrace();
+            log.error("API网关PUT method failed to access URL，URL：" + url, e);
+        } finally {
+            if (file != null) {
+                file.delete();
+            }
+        }
+
+        return result;
     }
 
 }

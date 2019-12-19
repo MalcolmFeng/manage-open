@@ -264,6 +264,13 @@
 						<select id="serviceHttpMethod" name="serviceHttpMethod" style="width: 25%" class="form-control ue-form Validform_input" datatype="s" nullmsg="请选择HTTP Method">
 							<option  value="get" <c:if test="${serviceDef.scHttpMethod eq 'get' }">selected="selected"  </c:if>>GET</option>
 							<option  value="post" <c:if test="${serviceDef.scHttpMethod eq 'post' }">selected="selected"  </c:if>>POST</option>
+                            <option value="delete"
+                                    <c:if test="${serviceDef.scHttpMethod eq 'delete' }">selected="selected"  </c:if>>
+                                DELETE
+                            </option>
+                            <option value="put"
+                                    <c:if test="${serviceDef.scHttpMethod eq 'put' }">selected="selected"  </c:if>>PUT
+                            </option>
 						</select>
 						<span class="Validform_checktip Validform_span" style="float: none"></span>
 					</div>
