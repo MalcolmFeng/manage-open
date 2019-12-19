@@ -16,20 +16,20 @@
     </param-value>
   </context-param>
 
- <context-param>
-    <param-name>keycloak.config.resolver</param-name>
-    <param-value>sdk.security.util.PathBasedKeycloakConfigResolver</param-value>
-  </context-param>
-  <context-param>
-    <param-name>keycloak.config.file</param-name>
-    <param-value>classpath*:/keycloak.json</param-value>
-  </context-param>
+<!-- <context-param>-->
+<!--    <param-name>keycloak.config.resolver</param-name>-->
+<!--    <param-value>sdk.security.util.PathBasedKeycloakConfigResolver</param-value>-->
+<!--  </context-param>-->
+<!--  <context-param>-->
+<!--    <param-name>keycloak.config.file</param-name>-->
+<!--    <param-value>classpath*:/keycloak.json</param-value>-->
+<!--  </context-param>-->
 
   <security-constraint>
     <web-resource-collection>
       <web-resource-name>All Resources</web-resource-name>
-<!--      <url-pattern>/service/*</url-pattern>-->
-<!--      <url-pattern>*.jsp</url-pattern>-->
+      <url-pattern>/service/*</url-pattern>
+      <url-pattern>*.jsp</url-pattern>
     </web-resource-collection>
     <auth-constraint>
       <role-name>*</role-name>
