@@ -114,15 +114,86 @@ public class ServiceMonitorImpl implements IServiceMonitorService {
         return new ModelAndView("service/monitor/api_monitor_info", model);
     }
 
+    /***
+     @Override public ModelAndView getDetailById(String monitorId) {
+     Map<String, Object> model = new HashMap<String, Object>();
+     Map<String, String> queryParam = new HashMap<String, String>();
+     queryParam.put("id", monitorId);
+     if (StringUtil.isEmpty(apiServiceId)) {
+//            apiServiceId = "b983cc8ee7814d2d9d4702fa08f230e7";
+     }
+//        queryParam.put("apiServiceId", apiServiceId);
+     queryParam.put("result", "200");
+     List<ApiServiceMonitor> apiServiceMonitors = serviceMonitorService.query(queryParam);
+     ApiServiceMonitor apiServiceMonitor = null;
+     String isSuccess = "";
+     String totalNumber = "0";
+     String totalPositivePopulation = "0";
+     String totalPositiveRecord = "0";
+     String uploadFile = "";
+     String resultFile = "";
+     if (apiServiceMonitors != null && apiServiceMonitors.size() == 1) {
+     apiServiceMonitor = apiServiceMonitors.get(0);
+     String callerUserId = apiServiceMonitor.getCallerUserId();
+     String callerIp = apiServiceMonitor.getCallerIp();
+     String requestTime = apiServiceMonitor.getRequestTime();
+     String responseTime = apiServiceMonitor.getResponseTime();
+     String openServiceOutput = apiServiceMonitor.getOpenServiceOutput();
+     JSONObject openServiceOutputJson = null;
+     try {
+     openServiceOutputJson = JSON.parseObject(openServiceOutput);
+     } catch (Exception e) {
+     return new ModelAndView("service/monitor/api_monitor_detail", model);
+     }
+     if (openServiceOutputJson == null || openServiceOutputJson.size() == 0) {
+     return new ModelAndView("service/monitor/api_monitor_detail", model);
+     }
+     String data = openServiceOutputJson.getString("data");
+     uploadFile = openServiceOutputJson.getString("fileSourcePath");
+     totalNumber = openServiceOutputJson.getString("authCount");
+     JSONObject instream = new JSONObject();
+     instream.put("content", data);
+     String getLogDataStr = sendPostLogData(getLogDataUrl, instream.toString());
+     if (StringUtil.isEmpty(getLogDataStr)) {
+     model.put("error", "用户模型解密失败，请联系管理员或稍后重试");
+     return new ModelAndView("service/monitor/api_monitor_detail", model);
+     }
+     JSONObject getLogDataJson = null;
+     try {
+     getLogDataJson = JSON.parseObject(getLogDataStr);
+     } catch (Exception e) {
+     model.put("error", "用户模型解密失败，请联系管理员或稍后重试");
+     return new ModelAndView("service/monitor/api_monitor_detail", model);
+     }
+     if (getLogDataJson == null || getLogDataJson.size() == 0) {
+     model.put("error", "用户模型解密失败，请联系管理员或稍后重试");
+     return new ModelAndView("service/monitor/api_monitor_detail", model);
+     }
+     totalPositiveRecord = getLogDataJson.getString("dataCount");
+     totalPositivePopulation = getLogDataJson.getString("realPeopleCount");
+//            resultFile = "../exportExcelById/" + monitorId;
+     resultFile = instream.toString();
+     isSuccess = "success";
+
+     model.put("isSuccess", isSuccess);
+     model.put("callerUserId", callerUserId);
+     model.put("callerIp", callerIp);
+     model.put("requestTime", requestTime);
+     model.put("responseTime", responseTime);
+     model.put("totalNumber", totalNumber);
+     model.put("totalPositivePopulation", totalPositivePopulation);
+     model.put("totalPositiveRecord", totalPositiveRecord);
+     model.put("uploadFile", uploadFile);
+     model.put("resultFile", resultFile);
+     }
+     return new ModelAndView("service/monitor/api_monitor_detail", model);
+     }
+     */
     @Override
     public ModelAndView getDetailById(String monitorId) {
         Map<String, Object> model = new HashMap<String, Object>();
         Map<String, String> queryParam = new HashMap<String, String>();
         queryParam.put("id", monitorId);
-        if (StringUtil.isEmpty(apiServiceId)) {
-//            apiServiceId = "b983cc8ee7814d2d9d4702fa08f230e7";
-        }
-//        queryParam.put("apiServiceId", apiServiceId);
         queryParam.put("result", "200");
         List<ApiServiceMonitor> apiServiceMonitors = serviceMonitorService.query(queryParam);
         ApiServiceMonitor apiServiceMonitor = null;
@@ -153,28 +224,10 @@ public class ServiceMonitorImpl implements IServiceMonitorService {
             totalNumber = openServiceOutputJson.getString("authCount");
             JSONObject instream = new JSONObject();
             instream.put("content", data);
-            String getLogDataStr = sendPostLogData(getLogDataUrl, instream.toString());
-            if (StringUtil.isEmpty(getLogDataStr)) {
-                model.put("error", "用户模型解密失败，请联系管理员或稍后重试");
-                return new ModelAndView("service/monitor/api_monitor_detail", model);
-            }
-            JSONObject getLogDataJson = null;
-            try {
-                getLogDataJson = JSON.parseObject(getLogDataStr);
-            } catch (Exception e) {
-                model.put("error", "用户模型解密失败，请联系管理员或稍后重试");
-                return new ModelAndView("service/monitor/api_monitor_detail", model);
-            }
-            if (getLogDataJson == null || getLogDataJson.size() == 0) {
-                model.put("error", "用户模型解密失败，请联系管理员或稍后重试");
-                return new ModelAndView("service/monitor/api_monitor_detail", model);
-            }
-            totalPositiveRecord = getLogDataJson.getString("dataCount");
-            totalPositivePopulation = getLogDataJson.getString("realPeopleCount");
-//            resultFile = "../exportExcelById/" + monitorId;
+            totalPositiveRecord = openServiceOutputJson.getString("dataCount");
+            totalPositivePopulation = openServiceOutputJson.getString("hasDataPeople");
             resultFile = instream.toString();
             isSuccess = "success";
-
             model.put("isSuccess", isSuccess);
             model.put("callerUserId", callerUserId);
             model.put("callerIp", callerIp);
@@ -188,6 +241,7 @@ public class ServiceMonitorImpl implements IServiceMonitorService {
         }
         return new ModelAndView("service/monitor/api_monitor_detail", model);
     }
+
 
     @Override
     public Map<String, Object> getApiMonitorList(Map<String, String> parameters) {

@@ -85,7 +85,9 @@
 					<label class="control-label">服务类型<span class="required">*</span></label>
 				</div>
 				<div class="col-xs-10 col-md-10 text-left radio" style="margin-top: 5px;">
-					<label><input type="radio" name="apiType" value="interface" <c:if test="${serviceDef.apiType eq 'interface' }"> checked="checked"</c:if>/>接口&emsp;</label>
+                    <label><input type="radio" name="apiType" value="interface" <c:if
+                            test="${serviceDef.apiType eq 'interface' }"> checked="checked"</c:if>
+                            <c:if test="${empty serviceDef.apiType}"> checked="checked"</c:if>/>接口&emsp;</label>
 					<label><input type="radio" name="apiType" value="page" <c:if test="${serviceDef.apiType eq 'page' }"> checked="checked"</c:if>/>页面&emsp;</label>
 				</div>
 			</div>
@@ -106,12 +108,16 @@
     			</div>
     			<div class="col-xs-10 col-md-10 text-left radio" style="margin-top: 5px;">
 					<label><input type="radio" name="authType" value="0" <c:if test="${serviceDef.authType eq 0 }"> checked="checked"</c:if>/>无需授权&emsp;</label>
-					<label><input type="radio" name="authType" value="1" <c:if test="${serviceDef.authType eq 1 || !edit}"> checked="checked"</c:if>/>需要授权&emsp;</label>
+                    <label><input type="radio" name="authType" value="1" <c:if
+                            test="${serviceDef.authType eq 1 || !edit}"> checked="checked"</c:if>
+                            <c:if test="${empty serviceDef.authType}"> checked="checked"</c:if>/>需要授权&emsp;</label>
 				</div>
 			</div>
 				<div class="form-group">
 					<input type="hidden" id="encryptionType" name="encryptionType"
-						   value="${serviceDef.encryptionType }"/>
+                            <c:if test="${not empty serviceDef.encryptionType}"> value="${serviceDef.encryptionType }" </c:if>
+                            <c:if test="${empty serviceDef.encryptionType}"> value="0" </c:if>
+                    />
 					<div class="col-xs-2 col-md-2 control-label">
 						<label class="control-label">加密类型<span class="required">*</span></label>
 					</div>
@@ -135,10 +141,11 @@
 						<label class="control-label">API限流<span class="required">*</span></label>
 					</div>
 					<div class="col-xs-10 col-md-10">
-						<input type="text" style="width: 25%" class="form-control ue-form Validform_input"
-							   id="limitCount"
-							   name="name" value="${serviceDef.limitCount}" placeholder="API限流次数"
-							   datatype="checknum" errormsg="请输入正确的数字" nullmsg="必填"/>
+                        <input type="text" style="width: 25%" class="form-control ue-form Validform_input"
+                               id="limitCount" name="name"
+                                <c:if test="${not empty serviceDef.limitCount}"> value="${serviceDef.limitCount}" </c:if>
+                                <c:if test="${empty serviceDef.limitCount}"> value="5000" </c:if> placeholder="API限流次数"
+                               datatype="checknum" errormsg="请输入正确的数字" nullmsg="必填"/>
 						<span class="Validform_checktip Validform_span">次/秒</span>
 					</div>
 				</div>
@@ -148,7 +155,8 @@
 					</div>
 					<div class="col-xs-10 col-md-10">
 						<input type="hidden" id="topLimitUnit" name="topLimitUnit"
-							   value="${serviceDef.topLimitUnit}"/>
+                                <c:if test="${not empty serviceDef.topLimitUnit}"> value="${serviceDef.topLimitUnit}" </c:if>
+                                <c:if test="${empty serviceDef.topLimitUnit}"> value="day" </c:if>/>
 						<div id="topLimitUnitDiv" style="width: 25%; display: inline-block"></div>
 						<div id="topLimitUnitListDiv" style="width: 10%; display:none"></div>
 						<span class="Validform_checktip Validform_span" style="float: none"></span>
@@ -158,9 +166,12 @@
 					</div>
 					<div class="col-xs-10 col-md-10">
 						<input type="text" style="width: 25%" class="form-control ue-form Validform_input"
-							   id="topLimitCount"
-							   name="topLimitCount" value="${serviceDef.topLimitCount}" placeholder="API限流次数"
-							   datatype="/^[1-9]\d{0,8}$/" errormsg="请输入正确的数字(1~9位正整数)" nullmsg="必填"/>
+                               id="topLimitCount"
+                               name="topLimitCount"
+                                <c:if test="${not empty serviceDef.topLimitCount}"> value="${serviceDef.topLimitCount}" </c:if>
+                                <c:if test="${empty serviceDef.topLimitCount}"> value="5000000" </c:if>
+                               placeholder="API限流次数"
+                               datatype="/^[1-9]\d{0,8}$/" errormsg="请输入正确的数字(1~9位正整数)" nullmsg="必填"/>
 						<span class="Validform_checktip Validform_span">次</span>
 					</div>
 
@@ -228,6 +239,8 @@
 						<label><input type="radio" name="scFrame" value="Axiom"  nullmsg="必填" <c:if test="${serviceDef.scFrame eq 'Axiom' }"> checked="checked"</c:if>/>Axiom</label>
                         <label><input type="radio" name="scFrame" value="RPCAxis" nullmsg="必填" <c:if
                                 test="${serviceDef.scFrame eq 'RPCAxis' }"> checked="checked"</c:if>/>RPCAxis</label>
+                        <label><input type="radio" name="scFrame" value="RPCAxis" nullmsg="必填" <c:if
+                                test="${serviceDef.scFrame eq 'RPCAxis2' }"> checked="checked"</c:if>/>RPCAxis2</label>
 						<span class="Validform_checktip"></span>
 					</div>
 				</div>
@@ -559,8 +572,14 @@
 	    $(function() {
           reNavBar();
 	      register.loadServiceGroupList("${serviceDef.apiGroup}");//初始化分组
-			register.encryptionTypeList("${serviceDef.encryptionType}");//初始化分组
-			register.loadTopLimitUnitList("${serviceDef.topLimitUnit}");//初始化分组
+            if ("${edit}" == "false") {
+                register.encryptionTypeList("0");//初始化加密类型
+                register.loadTopLimitUnitList("day");//初始化时间粒度
+            } else {
+                register.encryptionTypeList("${serviceDef.encryptionType}");//初始化加密类型
+                register.loadTopLimitUnitList("${serviceDef.topLimitUnit}");//初始化时间粒度
+            }
+
 	    $("#saveForm").uValidform({
 	        datatype: {
 	          "verifyExample": verifyExample
