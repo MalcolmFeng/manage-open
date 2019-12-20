@@ -359,8 +359,8 @@
 										</td>
 										<td>
 											<select name="required" onchange="changeEditFlag()">
-												<option value="1" <c:if test="${inparam.scRequired =='1'}">selected="selected"</c:if> >是</option>
-												<option value="0" <c:if test="${inparam.scRequired =='1'}">selected="selected"</c:if> >否</option>
+												<option value="1" <c:if test="${inparam.scRequired =='1'}"> selected="selected"</c:if> >是</option>
+												<option value="0" <c:if test="${inparam.scRequired =='0'}"> selected="selected"</c:if> >否</option>
 											</select>
 										</td>
 										<td>
