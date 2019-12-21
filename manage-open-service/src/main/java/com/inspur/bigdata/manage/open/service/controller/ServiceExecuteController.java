@@ -47,6 +47,7 @@ import org.apache.http.conn.socket.ConnectionSocketFactory;
 import org.apache.http.conn.socket.PlainConnectionSocketFactory;
 import org.apache.http.conn.ssl.NoopHostnameVerifier;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.entity.mime.content.FileBody;
@@ -77,6 +78,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.nio.charset.Charset;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
@@ -1462,7 +1464,8 @@ public class ServiceExecuteController {
                     file = asFile(mulFile.getInputStream(),fileName);
                     entityBuilder.addPart(entry.getKey(),new FileBody(file));
                 }else{
-                    entityBuilder.addTextBody(entry.getKey(), (String)entry.getValue());
+                    ContentType strContent = ContentType.create("text/plain", Charset.forName("UTF-8"));
+                    entityBuilder.addTextBody(entry.getKey(), (String)entry.getValue(),strContent);
                 }
             }
             HttpEntity httpEntity = entityBuilder.build();
