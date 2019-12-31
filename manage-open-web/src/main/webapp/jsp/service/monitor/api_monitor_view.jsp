@@ -94,10 +94,10 @@
         </div>
     </div>
     <div class="row clearfix">
-        <div class="col-md-8 column">
+        <div class="col-md-6 column">
             <div id="dayTotalCountEcharts" style="width: 100%;height:700px;"></div>
         </div>
-        <div class="col-md-4 column">
+        <div class="col-md-6 column">
             <div id="topApiCountEcharts" style="width: 100%;height:700px;"></div>
         </div>
     </div>
