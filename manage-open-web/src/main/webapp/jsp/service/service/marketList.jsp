@@ -59,7 +59,9 @@
 	                	<li><a onclick="reloadServiceListByGroupId('${item.id}')">${item.name}</a></li>
 	                </c:forEach>
 	            </ul>
-			</div> 
+				<input class="btn ue-btn" type="button" value="申请所选API" onclick=loadAppListByMulti() style="float: right">
+			</div>
+
 			<div class="row" id="subGroupList" style="margin-left:10px;"></div>
 		    <div class="row" id="openServiceList" style="margin-top:10px"></div>
 		    <div class="row">
@@ -204,9 +206,27 @@
                     title: "应用列表",
                     url: context + '/jsp/service/applist/apply_list.jsp?openServiceId=' + openServiceId+"&applyFlag="+apply_Flag,
                     width: 700,
-                    height: 400
+                    height:400,
                 });
 			}
+		function loadAppListByMulti() {
+			var cs = $("input[type='checkBox']:checked").serialize()
+			var ids = cs.split("&");//获取所选的id数组
+			var id=[];
+				for (var i=0;i<ids.length;i++){
+					var tempid = ids[i].split("=");
+					id[i]=tempid[1];
+				}
+
+			var apply_Flag="0";
+			$.dialog({
+				type: "iframe",
+				title: "应用列表",
+				url: context + '/jsp/service/applist/apply_list.jsp?openServiceId=' + id+"&applyFlag="+apply_Flag,
+				width: 700,
+				height: 400
+			});
+		}
 			function loadServiceInfo(openServiceId) {
 			  window.location.href = context + "/service/open/api/get/" + openServiceId+"/apply";
 			}
@@ -216,7 +236,7 @@
                <ul class="ue-list-n">
 			     <li>
 			        <div class="ue-list-left">
-			            
+						<input type="checkbox" value={{item.id}} name="id" style="margin-top: 12px">
 			            <div class="ue-list-left-content">
 			                <div class="title"><a onclick="loadServiceInfo('{{item.id}}')">{{item.name}}</a></div>
 			                <div class="desc">版本:{{item.version}}&emsp;简介:{{item.description}}</div>

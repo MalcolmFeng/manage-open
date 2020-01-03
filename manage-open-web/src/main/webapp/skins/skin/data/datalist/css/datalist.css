@@ -36,7 +36,9 @@
 	text-align:center;
 }
 .ue-list-left-content{
-	float:left;margin-left:15px
+	/*float:left;*/
+	margin-left: 29px;
+	margin-top: -21px;
 }
 .ue-list-left-img{
 	float:left;width:64px;height:64px;background-repeat:no-repeat;background-image:url(../img/default-64.png)

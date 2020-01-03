@@ -1,5 +1,6 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" isELIgnored="false"%>
-<%@ taglib uri="/tags/loushang-web" prefix="l"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" isELIgnored="false" %>
+<%@ taglib uri="/tags/loushang-web" prefix="l" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <!DOCTYPE html>
 <html lang="zh-CN">
   <head>
@@ -63,7 +64,7 @@
     
     function applyService(appId,userId, appName) {
       var param = {
-        openServiceId: $("#openServiceId").val(),
+        openServiceId: '${param.openServiceId }',
         applyFlag:$("#applyFlag").val(),
         appId:appId,
         userId: userId,
@@ -119,16 +120,11 @@
 			white-space: nowrap;
 			overflow: hidden;
 		}
-
-	
-
-
 </style>
-
 
 </head>
 <body>
-    <div class="container">
+    <div class="container" style="width: 96%;height: 400px ; padding-top:10px; overflow-y: auto">
         <div class="row">
             <form class="form-inline" onsubmit="return false;">
                 <div class="input-group" style="width:40%">

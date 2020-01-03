@@ -563,8 +563,11 @@ public class ServiceDefController {
     public Map<String, Object> getAppByUserId(@RequestBody Map<String, String> parameters) {
         Map<String, Object> mpMap = new HashMap<String, Object>();
         Map<String, Object> data = new HashMap<String, Object>();
+        String limit = parameters.get("limit");
+        String start = parameters.get("start");
         String userId = OpenServiceConstants.getUserId();
-        String api_service_id = parameters.get("openServiceId");
+        //批量提交时获得多个id
+        String id[]=parameters.get("openServiceId").split(",");
         String apply_flag = parameters.get("applyFlag");
         if (StringUtil.isNotEmpty(parameters.get("appName"))) {
             data.put("appName", parameters.get("appName"));
@@ -574,20 +577,41 @@ public class ServiceDefController {
         }
 
         List<AppInstance> appList = appManage.getappListByUserId(data);
-        data.put("api_service_id", api_service_id);
-        List<AppInstance> appApplyList = appManage.getAppStatusByUserId(data);
-
         boolean flag = false;
         for (int i = 0; i < appList.size(); i++) {
-            AppInstance app = appList.get(i);
-            String app_id = app.getAppId();
-            flag = getApplyForFlag(appApplyList, app_id);
-            app.setApplyFor(flag);
+             for (int j=0;j<id.length;j++){
+                data.put("api_service_id", id[j]);
+                List<AppInstance> appApplyList = appManage.getAppStatusByUserId(data);
+                AppInstance app = appList.get(i);
+                String app_id = app.getAppId();
+                flag = getApplyForFlag(appApplyList, app_id);
+                 app.setApplyFor(flag);
+                if(flag==false){
+                    break;
+                }
 
+            }
+        }
+        //手动分页
+        int it = 0;
+        int count = 0;
+        List<AppInstance> rtndata =new ArrayList<>();
+        for (AppInstance appInstance : appList){
+            // start
+            if (it >= Integer.parseInt(start)){
+                // 计数
+                if ( count >= Integer.parseInt(limit)){
+                    break;
+                }else{
+                    rtndata.add(appInstance);
+                    count++;
+                }
+            }
+            it++;
         }
         int total = PageUtil.getTotalCount();
         mpMap.put("total", total != -1 ? total : appList.size());
-        mpMap.put("data", appList);
+        mpMap.put("data", rtndata);
         return mpMap;
     }
 

@@ -183,6 +183,7 @@ a.cat-item {
     border: none;
     height: 50px;
     padding: 0px;
+    cursor: pointer;
 }
 a.lg-link {
     display: inline-block;

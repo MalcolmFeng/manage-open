@@ -211,54 +211,52 @@ public class ServiceApplyController {
         serviceApply.setApp_id(parameters.get("appId"));
         serviceApply.setApp_name(parameters.get("appName"));
 
-        String openServiceId=parameters.get("openServiceId");
-        ServiceDef serviceDef=serviceDefService.getServiceDef(openServiceId);
-        if(OpenServiceConstants.auth_type_no.equals(serviceDef.getAuthType())){
-            //无需授权
-            serviceApply.setAuth_status(OpenServiceConstants.auth_status_pass);
-            serviceApply.setAuth_user(serviceDef.getProvider());
-            serviceApply.setAuth_time(df.format(new Date()));
-        }else{
-            //需要授权
-            serviceApply.setAuth_status(OpenServiceConstants.auth_status_submit);
-        }
-        serviceApply.setApi_service_id(openServiceId);
-        serviceApply.setApi_service_name(serviceDef.getName());
-        serviceApply.setApi_provider(serviceDef.getProvider());
-        serviceApply.setApplicant(parameters.get("userId"));
-        serviceApply.setApply_time(df.format(new Date()));
-        serviceApply.setApply_flag(parameters.get("applyFlag"));
-
-        Map<String,Object> param=new HashMap<String,Object>();
-        param.put("APPLICANT",parameters.get("userId"));
-        param.put("appId",parameters.get("appId"));
-        param.put("apiServiceId",parameters.get("openServiceId"));
-        List<ServiceApply> service_app=serviceApplyService.getList(param);
-        log.error("====================>:"+service_app);
-        if(0==service_app.size())
-        {//添加
-            serviceApply.setBatch_apply_id(batch_apply_id);
-            String insert_flag=serviceApplyService.insert(serviceApply);
-            if("true".equals(insert_flag))
-            {
-                flag=true;
-            }
-        }else
-        {//更新
-            if("2".equals(service_app.get(0).getAuth_status()))
-            {
-                String id=service_app.get(0).getId();
-                serviceApply=new ServiceApply();
-
-                serviceApply.setId(id);
+        String ids[]=parameters.get("openServiceId").split(",");
+        for (int i=0;i<ids.length;i++) {
+            String openServiceId = ids[i];
+            ServiceDef serviceDef = serviceDefService.getServiceDef(openServiceId);
+            if (OpenServiceConstants.auth_type_no.equals(serviceDef.getAuthType())) {
+                //无需授权
+                serviceApply.setAuth_status(OpenServiceConstants.auth_status_pass);
+                serviceApply.setAuth_user(serviceDef.getProvider());
+                serviceApply.setAuth_time(df.format(new Date()));
+            } else {
+                //需要授权
                 serviceApply.setAuth_status(OpenServiceConstants.auth_status_submit);
-                serviceApply.setApply_time(df.format(new Date()));
-                serviceApplyService.updateById(serviceApply);
-                flag=true;
             }
-            //serviceApplyService.updateServiceApply(serviceApply);
-        }
+            serviceApply.setApi_service_id(openServiceId);
+            serviceApply.setApi_service_name(serviceDef.getName());
+            serviceApply.setApi_provider(serviceDef.getProvider());
+            serviceApply.setApplicant(parameters.get("userId"));
+            serviceApply.setApply_time(df.format(new Date()));
+            serviceApply.setApply_flag(parameters.get("applyFlag"));
 
+            Map<String, Object> param = new HashMap<String, Object>();
+            param.put("APPLICANT", parameters.get("userId"));
+            param.put("appId", parameters.get("appId"));
+            param.put("apiServiceId", openServiceId);
+            List<ServiceApply> service_app = serviceApplyService.getList(param);
+            log.error("====================>:" + service_app);
+            if (0 == service_app.size()) {//添加
+                serviceApply.setBatch_apply_id(batch_apply_id);
+                String insert_flag = serviceApplyService.insert(serviceApply);
+                if ("true".equals(insert_flag)) {
+                    flag = true;
+                }
+            } else {//更新
+                if ("2".equals(service_app.get(0).getAuth_status())) {
+                    String id = service_app.get(0).getId();
+                    serviceApply = new ServiceApply();
+
+                    serviceApply.setId(id);
+                    serviceApply.setAuth_status(OpenServiceConstants.auth_status_submit);
+                    serviceApply.setApply_time(df.format(new Date()));
+                    serviceApplyService.updateById(serviceApply);
+                    flag = true;
+                }
+//                serviceApplyService.updateServiceApply(serviceApply);
+            }
+        }
         return flag;
     }
 
