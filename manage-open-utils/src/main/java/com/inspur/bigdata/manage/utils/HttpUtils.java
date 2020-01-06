@@ -16,6 +16,8 @@ import javax.net.ssl.SSLSession;
 import javax.net.ssl.SSLSocket;
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
@@ -47,6 +49,7 @@ import org.apache.http.util.EntityUtils;
  * @see : TODO
  */
 public class HttpUtils {
+    private static final Log log = LogFactory.getLog(HttpUtils.class);
 	private static PoolingHttpClientConnectionManager connMgr;
 	private static RequestConfig requestConfig;
 	private static final int MAX_TIMEOUT = 50000;
@@ -216,14 +219,13 @@ public class HttpUtils {
 
 
 	/**
-	 * 发送 SSL POST 请求（HTTPS），K-V形式
+     * 发送 SSL GET 请求（HTTPS），?K=V形式
 	 * @param apiUrl API接口URL
 	 * @param params 参数map
 	 * @return
 	 */
-	public static HttpResponse doGetSSL(String apiUrl, Map<String, Object> params) {
+    public static String doGetSSL(String apiUrl, Map<String, Object> params) {
 		CloseableHttpClient httpclient = HttpClients.custom().setSSLSocketFactory(createSSLConnSocketFactory()).setConnectionManager(connMgr).setDefaultRequestConfig(requestConfig).build();
-
 		StringBuffer param = new StringBuffer();
 		int i = 0;
 		for (String key : params.keySet()) {
@@ -236,15 +238,27 @@ public class HttpUtils {
 		}
 		apiUrl += param;
 		String result = null;
-		HttpResponse response = null;
+        CloseableHttpResponse response = null;
 		try {
 			HttpGet httpGet = new HttpGet(apiUrl);
 			response = httpclient.execute(httpGet);
+            if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
+                result = EntityUtils.toString(response.getEntity(), "UTF-8");
+            } else {
+                log.error(EntityUtils.toString(response.getEntity(), "UTF-8"));
+            }
 		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
-		return response;
-
+            log.error(e.getMessage());
+        } finally {
+            if (response != null) {
+                try {
+                    response.close();
+                } catch (IOException e) {
+                    log.error(e.getMessage());
+                }
+            }
+        }
+        return result;
 	}
 
 	/**
@@ -353,7 +367,7 @@ public class HttpUtils {
 		}
 		// 如果是多级代理，那么取第一个ip为客户ip
 		if (ip != null && ip.indexOf(",") != -1) {
-			ip = ip.substring(ip.lastIndexOf(",") + 1, ip.length()).trim();
+            ip = ip.substring(ip.lastIndexOf(",") + 1).trim();
 		}
 		return ip;
 	}

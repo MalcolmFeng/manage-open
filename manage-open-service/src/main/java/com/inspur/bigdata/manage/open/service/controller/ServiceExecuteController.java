@@ -314,7 +314,7 @@ public class ServiceExecuteController {
         ApiServiceMonitor apiServiceMonitor = new ApiServiceMonitor();
         String logId = UUIDGenerator.getUUID();
         apiServiceMonitor.setId(logId);
-        System.out.println(logId+" ---- "+new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()) +" ---- "+ "1.接受请求");
+        log.info(logId + " **************** 1.接受请求 ****************");
         try {
             /**获取请求者IP*/
             String requestIp = ApiServiceMonitorUtil.getClientIp(request);
@@ -346,7 +346,7 @@ public class ServiceExecuteController {
                 apiServiceMonitor.setResult(ASM_ERROR_IP_REFUSE);
                 return;
             }
-            System.out.println(logId+" ---- "+new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()) +" ---- "+ "2.IP黑名单校验结束");
+            log.info(logId + " ---- 2.IP黑名单校验结束");
             //  ---------------- IP黑名单 end ----------------
 
 
@@ -390,7 +390,7 @@ public class ServiceExecuteController {
             requestUserId = appList.get(0).getUserId();
             apiServiceMonitor.setCallerAppId(appId);
             apiServiceMonitor.setCallerUserId(requestUserId);
-            System.out.println(logId+" ---- "+new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()) +" ---- "+ "3.查询应用信息结束");
+            log.info(logId + " ---- 3.查询应用信息结束");
             // ---------------- 查询APP end ----------------
 
 
@@ -403,7 +403,7 @@ public class ServiceExecuteController {
                 apiServiceMonitor.setResult(ASM_ERROR_SIGNATURE);
                 return;
             }
-            System.out.println(logId+" ---- "+new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()) +" ---- "+ "4.验证签名结束");
+            log.info(logId + " ---- 4.验证签名结束");
             // ---------------- 判断签名正确性 end ----------------
 
 
@@ -426,7 +426,7 @@ public class ServiceExecuteController {
                 apiServiceMonitor.setResult(ASM_ERROR_SERVICE_NO_PASS);
                 return;
             }
-            System.out.println(logId+" ---- "+new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()) +" ---- "+ "5.API是否存在和状态结束");
+            log.info(logId + " ---- 5.API是否存在和状态结束");
             // ----------------通过context,reqPath关联查询API是否存在和状态 end ----------------
 
 
@@ -474,7 +474,7 @@ public class ServiceExecuteController {
                     }
                 }
             }
-            System.out.println(logId+" ---- "+new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()) +" ---- "+ "6.判断余额结束");
+            log.info(logId + " ---- 6.判断余额结束");
             // ---------------- 余额判断 end ----------------
 
 
@@ -499,7 +499,7 @@ public class ServiceExecuteController {
                 apiServiceMonitor.setResult(ASM_ERROR_PARAMETER);
                 return;
             }
-            System.out.println(logId+" ---- "+new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()) +" ---- "+ "7.入参初始化结束");
+            log.info(logId + " ---- 7.入参初始化结束");
             // ---------------- 入参初始化 end ----------------
 
 
@@ -507,7 +507,7 @@ public class ServiceExecuteController {
             String key = apiContext+"/"+reqPath;
             // 如果是首次请求
             if (map.get(key) == null){
-                log.info("apiService: "+ JSON.toJSONString(serviceDef));
+                log.debug("apiService: " + JSON.toJSONString(serviceDef));
                 map.putIfAbsent(key, RateLimiter.create( serviceDef != null ? serviceDef.getLimitCount() : default_limitCount ));
             }
             // 进行限流
@@ -561,7 +561,7 @@ public class ServiceExecuteController {
                         result_str = AxisClientUtil.executeRPCAxisClient(success, serviceDef, listServiceInput, apiServiceMonitor);
                     }
                 } else {
-                    System.out.println(logId+" ---- "+new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()) +" ---- "+ "8.doRequest开始");
+                    log.info(logId + " ---- 8.doRequest开始");
                     result_str = doRequest(response,success, instream, serviceDef, listServiceInput, apiServiceMonitor);
                 }
                 response.addHeader("Content-Type", OpenServiceConstants.getContentType(serviceDef.getContentType()));
@@ -599,9 +599,6 @@ public class ServiceExecuteController {
             responseTime = DateUtil.getCurrentTime2();
             long serviceTime = System.currentTimeMillis() - startTime;
             apiServiceMonitor.setServiceTotalTime((int) serviceTime);
-            if (log.isDebugEnabled()) {
-                log.debug("调用api执行的时间" + (serviceTime) + "毫秒");
-            }
             // 扣款
             if (success) {
                 if (requestUserId != null && servicePrice != null) {
@@ -614,6 +611,7 @@ public class ServiceExecuteController {
             apiServiceMonitor.setResponseTime(responseTime);
             apiServiceMonitor.setCreateTime(DateUtil.getCurrentTime2());
             ApiServiceMonitorUtil.insertByThreadPool(monitorService, apiServiceMonitor, monitorExecutorService);
+            log.info(apiServiceMonitor.getId() + " ---- 14.finally api总执行时间" + (serviceTime) + "毫秒");
         }
     }
 
@@ -741,7 +739,7 @@ public class ServiceExecuteController {
     private String executeRPC(boolean success,ServiceDef ws, List<ServiceInput> serviceInputList) throws AxisFault {
         RPCServiceClient serviceClient = new RPCServiceClient();
 
-        System.out.println("***************************:  " + ws.getScAddr());
+        log.debug("***************************:  " + ws.getScAddr());
         EndpointReference targetEPR = new EndpointReference(ws.getScAddr());
         Options options = serviceClient.getOptions();
 
@@ -750,7 +748,7 @@ public class ServiceExecuteController {
         options.setAction(ws.getNameSpace() + "/" + ws.getSc_ws_function());
         QName qname = new QName(ws.getNameSpace(), ws.getSc_ws_function());
 
-        System.out.println("%%%%%%%%%%%%%%%%%%%%%%%%%%%:  " + ws.getNameSpace() + "/" + ws.getSc_ws_function());
+        log.debug("%%%%%%%%%%%%%%%%%%%%%%%%%%%:  " + ws.getNameSpace() + "/" + ws.getSc_ws_function());
         Object[] parameters = null;
         if (serviceInputList !=null){
             parameters = new Object[serviceInputList.size()];
@@ -770,7 +768,7 @@ public class ServiceExecuteController {
 //                for (Map.Entry<String, Object> entry : param.entrySet()) {
 //                    String mapKey = (String)entry.getKey();
 //                    String mapValue = entry.getValue().toString();
-//                    System.out.println(mapKey + ":" + mapValue);
+//                    log.debug(mapKey + ":" + mapValue);
 //
 //                    parameters[j++] = mapValue;
 //                }
@@ -781,16 +779,16 @@ public class ServiceExecuteController {
 //            parameters = new Object[] { null };
 //        }
         try{
-            System.out.println("############################:  " + parameters[0]);
+            log.debug("############################:  " + parameters[0]);
         }catch (Exception e){
-            System.out.println(e.toString());
+            log.error(e.toString());
         }
 
         OMElement element = serviceClient.invokeBlocking(qname, parameters);
 
         String result = getResults(element);
 
-        System.out.println("result::::::::::::::::::::::" + result);
+        log.debug("result::::::::::::::::::::::" + result);
         return result;
     }
 
@@ -907,7 +905,7 @@ public class ServiceExecuteController {
         while (iterator.hasNext()) {
             OMElement item = iterator.next();
             String xmlOld = item.toString();
-            System.out.println("xmlOld:" + xmlOld);
+            log.debug("xmlOld:" + xmlOld);
             if (xmlOld.contains("jythis")){
                 String xmlNew1 = xmlOld.replace("&lt;","<").replace("&#xd","").replace(";","").replace("</ns1:out>","");
 
@@ -920,7 +918,7 @@ public class ServiceExecuteController {
                 while (innerItr.hasNext()) {
                     OMElement elem = (OMElement)innerItr.next();
 
-                    System.out.println("\t\t" + elem.getLocalName() + ": " + elem.getText());
+                    log.debug("\t\t" + elem.getLocalName() + ": " + elem.getText());
                     data.put(elem.getLocalName(), elem.getText());
                     list.add(data);
                     data = new HashMap<String, String>();
@@ -939,7 +937,7 @@ public class ServiceExecuteController {
             for (ServiceInput serviceInput : listServiceInput) {
                 String paramType = serviceInput.getScParamType();
                 if (paramType.equalsIgnoreCase("body")) {
-                    System.out.println(serviceInput.getScType() + ":" + serviceInput.getValue());
+                    log.debug(serviceInput.getScType() + ":" + serviceInput.getValue());
                     params[i++] = serviceInput.getName();
                 }
             }
@@ -956,7 +954,7 @@ public class ServiceExecuteController {
 //            for (Map.Entry<String, Object> entry : param.entrySet()) {
 //                String mapKey = (String)entry.getKey();
 //                String mapValue = entry.getValue().toString();
-//                System.out.println(mapKey + ":" + mapValue);
+//                log.debug(mapKey + ":" + mapValue);
 //                paramValues[j++] = mapValue;
 //            }
             OMElement getPricePayload = buildParam(ws.getNameSpace(), params, paramValues, "tn", ws.getSc_ws_function(), "tn");
@@ -972,14 +970,14 @@ public class ServiceExecuteController {
 
             OMElement result = sender.sendReceive(getPricePayload);
             String response = result.getFirstElement().getText();
-            System.out.println("Current price of WSO: " + response);
+            log.debug("Current price of WSO: " + response);
             success = true;
             return response;
         } catch (AxisFault e) {
             log.error("axis2执行异常", e);
             throw e;
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.getMessage());
         }
         return null;
     }
@@ -1035,9 +1033,9 @@ public class ServiceExecuteController {
             String paramPositionType = serviceInput.getScParamType();
 
             // 入参解密
-            System.out.println(apiServiceMonitor.getId()+" ---- "+new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()) +" ---- "+ "9.解密开始");
+            log.info(apiServiceMonitor.getId() + " ---- 9.解密开始");
             Object decryptedParam = decryptedParam(serviceInput, serviceDef.getEncryptionType());
-            System.out.println(apiServiceMonitor.getId()+" ---- "+new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()) +" ---- "+ "10.解密结束");
+            log.info(apiServiceMonitor.getId() + " ---- 10.解密结束 ---- 解密结果为[" + decryptedParam + "]");
             if (decryptedParam!=null){
                 serviceInputParam.put(paramsName, decryptedParam.toString());
             }
@@ -1075,24 +1073,24 @@ public class ServiceExecuteController {
         apiServiceMonitor.setServiceMethod(method);
         switch (method) {
             case "GET":
-                System.out.println(apiServiceMonitor.getId()+" ---- "+new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()) +" ---- "+ "11.执行get转发开始");
+                log.info(apiServiceMonitor.getId() + " ---- 11.执行get转发开始");
                 result = execGet(dataType,response,success, httpurl.toString(), timeout, headerMap,paramsMap,listServiceInput);
-                System.out.println(apiServiceMonitor.getId()+" ---- "+new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()) +" ---- "+ "12.执行post转发结束");
+                log.info(apiServiceMonitor.getId() + " ---- 12.执行post转发结束");
                 break;
             case "POST":
-                System.out.println(apiServiceMonitor.getId()+" ---- "+new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()) +" ---- "+ "11.执行post转发开始");
+                log.info(apiServiceMonitor.getId() + " ---- 11.执行post转发开始");
                 result = execPost(dataType,response,success, instream, scType, httpurl.toString(), timeout, headerMap, paramsMap, paramsTypeMap,listServiceInput);
-                System.out.println(apiServiceMonitor.getId()+" ---- "+new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()) +" ---- "+ "12.执行post转发结束");
+                log.info(apiServiceMonitor.getId() + " ---- 12.执行post转发结束");
                 break;
             case "DELETE":
-                System.out.println(apiServiceMonitor.getId() + " ---- " + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()) + " ---- " + "11.执行DELETE转发开始");
+                log.info(apiServiceMonitor.getId() + " ---- 11.执行DELETE转发开始");
                 result = execDelete(dataType, response, success, instream, scType, httpurl.toString(), timeout, headerMap, paramsMap, paramsTypeMap, listServiceInput);
-                System.out.println(apiServiceMonitor.getId() + " ---- " + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()) + " ---- " + "12.执行DELETE转发结束");
+                log.info(apiServiceMonitor.getId() + " ---- 12.执行DELETE转发结束");
                 break;
             case "PUT":
-                System.out.println(apiServiceMonitor.getId() + " ---- " + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()) + " ---- " + "11.执行put转发开始");
+                log.info(apiServiceMonitor.getId() + " ---- 11.执行put转发开始");
                 result = execPut(dataType, response, success, instream, scType, httpurl.toString(), timeout, headerMap, paramsMap, paramsTypeMap, listServiceInput);
-                System.out.println(apiServiceMonitor.getId() + " ---- " + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()) + " ---- " + "12.执行put转发结束");
+                log.info(apiServiceMonitor.getId() + " ---- 12.执行put转发结束");
                 break;
             default:
                 result = "{error:404}";
@@ -1100,7 +1098,7 @@ public class ServiceExecuteController {
         apiServiceMonitor.setServiceOutput(result);
 
         result = encryptionResult(result, serviceDef.getEncryptionType());
-        System.out.println(apiServiceMonitor.getId()+" ---- "+new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()) +" ---- "+ "13.执行结束");
+        log.info(apiServiceMonitor.getId() + " ---- 13.执行结束");
         return result;
     }
 
@@ -1763,7 +1761,7 @@ public class ServiceExecuteController {
     }
 
     public static String callCxf(String wsdl, String namespaceURI, String localPart, String xmlStr) throws Exception {
-        System.out.println("wsdl = [" + wsdl + "], namespaceURI = [" + namespaceURI + "], localPart = [" + localPart + "], xmlStr = [" + xmlStr + "]");
+        log.debug("wsdl = [" + wsdl + "], namespaceURI = [" + namespaceURI + "], localPart = [" + localPart + "], xmlStr = [" + xmlStr + "]");
         JaxWsDynamicClientFactory dcf = JaxWsDynamicClientFactory.newInstance();
         org.apache.cxf.endpoint.Client client = dcf.createClient(wsdl);
         // url为调用webService的wsdl地址

@@ -1,6 +1,8 @@
 package com.inspur.bigdata.manage.utils;
 
 import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpResponse;
 import org.apache.http.util.EntityUtils;
 import sun.misc.BASE64Decoder;
@@ -16,6 +18,7 @@ import java.util.Map;
  * 加密工具类
  */
 public class EncryptionUtil {
+    private static final Log log = LogFactory.getLog(EncryptionUtil.class);
     public static final String KEY_SHA = "SHA";
     public static final String KEY_MD5 = "MD5";
 
@@ -104,19 +107,19 @@ public class EncryptionUtil {
     }
 
     private static String crypt(String url, String name, String value) {
+        String result = null;
         try {
             Map<String, Object> params = new HashMap<>();
 //            params.put(name, value);
             params.put("content", URLEncoder.encode(value));
-            HttpResponse response = HttpUtils.doGetSSL(url,params);
-            if (response.getStatusLine().getStatusCode() == 200) {
-                String entity = EntityUtils.toString(response.getEntity(), "UTF-8");
-                return entity;
+            result = HttpUtils.doGetSSL(url, params);
+            if (StringUtil.isEmpty(result)) {
+                log.error("参数Rest解密异常.");
             }
         } catch (Exception e) {
-            System.out.println("参数Rest解密异常：" + e.toString());
+            log.error("参数Rest解密异常：" + e.getMessage());
         }
-        return null;
+        return result;
     }
 
 
