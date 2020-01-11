@@ -54,6 +54,8 @@ public class HttpUtils {
 	private static RequestConfig requestConfig;
 	private static final int MAX_TIMEOUT = 50000;
 
+	static SSLConnectionSocketFactory sslConnectionSocketFactory;
+
 	static {
 		// 设置连接池
 		connMgr = new PoolingHttpClientConnectionManager();
@@ -71,6 +73,8 @@ public class HttpUtils {
 		// 在提交请求之前 测试连接是否可用
 		//        configBuilder.setStaleConnectionCheckEnabled(true);
 		requestConfig = configBuilder.build();
+
+		sslConnectionSocketFactory = createSSLConnSocketFactory();
 	}
 
 	/**
@@ -225,7 +229,7 @@ public class HttpUtils {
 	 * @return
 	 */
     public static String doGetSSL(String apiUrl, Map<String, Object> params) {
-		CloseableHttpClient httpclient = HttpClients.custom().setSSLSocketFactory(createSSLConnSocketFactory()).setConnectionManager(connMgr).setDefaultRequestConfig(requestConfig).build();
+		CloseableHttpClient httpclient = HttpClients.custom().setSSLSocketFactory(sslConnectionSocketFactory).setConnectionManager(connMgr).setDefaultRequestConfig(requestConfig).build();
 		StringBuffer param = new StringBuffer();
 		int i = 0;
 		for (String key : params.keySet()) {
@@ -248,7 +252,7 @@ public class HttpUtils {
                 log.error(EntityUtils.toString(response.getEntity(), "UTF-8"));
             }
 		} catch (IOException e) {
-            log.error(e.getMessage());
+			log.error(e.toString());
         } finally {
             if (response != null) {
                 try {
@@ -268,7 +272,7 @@ public class HttpUtils {
 	 * @return
 	 */
 	public static String doPostSSL(String apiUrl, Object json) {
-		CloseableHttpClient httpClient = HttpClients.custom().setSSLSocketFactory(createSSLConnSocketFactory()).setConnectionManager(connMgr).setDefaultRequestConfig(requestConfig).build();
+		CloseableHttpClient httpClient = HttpClients.custom().setSSLSocketFactory(sslConnectionSocketFactory).setConnectionManager(connMgr).setDefaultRequestConfig(requestConfig).build();
 		HttpPost httpPost = new HttpPost(apiUrl);
 		CloseableHttpResponse response = null;
 		String httpStr = null;

@@ -426,7 +426,7 @@ public class ServiceExecuteController {
                 apiServiceMonitor.setResult(ASM_ERROR_SERVICE_NO_PASS);
                 return;
             }
-            log.info(logId + " ---- 5.API是否存在和状态结束");
+            log.info(logId + " ---- 5.API是否存在和状态结束[" + apiServiceId + "][" + serviceDef.getName() + "]");
             // ----------------通过context,reqPath关联查询API是否存在和状态 end ----------------
 
 
@@ -1075,7 +1075,7 @@ public class ServiceExecuteController {
             case "GET":
                 log.info(apiServiceMonitor.getId() + " ---- 11.执行get转发开始");
                 result = execGet(dataType,response,success, httpurl.toString(), timeout, headerMap,paramsMap,listServiceInput);
-                log.info(apiServiceMonitor.getId() + " ---- 12.执行post转发结束");
+                log.info(apiServiceMonitor.getId() + " ---- 12.执行get转发结束");
                 break;
             case "POST":
                 log.info(apiServiceMonitor.getId() + " ---- 11.执行post转发开始");
