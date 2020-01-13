@@ -99,7 +99,8 @@ public class ServiceMonitorImpl implements IServiceMonitorService {
             inputParam = jsonToServiceInputList(openServiceInput);
             String ServiceInput = apiServiceMonitor.getServiceInput();
             serviceInputsParam = jsonToServiceInputList(ServiceInput);
-            if (OpenServiceConstants.getUserId().equals(apiServiceMonitor.getCallerUserId()) || OpenServiceConstants.isSuperAdmin(OpenServiceConstants.getRealm())) {
+            if ((OpenServiceConstants.getUserId() != null && OpenServiceConstants.getUserId().equals(apiServiceMonitor.getCallerUserId()))
+                    || OpenServiceConstants.isSuperAdmin(OpenServiceConstants.getRealm())) {
                 canViewBackEnd = true;
             }
         } else {
