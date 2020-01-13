@@ -1179,6 +1179,30 @@ public class ServiceDefController {
     }
 
 
+    @RequestMapping(value = "/getApiListByUserIdNew", method = RequestMethod.POST)
+    @ResponseBody
+    public Map<String, Object> getApiListByUserIdNew(@RequestBody Map<String, Object> parameters) {
+        Map<String, Object> mpMap = new HashMap<String, Object>();
+//        Map<String, Object> parameters = new HashMap<String, Object>();
+        parameters.put("provider", OpenServiceConstants.getUserId());
+        List<String> status = new ArrayList<String>();
+        status.add("0");
+        status.add("3");
+        status.add("4");
+        parameters.put("auditStatus", status);
+        List<ServiceDef> ServiceDefs = serviceDefService.listAPIByProvider(parameters);
+        if (StringUtil.isEmpty(ServiceDefs)) {
+            mpMap.put("total", 0);
+            mpMap.put("data", new ArrayList<ServiceDef>());
+            return mpMap;
+        }
+        // 排序
+        int total = PageUtil.getTotalCount();
+        mpMap.put("total", total != -1 ? total : ServiceDefs.size());
+        mpMap.put("data", ServiceDefs);
+
+        return mpMap;
+    }
     @RequestMapping(value = "/getApiListByUserId")
     @ResponseBody
     public Map<String, Object> getApiListByUserId() {
